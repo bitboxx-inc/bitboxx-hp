@@ -15,24 +15,32 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v2
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v2
         with:
-          node-version: '20'
-
+          node-version: '16'
       - name: Install dependencies
         run: npm install
-
-      - name: Build Svelte site
+      - name: Build
         run: npm run build
-      
+      - name: Upload artifact for deployment
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifact
+          path: ./dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifact
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
-        with:
-          build-directory: 'build'
+
