@@ -33,7 +33,3 @@ jobs:
 
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
-        with:
-        # この`with`セクションは不要で、設定する必要のあるオプションはありません。
-        # GitHub Pagesのデプロイアクションは自動的にビルドされたファイルを識別し、
-        # デプロイします。
