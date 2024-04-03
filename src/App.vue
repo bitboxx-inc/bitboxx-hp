@@ -9,11 +9,11 @@
       <v-btn
           v-if="$vuetify.display.mdAndUp"
           v-for="item in links" :key="item.name"
-          class="ml-2"
+          class="mx-1"
           density="compact"
           variant="text"
           :to="item.path">{{ item.name }}</v-btn>
-      <v-app-bar-nav-icon v-else @click="showDrawer = !showDrawer"></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon density="compact" v-else @click="showDrawer = !showDrawer" class="mx-1" />
       <v-spacer/>
     </v-app-bar>
 
