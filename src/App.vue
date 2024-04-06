@@ -48,7 +48,8 @@
 
 <script lang="ts" setup>
 
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
+import router from "@/router";
 
 const showDrawer = ref(false);
 
@@ -70,4 +71,9 @@ const links = [
     "path": ""
   }
 ]
+
+// TODO あとではずす
+onMounted(() => {
+  window.location.href = 'https://tools.bitboxx.co.jp'
+})
 </script>
