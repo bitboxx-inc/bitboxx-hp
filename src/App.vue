@@ -73,7 +73,7 @@ const links = [
 ]
 
 // TODO あとではずす
-onMounted(() => {
-  window.location.href = 'https://tools.bitboxx.co.jp'
-})
+// onMounted(() => {
+//   window.location.href = 'https://tools.bitboxx.co.jp'
+// })
 </script>
