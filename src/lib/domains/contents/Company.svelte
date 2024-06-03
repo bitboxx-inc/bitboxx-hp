@@ -52,7 +52,13 @@
                     <span style="letter-spacing: 8px;">主な業務</span>
                 </th>
                 <td>
-                    <div class="w-full p-4" style="font-size: 16px;">代表取締役CEO　影島 翔</div>
+                    <div class="w-full p-4" style="font-size: 16px;">
+                        <ul>
+                            <li>・自社サービス開発</li>
+                            <li>・システム開発、ウェブサイト制作/運用</li>
+                            <li>・デザイン</li>
+                        </ul>
+                    </div>
                 </td>
             </tr>
             </tbody>

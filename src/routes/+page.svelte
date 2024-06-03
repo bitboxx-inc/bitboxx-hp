@@ -5,6 +5,7 @@
     import Company from "$lib/domains/contents/Company.svelte";
     import Works from "$lib/domains/contents/Works.svelte";
     import ThreeCube from "./ThreeCube.svelte";
+    import Contact from "$lib/domains/contents/Contact.svelte";
 
     let contents = [
         {
@@ -47,5 +48,13 @@
     <!-- COMPANY -->
     <Company/>
 
-    <ThreeCube/>
+    <!-- CONTACT -->
+    <Contact/>
+
+    <footer>
+        <div class="flex justify-center py-12" style="font-family: 'Noto Sans JP'">
+            2024 &copy; bitboxx inc.
+        </div>
+    </footer>
 </div>
+

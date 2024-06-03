@@ -6,7 +6,10 @@
 
 <script lang="ts">
     import "../app.css";
+    import ThreeCube from "./ThreeCube.svelte";
     export const prerender = true;
 </script>
 
 <slot></slot>
+
+<ThreeCube/>

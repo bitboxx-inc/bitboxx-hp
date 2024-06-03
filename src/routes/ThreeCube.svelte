@@ -56,7 +56,8 @@
         ];
         const geometry = new THREE.BoxGeometry();
         cube = new THREE.Mesh(geometry, materials);
-        scene.add(cube);
+        // TODO 正六面体を追加する場合
+        // scene.add(cube);
 
         // エッジの追加
         const edges = new THREE.EdgesGeometry(geometry);

@@ -2,12 +2,14 @@
     import BitboxxTypography from "$lib/infras/BitboxxTypography.svelte";
 
     export let num = 0;
+    export let fontSizePx = 96;
+    export let widthPx = 88;
 </script>
 
-<span class="rect-before">
-    <BitboxxTypography fontSizePx={96} outlined={true} widthPx={88}>{String(num).padStart(2, '0')}</BitboxxTypography>
+<span class={`${fontSizePx === 96 ? 'rect-before' : ''} `}>
+    <BitboxxTypography fontSizePx={fontSizePx} outlined={true} widthPx={widthPx}>{String(num).padStart(2, '0')}</BitboxxTypography>
 </span>
-<BitboxxTypography fontSizePx={96}><slot/></BitboxxTypography>
+<BitboxxTypography fontSizePx={fontSizePx}><slot/></BitboxxTypography>
 
 <style lang="css">
     .rect-before::before {
