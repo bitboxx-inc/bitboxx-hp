@@ -1,0 +1,46 @@
+<script>
+    import BitboxxContentTitle from "$lib/infras/BitboxxContentTitle.svelte";
+    import BitboxxContent from "$lib/infras/BitboxxContent.svelte";
+    import BitboxxTypography from "$lib/infras/BitboxxTypography.svelte";
+</script>
+
+<BitboxxContent id={"service"}>
+    <div class="absolute top-0 left-0">
+        <BitboxxContentTitle num={2}>SERVICE</BitboxxContentTitle>
+    </div>
+    <div class="max-w-screen-xl flex justify-center items-center">
+        <table class="table-auto w-full">
+            <tbody>
+            <tr class="border-b-2 border-black" style="height: 190px;">
+                <th class="p-8 m-24">
+                    <BitboxxTypography fontSizePx={32}>自社サービス開発</BitboxxTypography>
+                </th>
+                <td style="font-size: 24px;">
+                    ニーズに合わせた独自のソリューションを開発。最先端の技術と豊富な経験を活かし、ビジネスの成長をサポート。
+                </td>
+            </tr>
+            <tr class="border-b-2 border-black" style="height: 190px;">
+                <th class="p-8 m-24">
+                    <BitboxxTypography fontSizePx={32}>
+                        システム開発<br/>
+                        ウェブサイト制作/運用
+                    </BitboxxTypography>
+                </th>
+                <td style="font-size: 24px;">
+                    高性能なシステム開発と魅力的なウェブサイトの制作・運用を一貫して提供。効率的で使いやすいデジタル環境を構築します。
+                </td>
+            </tr>
+            <tr class="border-b-2 border-black" style="height: 190px;">
+                <th class="p-8 m-24">
+                    <BitboxxTypography fontSizePx={32}>
+                        デザイン設計
+                    </BitboxxTypography>
+                </th>
+                <td style="font-size: 24px;">
+                    視覚的に優れたデザインを通じて、ブランドの魅力を最大限に引き出します。ユーザー体験を重視した設計で、印象的なデジタルプレゼンスを実現。
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</BitboxxContent>
