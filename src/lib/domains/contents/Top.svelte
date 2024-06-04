@@ -4,6 +4,7 @@
     import { writable } from "svelte/store";
     import Display from "$lib/infras/Display.svelte";
     import Humberger from "$lib/domains/contents/Humberger.svelte";
+    import FadeIn from "$lib/infras/fade/FadeIn.svelte";
 
     export let contents: { link: string; title: string }[] = [];
     const hoverState = writable<number | null>(null);
@@ -26,16 +27,18 @@
             <div class="flex-1 relative">
                 {#each contents as content, index}
                     <div class="hover-container" style="line-height: 0.85">
-                        <a href={content.link}
-                           class="hover-effect"
-                           on:mouseenter={() => handleMouseEnter(index)}
-                           on:mouseleave={handleMouseLeave}>
-                            <BitboxxTypography widthPx={88} fontSizePx={160} outlined={true}>
-                                {String(index + 1).padStart(2, '0')}
-                            </BitboxxTypography>
-                            <BitboxxTypography fontSizePx={160}>&nbsp;</BitboxxTypography>
-                            <BitboxxTypography fontSizePx={160}>{content.title}</BitboxxTypography>
-                        </a>
+                        <FadeIn>
+                            <a href={content.link}
+                               class="hover-effect"
+                               on:mouseenter={() => handleMouseEnter(index)}
+                               on:mouseleave={handleMouseLeave}>
+                                <BitboxxTypography widthPx={88} fontSizePx={160} outlined={true}>
+                                    {String(index + 1).padStart(2, '0')}
+                                </BitboxxTypography>
+                                <BitboxxTypography fontSizePx={160}>&nbsp;</BitboxxTypography>
+                                <BitboxxTypography fontSizePx={160}>{content.title}</BitboxxTypography>
+                            </a>
+                        </FadeIn>
                         {#if $hoverState === index}
                             <div class="hover-line"></div>
                         {/if}
@@ -52,16 +55,18 @@
             <div class="flex-1 relative">
                 {#each contents as content, index}
                     <div class="hover-container" style="line-height: 0.85">
-                        <a href={content.link}
-                           class="hover-effect"
-                           on:mouseenter={() => handleMouseEnter(index)}
-                           on:mouseleave={handleMouseLeave}>
-                            <BitboxxTypography widthPx={48} fontSizePx={80} outlined={true}>
-                                {String(index + 1).padStart(2, '0')}
-                            </BitboxxTypography>
-                            <BitboxxTypography fontSizePx={80}>&nbsp;</BitboxxTypography>
-                            <BitboxxTypography fontSizePx={80}>{content.title}</BitboxxTypography>
-                        </a>
+                        <FadeIn>
+                            <a href={content.link}
+                               class="hover-effect"
+                               on:mouseenter={() => handleMouseEnter(index)}
+                               on:mouseleave={handleMouseLeave}>
+                                <BitboxxTypography widthPx={88} fontSizePx={160} outlined={true}>
+                                    {String(index + 1).padStart(2, '0')}
+                                </BitboxxTypography>
+                                <BitboxxTypography fontSizePx={160}>&nbsp;</BitboxxTypography>
+                                <BitboxxTypography fontSizePx={160}>{content.title}</BitboxxTypography>
+                            </a>
+                        </FadeIn>
                         {#if $hoverState === index}
                             <div class="hover-line"></div>
                         {/if}

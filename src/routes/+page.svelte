@@ -35,9 +35,7 @@
 <div>
 
     <!-- TOP -->
-    <FadeIn>
-        <Top contents={contents}/>
-    </FadeIn>
+    <Top contents={contents}/>
 
     <!-- ABOUT US -->
     <section id="about-us">
@@ -75,6 +73,6 @@
 
 <style>
     div {
-        backdrop-filter: blur(2px);
+        backdrop-filter: blur(0.01em);
     }
 </style>

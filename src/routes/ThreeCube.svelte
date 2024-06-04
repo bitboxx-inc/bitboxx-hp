@@ -46,13 +46,13 @@
 
         // 正六面体の作成
         const materials = [
-            createTextMaterial('!?'),
-            createTextMaterial('ABOUT US'),
-            createTextMaterial('SERVICE'),
-            createTextMaterial('WORKS'),
-            createTextMaterial('COMPANY'),
-            createTextMaterial('CONTACT'),
-            new THREE.MeshBasicMaterial({ color: 0xD62649 }) // 最後の面は色だけのマテリアル
+            new THREE.MeshBasicMaterial({ color: 0xAAAAAA }),
+            createTextMaterial("!?"),
+            new THREE.MeshBasicMaterial({ color: 0xAAAAAA }),
+            new THREE.MeshBasicMaterial({ color: 0xAAAAAA }),
+            new THREE.MeshBasicMaterial({ color: 0xAAAAAA }),
+            new THREE.MeshBasicMaterial({ color: 0xAAAAAA }),
+
         ];
         const geometry = new THREE.BoxGeometry();
         cube = new THREE.Mesh(geometry, materials);
@@ -60,7 +60,7 @@
 
         // エッジの追加
         const edges = new THREE.EdgesGeometry(geometry);
-        const lineMaterial = new THREE.LineBasicMaterial({ color: 0xCCCCCC });
+        const lineMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
         const lineSegments = new THREE.LineSegments(edges, lineMaterial);
         cube.add(lineSegments);
 
@@ -92,10 +92,10 @@
         canvas.width = 256;
         canvas.height = 256;
 
-        context.fillStyle = 'white';
+        context.fillStyle = '#AAAAAA';
         context.fillRect(0, 0, canvas.width, canvas.height);
 
-        context.fillStyle = '#D62649';
+        context.fillStyle = 'white' // '#D62649';
         context.font = '48px Arial';
         context.textAlign = 'center';
         context.textBaseline = 'middle';
