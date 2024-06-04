@@ -31,8 +31,8 @@
         scene = new THREE.Scene();
 
         // カメラの作成
-        camera = new THREE.PerspectiveCamera(99, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.z = 6;
+        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 10; // カメラの初期位置
 
         // レンダラーの作成
         renderer = new THREE.WebGLRenderer({ alpha: true });
@@ -56,12 +56,11 @@
         ];
         const geometry = new THREE.BoxGeometry();
         cube = new THREE.Mesh(geometry, materials);
-        // TODO 正六面体を追加する場合
         scene.add(cube);
 
         // エッジの追加
         const edges = new THREE.EdgesGeometry(geometry);
-        const lineMaterial = new THREE.LineBasicMaterial({ color: 0xDDDDDD});
+        const lineMaterial = new THREE.LineBasicMaterial({ color: 0xDDDDDD });
         const lineSegments = new THREE.LineSegments(edges, lineMaterial);
         cube.add(lineSegments);
 
@@ -82,6 +81,8 @@
         stars = new THREE.Points(starGeometry, starMaterial);
         scene.add(stars);
 
+        // 初期配置
+        updateCameraAndCubePosition();
         animate();
     }
 
@@ -102,6 +103,18 @@
 
         const texture = new THREE.CanvasTexture(canvas);
         return new THREE.MeshBasicMaterial({ map: texture });
+    }
+
+    function updateCameraAndCubePosition() {
+        // 画面サイズに基づいてカメラとCubeの位置を更新
+        const aspect = window.innerWidth / window.innerHeight;
+        const frustumHeight = 2 * camera.position.z * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+        const frustumWidth = frustumHeight * aspect;
+
+        cube.position.x = frustumWidth / 2 - 1; // 右端にCubeを配置
+        cube.position.y = -frustumHeight / 2 + 1; // 下端にCubeを配置
+
+        camera.lookAt(cube.position); // カメラをCubeに向ける
     }
 
     function animate() {
@@ -134,6 +147,7 @@
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
+        updateCameraAndCubePosition(); // 画面リサイズ時に位置を更新
     }
 
     function handleClick(event) {
@@ -144,7 +158,7 @@
 
         const intersects = raycaster.intersectObject(cube);
         if (intersects.length > 0) {
-            const faceIndex = intersects[0].index;
+            const faceIndex = intersects[0].face.materialIndex;
             const link = links[faceIndex];
             if (link) {
                 window.location.hash = link.link;
