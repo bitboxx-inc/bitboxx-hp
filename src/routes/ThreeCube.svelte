@@ -32,7 +32,7 @@
 
         // カメラの作成
         camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.z = 10; // カメラの初期位置
+        camera.position.z = 2.5; // カメラの初期位置
 
         // レンダラーの作成
         renderer = new THREE.WebGLRenderer({ alpha: true });

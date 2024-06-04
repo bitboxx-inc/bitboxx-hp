@@ -1,8 +1,30 @@
 <script>
     import BitboxxContentTitle from "$lib/infras/BitboxxContentTitle.svelte";
     import BitboxxContent from "$lib/infras/BitboxxContent.svelte";
-    import BitboxxTypography from "$lib/infras/BitboxxTypography.svelte";
     import Display from "$lib/infras/Display.svelte";
+
+    let info = [
+        {
+            title: '社名',
+            description: '株式会社bitboxx'
+        },
+        {
+            title: '設立',
+            description: '2024年04月25日'
+        },
+        {
+            title: '代表者',
+            description: '代表取締役CEO　影島 翔'
+        },
+        {
+            title: '所在地',
+            description: '103-0015<br/>東京都中央区日本橋箱崎町16-11<br/>ルミネ日本橋601'
+        },
+        {
+            title: '主な業務',
+            description: '<ul><li>・自社サービス開発</li><li>・システム開発、ウェブサイト制作/運用</li><li>・デザイン</li></ul>'
+        },
+    ]
 </script>
 
 <Display id={"company"}>
@@ -14,56 +36,16 @@
         <div class="max-w-4xl mx-auto p-4">
             <table>
                 <tbody>
-                <tr class="border-b-2 border-black">
-                    <th class="w-96 h-24" style="mergin-left: -24px;">
-                        <span style="font-size: 16px; letter-spacing: 24px;">社名</span>
-                    </th>
-                    <td>
-                        <div class="w-full p-4" style="font-size: 16px;">株式会社bitboxx</div>
-                    </td>
-                </tr>
-                <tr class="border-b-2 border-black">
-                    <th class="w-96 h-24" style="mergin-left: -24px;">
-                        <span style="font-size: 16px; letter-spacing: 24px;">設立</span>
-                    </th>
-                    <td>
-                        <div class="w-full p-4" style="font-size: 16px;">2024年04月25日</div>
-                    </td>
-                </tr>
-                <tr class="border-b-2 border-black">
-                    <th class="w-96 h-24">
-                        <span style="font-size: 16px; letter-spacing: 16px;">代表者</span>
-                    </th>
-                    <td>
-                        <div class="w-full p-4" style="font-size: 16px;">代表取締役CEO　影島 翔</div>
-                    </td>
-                </tr>
-                <tr class="border-b-2 border-black">
-                    <th class="w-96 h-24">
-                        <span style="letter-spacing: 16px;">所在地</span>
-                    </th>
-                    <td>
-                        <div class="w-full p-4" style="font-size: 16px;">
-                            103-0015<br/>
-                            東京都中央区日本橋箱崎町16-11<br/>
-                            ルミネ日本橋601
-                        </div>
-                    </td>
-                </tr>
-                <tr class="border-b-2 border-black">
-                    <th class="w-96 h-24">
-                        <span style="letter-spacing: 8px;">主な業務</span>
-                    </th>
-                    <td>
-                        <div class="w-full p-4" style="font-size: 16px;">
-                            <ul>
-                                <li>・自社サービス開発</li>
-                                <li>・システム開発、ウェブサイト制作/運用</li>
-                                <li>・デザイン</li>
-                            </ul>
-                        </div>
-                    </td>
-                </tr>
+                {#each info as inf}
+                    <tr class="border-b-2 border-black">
+                        <th class="w-96 h-24" style="mergin-left: -24px;">
+                            <span style="font-size: 16px; letter-spacing: 24px;">{@html inf.title}</span>
+                        </th>
+                        <td>
+                            <div class="w-full p-4" style="font-size: 16px;">{@html inf.description}</div>
+                        </td>
+                    </tr>
+                {/each}
                 </tbody>
             </table>
         </div>
@@ -76,56 +58,16 @@
         <div class="max-w-4xl mx-auto p-4">
             <table>
                 <tbody>
-                <tr class="border-b-2 border-black">
-                    <th class="w-96 h-24" style="mergin-left: -24px;">
-                        <span style="font-size: 16px; letter-spacing: 24px;">社名</span>
-                    </th>
-                    <td>
-                        <div class="w-full p-4" style="font-size: 16px;">株式会社bitboxx</div>
-                    </td>
-                </tr>
-                <tr class="border-b-2 border-black">
-                    <th class="w-96 h-24" style="mergin-left: -24px;">
-                        <span style="font-size: 16px; letter-spacing: 24px;">設立</span>
-                    </th>
-                    <td>
-                        <div class="w-full p-4" style="font-size: 16px;">2024年04月25日</div>
-                    </td>
-                </tr>
-                <tr class="border-b-2 border-black">
-                    <th class="w-96 h-24">
-                        <span style="font-size: 16px; letter-spacing: 16px;">代表者</span>
-                    </th>
-                    <td>
-                        <div class="w-full p-4" style="font-size: 16px;">代表取締役CEO　影島 翔</div>
-                    </td>
-                </tr>
-                <tr class="border-b-2 border-black">
-                    <th class="w-96 h-24">
-                        <span style="letter-spacing: 16px;">所在地</span>
-                    </th>
-                    <td>
-                        <div class="w-full p-4" style="font-size: 16px;">
-                            103-0015<br/>
-                            東京都中央区日本橋箱崎町16-11<br/>
-                            ルミネ日本橋601
-                        </div>
-                    </td>
-                </tr>
-                <tr class="border-b-2 border-black">
-                    <th class="w-96 h-24">
-                        <span style="letter-spacing: 8px;">主な業務</span>
-                    </th>
-                    <td>
-                        <div class="w-full p-4" style="font-size: 16px;">
-                            <ul>
-                                <li>・自社サービス開発</li>
-                                <li>・システム開発、ウェブサイト制作/運用</li>
-                                <li>・デザイン</li>
-                            </ul>
-                        </div>
-                    </td>
-                </tr>
+                {#each info as inf}
+                    <tr class="border-b-2 border-black">
+                        <th class="w-96 h-24" style="mergin-left: -24px;">
+                            <span style="font-size: 16px; letter-spacing: 24px;">{@html inf.title}</span>
+                        </th>
+                        <td>
+                            <div class="w-full p-4" style="font-size: 16px;">{@html inf.description}</div>
+                        </td>
+                    </tr>
+                {/each}
                 </tbody>
             </table>
         </div>
@@ -138,56 +80,16 @@
         <div class="max-w-4xl mx-auto p-4">
             <table>
                 <tbody>
-                <tr class="border-b-2 border-black">
-                    <th class="h-24">
-                        <span style="font-size: 16px; letter-spacing: 8px;">社名</span>
-                    </th>
-                    <td>
-                        <div class="w-full p-4" style="font-size: 16px;">株式会社bitboxx</div>
-                    </td>
-                </tr>
-                <tr class="border-b-2 border-black">
-                    <th class="h-24">
-                        <span style="font-size: 16px; letter-spacing: 8px;">設立</span>
-                    </th>
-                    <td>
-                        <div class="w-full p-4" style="font-size: 16px;">2024年04月25日</div>
-                    </td>
-                </tr>
-                <tr class="border-b-2 border-black">
-                    <th class="h-24">
-                        <span style="font-size: 16px; letter-spacing: 4px;">代表者</span>
-                    </th>
-                    <td>
-                        <div class="w-full p-4" style="font-size: 16px;">代表取締役CEO　影島 翔</div>
-                    </td>
-                </tr>
-                <tr class="border-b-2 border-black">
-                    <th class="h-24">
-                        <span style="letter-spacing: 4px;">所在地</span>
-                    </th>
-                    <td>
-                        <div class="w-full p-4" style="font-size: 16px;">
-                            103-0015<br/>
-                            東京都中央区日本橋箱崎町16-11<br/>
-                            ルミネ日本橋601
-                        </div>
-                    </td>
-                </tr>
-                <tr class="border-b-2 border-black">
-                    <th class="h-24">
-                        <span style="letter-spacing: 2px;">主な業務</span>
-                    </th>
-                    <td>
-                        <div class="w-full p-4" style="font-size: 16px;">
-                            <ul>
-                                <li>・自社サービス開発</li>
-                                <li>・システム開発、ウェブサイト制作/運用</li>
-                                <li>・デザイン</li>
-                            </ul>
-                        </div>
-                    </td>
-                </tr>
+                {#each info as inf}
+                    <tr class="border-b-2 border-black">
+                        <th class="h-24" style="mergin-left: -24px;">
+                            <span style="font-size: 16px; letter-spacing: 24px;">{@html inf.title}</span>
+                        </th>
+                        <td>
+                            <div class="w-full p-4" style="font-size: 16px;">{@html inf.description}</div>
+                        </td>
+                    </tr>
+                {/each}
                 </tbody>
             </table>
         </div>
