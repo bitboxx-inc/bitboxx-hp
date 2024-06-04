@@ -32,7 +32,7 @@
 
         // カメラの作成
         camera = new THREE.PerspectiveCamera(99, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.z = 5;
+        camera.position.z = 6;
 
         // レンダラーの作成
         renderer = new THREE.WebGLRenderer({ alpha: true });
@@ -57,11 +57,11 @@
         const geometry = new THREE.BoxGeometry();
         cube = new THREE.Mesh(geometry, materials);
         // TODO 正六面体を追加する場合
-        // scene.add(cube);
+        scene.add(cube);
 
         // エッジの追加
         const edges = new THREE.EdgesGeometry(geometry);
-        const lineMaterial = new THREE.LineBasicMaterial({ color: 0xD62649 });
+        const lineMaterial = new THREE.LineBasicMaterial({ color: 0xDDDDDD});
         const lineSegments = new THREE.LineSegments(edges, lineMaterial);
         cube.add(lineSegments);
 
@@ -144,7 +144,7 @@
 
         const intersects = raycaster.intersectObject(cube);
         if (intersects.length > 0) {
-            const faceIndex = intersects[0].face.materialIndex;
+            const faceIndex = intersects[0].index;
             const link = links[faceIndex];
             if (link) {
                 window.location.hash = link.link;
@@ -164,7 +164,7 @@
         left: 0;
         width: 100vw;
         height: 100vh;
-        z-index: -1; /* 背面に配置 */
+        z-index: -2; /* 背面に配置 */
     }
 </style>
 
