@@ -4,8 +4,9 @@
     import Top from "$lib/domains/contents/Top.svelte";
     import Company from "$lib/domains/contents/Company.svelte";
     import Works from "$lib/domains/contents/Works.svelte";
-    import ThreeCube from "./ThreeCube.svelte";
     import Contact from "$lib/domains/contents/Contact.svelte";
+    import FadeIn from "$lib/infras/fade/FadeIn.svelte";
+    import Display from "$lib/infras/Display.svelte";
 
     let contents = [
         {
@@ -31,30 +32,49 @@
     ];
 </script>
 
-<div class="h-dvh">
+<div>
 
     <!-- TOP -->
-    <Top contents={contents}/>
+    <FadeIn>
+        <Top contents={contents}/>
+    </FadeIn>
 
     <!-- ABOUT US -->
-    <AboutUs/>
+    <section id="about-us">
+        <AboutUs/>
+    </section>
 
     <!-- SERVICE -->
-    <Service/>
+    <section id="service">
+        <Service/>
+    </section>
 
     <!-- WORKS -->
-    <Works/>
+    <section id="works">
+        <Works/>
+    </section>
 
     <!-- COMPANY -->
-    <Company/>
+    <section id="company">
+        <Company/>
+    </section>
 
     <!-- CONTACT -->
-    <Contact/>
+    <section id="contact">
+        <Contact/>
+    </section>
 
-    <footer>
-        <div class="flex justify-center py-12" style="font-family: 'Noto Sans JP'">
-            2024 &copy; bitboxx inc.
-        </div>
-    </footer>
+    <Display>
+        <footer>
+            <div class="flex justify-center py-12" style="font-family: 'Noto Sans JP'">
+                2024 &copy; bitboxx inc.
+            </div>
+        </footer>
+    </Display>
 </div>
 
+<style>
+    div {
+        backdrop-filter: blur(2px);
+    }
+</style>

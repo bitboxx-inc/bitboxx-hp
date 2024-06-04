@@ -5,7 +5,7 @@
     import Display from "$lib/infras/Display.svelte";
 </script>
 
-<Display id={"contact"}>
+<Display>
 
     <BitboxxContent slot="lg">
         <div class="absolute top-0 left-0">

@@ -1,11 +1,10 @@
 <script lang="ts">
     import {onMount} from "svelte";
 
-    export let id = '';
-
     let isLgSize = false;
     let isMdSize = false;
     let isSmSize = false;
+    let loaded = false;
 
     // メディアクエリリスナーを設定する関数
     function updateMediaQueries() {
@@ -41,10 +40,11 @@
     // コンポーネントのマウント時にメディアクエリリスナーを設定
     onMount(() => {
         updateMediaQueries();
+        loaded = true;
     });
 </script>
 
-<span id={id}>
+{#if loaded}
     {#if isLgSize}
         <slot name="lg"/>
     {:else if isMdSize}
@@ -52,4 +52,4 @@
     {:else}
         <slot name="sm"/>
     {/if}
-</span>
+{/if}

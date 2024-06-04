@@ -60,7 +60,7 @@
 
         // エッジの追加
         const edges = new THREE.EdgesGeometry(geometry);
-        const lineMaterial = new THREE.LineBasicMaterial({ color: 0xDDDDDD });
+        const lineMaterial = new THREE.LineBasicMaterial({ color: 0xCCCCCC });
         const lineSegments = new THREE.LineSegments(edges, lineMaterial);
         cube.add(lineSegments);
 

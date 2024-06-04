@@ -1,7 +1,6 @@
 <script lang="ts">
     import BitboxxLogo from "$lib/domains/BitboxxLogo.svelte";
     import BitboxxTypography from "$lib/infras/BitboxxTypography.svelte";
-    import { onMount } from "svelte";
     import { writable } from "svelte/store";
     import Display from "$lib/infras/Display.svelte";
     import Humberger from "$lib/domains/contents/Humberger.svelte";
@@ -18,7 +17,7 @@
     }
 </script>
 
-<Display id={'top'}>
+<Display>
     <div slot="lg">
         <div class="h-dvh flex place-items-center">
             <div class="flex-1 flex justify-center">
@@ -112,21 +111,34 @@
         -webkit-text-stroke: 1px #D62649; /* アウトラインの色を指定 */
         text-shadow: none; /* テキストシャドウをオフにする */
     }
+
     .hover-container {
         position: relative;
     }
+
     .hover-line {
         z-index: -1;
         position: absolute;
         top: 50%;
-        right: 0;
+        left: 0;
         height: 2px;
-        width: 0;
-        background-color: #D62649;
-        transform: translateY(-50%);
-        transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1); /* 初速を早くし、徐々に遅くする */
-    }
-    .hover-container:hover .hover-line {
         width: 100%;
+        background-color: #D62649;
+        transform: scaleX(0);
+        transform-origin: right;
+        animation: none;
+    }
+
+    .hover-container:hover .hover-line {
+        animation: stretch-line 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes stretch-line {
+        0% {
+            transform: scaleX(0);
+        }
+        100% {
+            transform: scaleX(1);
+        }
     }
 </style>

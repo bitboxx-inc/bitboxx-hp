@@ -27,7 +27,7 @@
     ]
 </script>
 
-<Display id={"company"}>
+<Display>
 
     <BitboxxContent slot="lg">
         <div class="absolute top-0 left-0">

@@ -20,7 +20,7 @@
     ]
 </script>
 
-<Display id={"service"}>
+<Display>
 
     <BitboxxContent slot="lg">
         <div class="absolute top-0 left-0">

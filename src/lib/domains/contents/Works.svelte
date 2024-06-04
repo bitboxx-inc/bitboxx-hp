@@ -5,7 +5,7 @@ import BitboxxTypography from "$lib/infras/BitboxxTypography.svelte";
 import Display from "$lib/infras/Display.svelte";
 </script>
 
-<Display id={"works"}>
+<Display>
 
     <BitboxxContent slot="lg">
         <div class="absolute top-0 left-0">
