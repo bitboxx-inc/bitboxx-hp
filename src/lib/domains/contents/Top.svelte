@@ -85,26 +85,38 @@
         </div>
     </div>
     <div slot="sm">
-        <div class="h-dvh flex place-items-center justify-center" style="margin-top: -68px;">
-            <div class="relative">
-                {#each contents as content, index}
-                    <div class="hover-container" style="line-height: 0.85">
-                        <a href={content.link}
-                           class="hover-effect"
-                           on:click|preventDefault={(event) => handleLinkClick(event, content.link)}
-                           on:mouseenter={() => handleMouseEnter(index)}
-                           on:mouseleave={handleMouseLeave}>
-                            <BitboxxTypography widthPx={48} fontSizePx={80} outlined={true}>
-                                {String(index + 1).padStart(2, '0')}
-                            </BitboxxTypography>
-                            <BitboxxTypography fontSizePx={80}>&nbsp;</BitboxxTypography>
-                            <BitboxxTypography fontSizePx={80}>{content.title}</BitboxxTypography>
-                        </a>
-                        {#if $hoverState === index}
-                            <div class="hover-line"></div>
-                        {/if}
-                    </div>
-                {/each}
+        <div class="h-dvh flex justify-center">
+            <div class="flex">
+                <span class="flex-1 flex justify-center">
+                </span>
+                    <span class="flex-1">
+                <span class="flex-1 flex justify-center">
+                </span>
+                </span>
+                    <span class="flex-1 flex justify-center">
+                </span>
+            </div>
+            <div class="flex place-items-center">
+                <div class="relative">
+                    {#each contents as content, index}
+                        <div class="hover-container" style="line-height: 0.85">
+                            <a href={content.link}
+                               class="hover-effect"
+                               on:click|preventDefault={(event) => handleLinkClick(event, content.link)}
+                               on:mouseenter={() => handleMouseEnter(index)}
+                               on:mouseleave={handleMouseLeave}>
+                                <BitboxxTypography widthPx={48} fontSizePx={80} outlined={true}>
+                                    {String(index + 1).padStart(2, '0')}
+                                </BitboxxTypography>
+                                <BitboxxTypography fontSizePx={80}>&nbsp;</BitboxxTypography>
+                                <BitboxxTypography fontSizePx={80}>{content.title}</BitboxxTypography>
+                            </a>
+                            {#if $hoverState === index}
+                                <div class="hover-line"></div>
+                            {/if}
+                        </div>
+                    {/each}
+                </div>
             </div>
         </div>
     </div>
