@@ -38,7 +38,7 @@
         <div class="absolute top-0 left-0">
             <BitboxxContentTitle num={4}>COMPANY</BitboxxContentTitle>
         </div>
-        <div class="max-w-4xl mx-auto p-4">
+        <div>
             <table>
                 <tbody>
                 {#each info as inf}
@@ -46,7 +46,7 @@
                         <th class="w-96 h-24">
                             <span style={`letter-spacing: ${inf.letterSp}px; margin-right: -${inf.letterSp}px;`}>{@html inf.title}</span>
                         </th>
-                        <td>
+                        <td class="w-96 h-24">
                             <div class="w-full p-4" style="font-size: 16px;">{@html inf.description}</div>
                         </td>
                     </tr>
@@ -60,7 +60,7 @@
         <div class="absolute top-0 left-0">
             <BitboxxContentTitle num={4}>COMPANY</BitboxxContentTitle>
         </div>
-        <div class="max-w-4xl mx-auto p-4">
+        <div>
             <table>
                 <tbody>
                 {#each info as inf}
@@ -68,7 +68,7 @@
                         <th class="w-96 h-24">
                             <span style={`letter-spacing: ${inf.letterSp}px; margin-right: -${inf.letterSp}px;`}>{@html inf.title}</span>
                         </th>
-                        <td>
+                        <td class="w-96 h-24">
                             <div class="w-full p-4" style="font-size: 16px;">{@html inf.description}</div>
                         </td>
                     </tr>
@@ -82,13 +82,13 @@
         <div class="absolute top-0 left-4">
             <BitboxxContentTitle num={4} fontSizePx={48} widthPx={40}>COMPANY</BitboxxContentTitle>
         </div>
-        <div class="max-w-4xl mx-auto p-4">
-            <table>
+        <div>
+            <table class="mx-4">
                 <tbody>
                 {#each info as inf}
                     <tr class="border-b-2 border-black">
                         <th class="w-40 h-12">
-                            <span style={`font-size: 12px; letter-spacing: ${inf.letterSp / 16 * 12}px; margin-right: -${inf.letterSp / 16 * 12}px;`}>{@html inf.title}</span>
+                            <span style={`font-size: 14px; letter-spacing: ${inf.letterSp / 16 * 12}px; margin-right: -${inf.letterSp / 16 * 12}px;`}>{@html inf.title}</span>
                         </th>
                         <td>
                             <div class="w-full p-2" style="font-size: 14px;">{@html inf.description}</div>

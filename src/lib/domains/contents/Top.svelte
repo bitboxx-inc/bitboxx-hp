@@ -68,11 +68,11 @@
                                on:click|preventDefault={(event) => handleLinkClick(event, content.link)}
                                on:mouseenter={() => handleMouseEnter(index)}
                                on:mouseleave={handleMouseLeave}>
-                                <BitboxxTypography widthPx={88} fontSizePx={160} outlined={true}>
+                                <BitboxxTypography widthPx={64} fontSizePx={100} outlined={true}>
                                     {String(index + 1).padStart(2, '0')}
                                 </BitboxxTypography>
-                                <BitboxxTypography fontSizePx={160}>&nbsp;</BitboxxTypography>
-                                <BitboxxTypography fontSizePx={160}>{content.title}</BitboxxTypography>
+                                <BitboxxTypography fontSizePx={100}>&nbsp;</BitboxxTypography>
+                                <BitboxxTypography fontSizePx={100}>{content.title}</BitboxxTypography>
                             </a>
                         </FadeIn>
                         {#if $hoverState === index}

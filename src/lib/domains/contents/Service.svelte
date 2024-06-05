@@ -71,7 +71,7 @@
             <BitboxxContentTitle num={2} fontSizePx={48} widthPx={40}>SERVICE</BitboxxContentTitle>
         </div>
 
-        <div class="flex flex-col space-y-8 mt-20 mx-8">
+        <div class="flex flex-col space-y-8 mt-20 mx-4">
             <table>
                 <tbody>
                 {#each services as service}

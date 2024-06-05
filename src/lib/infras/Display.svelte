@@ -8,7 +8,7 @@
 
     // メディアクエリリスナーを設定する関数
     function updateMediaQueries() {
-        const lgMediaQuery = window.matchMedia('(min-width: 1400px)') && window.matchMedia('(min-height: 800px)'); // Tailwind lg: 1200px
+        const lgMediaQuery = window.matchMedia('(min-width: 1400px)'); // Tailwind lg: 1200px
         const mdMediaQuery = window.matchMedia('(min-width: 768px)'); // Tailwind md: 768px
         const smMediaQuery = window.matchMedia('(min-width: 640px)'); // Tailwind sm: 640px
 
@@ -53,4 +53,3 @@
         <slot name="sm"/>
     {/if}
 {/if}
-<slot/>
