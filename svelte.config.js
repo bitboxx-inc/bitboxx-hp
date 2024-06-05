@@ -14,7 +14,7 @@ const config = {
         adapter: adapter({
             pages: 'build',
             assets: 'build',
-            fallback: 'index.html', // If you want to use fallback, set this to a valid file (e.g., 'index.html')
+            fallback: '404.html', // If you want to use fallback, set this to a valid file (e.g., 'index.html')
             strict: true
         }),
     }

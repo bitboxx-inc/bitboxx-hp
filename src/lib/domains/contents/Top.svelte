@@ -5,6 +5,7 @@
     import Display from "$lib/infras/Display.svelte";
     import Humberger from "$lib/domains/contents/Humberger.svelte";
     import FadeIn from "$lib/infras/fade/FadeIn.svelte";
+    import { scrollToTarget } from "$lib/infras/utils/scrollToTarget"; // ここでユーティリティをインポート
 
     export let contents: { link: string; title: string }[] = [];
     const hoverState = writable<number | null>(null);
@@ -15,6 +16,12 @@
 
     function handleMouseLeave() {
         hoverState.set(null);
+    }
+
+    function handleLinkClick(event: Event, link: string) {
+        event.preventDefault();
+        const targetId = link.replace('/#', '');
+        scrollToTarget(targetId);
     }
 </script>
 
@@ -30,6 +37,7 @@
                         <FadeIn>
                             <a href={content.link}
                                class="hover-effect"
+                               on:click|preventDefault={(event) => handleLinkClick(event, content.link)}
                                on:mouseenter={() => handleMouseEnter(index)}
                                on:mouseleave={handleMouseLeave}>
                                 <BitboxxTypography widthPx={88} fontSizePx={160} outlined={true}>
@@ -58,6 +66,7 @@
                         <FadeIn>
                             <a href={content.link}
                                class="hover-effect"
+                               on:click|preventDefault={(event) => handleLinkClick(event, content.link)}
                                on:mouseenter={() => handleMouseEnter(index)}
                                on:mouseleave={handleMouseLeave}>
                                 <BitboxxTypography widthPx={88} fontSizePx={160} outlined={true}>
@@ -76,22 +85,13 @@
         </div>
     </div>
     <div slot="sm">
-        <div class="flex justify-center mt-4">
-            <span class="flex-1 flex justify-center">
-            </span>
-            <span class="flex-1">
-                <BitboxxLogo width={192} height={51}/>
-            </span>
-            <span class="flex-1 flex justify-center place-items-center">
-                <Humberger/>
-            </span>
-        </div>
         <div class="h-dvh flex place-items-center justify-center" style="margin-top: -68px;">
             <div class="relative">
                 {#each contents as content, index}
                     <div class="hover-container" style="line-height: 0.85">
                         <a href={content.link}
                            class="hover-effect"
+                           on:click|preventDefault={(event) => handleLinkClick(event, content.link)}
                            on:mouseenter={() => handleMouseEnter(index)}
                            on:mouseleave={handleMouseLeave}>
                             <BitboxxTypography widthPx={48} fontSizePx={80} outlined={true}>

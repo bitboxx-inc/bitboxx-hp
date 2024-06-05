@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import { onMount } from 'svelte';
     import * as THREE from 'three';
 
@@ -46,12 +46,12 @@
 
         // 正六面体の作成
         const materials = [
-            new THREE.MeshBasicMaterial({ color: 0xAAAAAA }),
+            new THREE.MeshBasicMaterial({ color: 0xCCCCCC }),
             createTextMaterial("!?"),
-            new THREE.MeshBasicMaterial({ color: 0xAAAAAA }),
-            new THREE.MeshBasicMaterial({ color: 0xAAAAAA }),
-            new THREE.MeshBasicMaterial({ color: 0xAAAAAA }),
-            new THREE.MeshBasicMaterial({ color: 0xAAAAAA }),
+            new THREE.MeshBasicMaterial({ color: 0xCCCCCC }),
+            new THREE.MeshBasicMaterial({ color: 0xCCCCCC }),
+            new THREE.MeshBasicMaterial({ color: 0xCCCCCC }),
+            new THREE.MeshBasicMaterial({ color: 0xCCCCCC }),
 
         ];
         const geometry = new THREE.BoxGeometry();
@@ -102,6 +102,7 @@
         context.fillText(text, canvas.width / 2, canvas.height / 2);
 
         const texture = new THREE.CanvasTexture(canvas);
+
         return new THREE.MeshBasicMaterial({ map: texture });
     }
 
@@ -150,20 +151,21 @@
         updateCameraAndCubePosition(); // 画面リサイズ時に位置を更新
     }
 
-    function handleClick(event) {
-        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    function handleClick(event: Event) {
 
-        raycaster.setFromCamera(mouse, camera);
-
-        const intersects = raycaster.intersectObject(cube);
-        if (intersects.length > 0) {
-            const faceIndex = intersects[0].face.materialIndex;
-            const link = links[faceIndex];
-            if (link) {
-                window.location.hash = link.link;
-            }
-        }
+        // mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        // mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        //
+        // raycaster.setFromCamera(mouse, camera);
+        //
+        // const intersects = raycaster.intersectObject(cube);
+        // if (intersects.length > 0) {
+        //     const faceIndex = intersects[0].face.materialIndex;
+        //     const link = links[faceIndex];
+        //     if (link) {
+        //         window.location.hash = link.link;
+        //     }
+        // }
     }
 </script>
 

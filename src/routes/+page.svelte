@@ -5,7 +5,6 @@
     import Company from "$lib/domains/contents/Company.svelte";
     import Works from "$lib/domains/contents/Works.svelte";
     import Contact from "$lib/domains/contents/Contact.svelte";
-    import FadeIn from "$lib/infras/fade/FadeIn.svelte";
     import Display from "$lib/infras/Display.svelte";
 
     let contents = [
