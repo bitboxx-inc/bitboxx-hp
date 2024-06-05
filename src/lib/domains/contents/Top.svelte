@@ -3,7 +3,6 @@
     import BitboxxTypography from "$lib/infras/BitboxxTypography.svelte";
     import { writable } from "svelte/store";
     import Display from "$lib/infras/Display.svelte";
-    import Humberger from "$lib/domains/contents/Humberger.svelte";
     import FadeIn from "$lib/infras/fade/FadeIn.svelte";
     import { scrollToTarget } from "$lib/infras/utils/scrollToTarget"; // ここでユーティリティをインポート
 

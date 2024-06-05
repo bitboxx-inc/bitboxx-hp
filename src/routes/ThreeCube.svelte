@@ -4,6 +4,11 @@
 
     let container;
     let scene, camera, renderer, cube, stars, raycaster, mouse;
+    let isDragging = false;
+    let previousMousePosition = {
+        x: 0,
+        y: 0
+    };
 
     const links = [
         { title: 'ABOUT US', link: '/#about-us', rotation: { x: 0, y: 0, z: 0 } },
@@ -11,18 +16,19 @@
         { title: 'WORKS', link: '/#works', rotation: { x: 0, y: Math.PI / 2, z: 0 } },
         { title: 'COMPANY', link: '/#company', rotation: { x: 0, y: 0, z: Math.PI / 2 } },
         { title: 'CONTACT', link: '/#contact', rotation: { x: Math.PI / 2, y: Math.PI / 2, z: 0 } },
+        { title: 'OTHER', link: '/#other', rotation: { x: 0, y: Math.PI, z: 0 } }
     ];
 
     onMount(() => {
         init();
-        window.addEventListener('hashchange', handleHashChange);
         window.addEventListener('resize', handleResize);
-        window.addEventListener('click', handleClick);
 
         return () => {
-            window.removeEventListener('hashchange', handleHashChange);
             window.removeEventListener('resize', handleResize);
-            window.removeEventListener('click', handleClick);
+            container.removeEventListener('mousedown', onMouseDown);
+            container.removeEventListener('mousemove', onMouseMove);
+            container.removeEventListener('mouseup', onMouseUp);
+            container.removeEventListener('mouseout', onMouseOut);
         };
     });
 
@@ -46,13 +52,12 @@
 
         // 正六面体の作成
         const materials = [
-            new THREE.MeshBasicMaterial({ color: 0xCCCCCC }),
-            createTextMaterial("!?"),
-            new THREE.MeshBasicMaterial({ color: 0xCCCCCC }),
-            new THREE.MeshBasicMaterial({ color: 0xCCCCCC }),
-            new THREE.MeshBasicMaterial({ color: 0xCCCCCC }),
-            new THREE.MeshBasicMaterial({ color: 0xCCCCCC }),
-
+            createTextMaterial("ABOUT US"),
+            createTextMaterial("SERVICE"),
+            createTextMaterial("WORKS"),
+            createTextMaterial("COMPANY"),
+            createTextMaterial("CONTACT"),
+            createTextMaterial("OTHER")
         ];
         const geometry = new THREE.BoxGeometry();
         cube = new THREE.Mesh(geometry, materials);
@@ -84,6 +89,12 @@
         // 初期配置
         updateCameraAndCubePosition();
         animate();
+
+        container.addEventListener('mousedown', onMouseDown);
+        container.addEventListener('mousemove', onMouseMove);
+        container.addEventListener('mouseup', onMouseUp);
+        container.addEventListener('mouseout', onMouseOut);
+        container.addEventListener('click', handleClick);
     }
 
     function createTextMaterial(text) {
@@ -95,7 +106,7 @@
         context.fillStyle = '#AAAAAA';
         context.fillRect(0, 0, canvas.width, canvas.height);
 
-        context.fillStyle = 'white' // '#D62649';
+        context.fillStyle = 'white';
         context.font = '48px Arial';
         context.textAlign = 'center';
         context.textBaseline = 'middle';
@@ -122,26 +133,16 @@
         requestAnimationFrame(animate);
 
         // キューブの回転
-        cube.rotation.x += 0.001;
-        cube.rotation.y += 0.001;
+        if (!isDragging) {
+            cube.rotation.x += 0.001;
+            cube.rotation.y += 0.001;
+        }
 
         // 星の回転
         stars.rotation.x += 0.002;
         stars.rotation.y += 0.001;
 
         renderer.render(scene, camera);
-    }
-
-    function setRotation(rotation) {
-        cube.rotation.set(rotation.x, rotation.y, rotation.z);
-    }
-
-    function handleHashChange() {
-        const hash = window.location.hash;
-        const link = links.find(link => link.link === hash);
-        if (link) {
-            setRotation(link.rotation);
-        }
     }
 
     function handleResize() {
@@ -151,21 +152,64 @@
         updateCameraAndCubePosition(); // 画面リサイズ時に位置を更新
     }
 
-    function handleClick(event: Event) {
+    function handleClick(event: MouseEvent) {
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
-        // mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-        // mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-        //
-        // raycaster.setFromCamera(mouse, camera);
-        //
-        // const intersects = raycaster.intersectObject(cube);
-        // if (intersects.length > 0) {
-        //     const faceIndex = intersects[0].face.materialIndex;
-        //     const link = links[faceIndex];
-        //     if (link) {
-        //         window.location.hash = link.link;
-        //     }
-        // }
+        raycaster.setFromCamera(mouse, camera);
+
+        const intersects = raycaster.intersectObject(cube);
+        if (intersects.length > 0) {
+            const faceIndex = Math.floor(intersects[0].faceIndex / 2);
+            const link = links[faceIndex];
+            if (link) {
+                window.location.hash = link.link;
+            }
+        }
+    }
+
+    function onMouseDown(event) {
+        isDragging = true;
+        previousMousePosition = {
+            x: event.clientX,
+            y: event.clientY
+        };
+    }
+
+    function onMouseMove(event) {
+        if (isDragging) {
+            const deltaMove = {
+                x: event.clientX - previousMousePosition.x,
+                y: event.clientY - previousMousePosition.y
+            };
+
+            const deltaRotationQuaternion = new THREE.Quaternion()
+                .setFromEuler(new THREE.Euler(
+                    toRadians(deltaMove.y * 1),
+                    toRadians(deltaMove.x * 1),
+                    0,
+                    'XYZ'
+                ));
+
+            cube.quaternion.multiplyQuaternions(deltaRotationQuaternion, cube.quaternion);
+
+            previousMousePosition = {
+                x: event.clientX,
+                y: event.clientY
+            };
+        }
+    }
+
+    function onMouseUp() {
+        isDragging = false;
+    }
+
+    function onMouseOut() {
+        isDragging = false;
+    }
+
+    function toRadians(angle) {
+        return angle * (Math.PI / 180);
     }
 </script>
 
@@ -181,6 +225,10 @@
         width: 100vw;
         height: 100vh;
         z-index: -2; /* 背面に配置 */
+        cursor: grab;
+    }
+    #container:active {
+        cursor: grabbing;
     }
 </style>
 

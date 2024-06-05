@@ -75,8 +75,8 @@
             <table>
                 <tbody>
                 {#each services as service}
-                    <tr class="border-b-2 border-black" style="height: 50px;">
-                        <td class="p-6 m-12">
+                    <tr class="border-b-2 border-black">
+                        <td class="p-4 m-8">
                             <div class="flex justify-center sp-service-title">
                                 <BitboxxTypography fontSizePx={24}><b>{@html service.title}</b></BitboxxTypography>
                             </div>
