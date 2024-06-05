@@ -53,3 +53,4 @@
         <slot name="sm"/>
     {/if}
 {/if}
+<slot/>

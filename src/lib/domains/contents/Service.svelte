@@ -72,11 +72,11 @@
         </div>
 
         <div class="flex flex-col space-y-8 mt-20 mx-8">
-            <table class="table-auto w-full mt-12">
+            <table>
                 <tbody>
                 {#each services as service}
                     <tr class="border-b-2 border-black" style="height: 50px;">
-                        <td class="p-6 m-12" style="font-family: 'Noto Sans JP';">
+                        <td class="p-6 m-12">
                             <div class="flex justify-center sp-service-title">
                                 <BitboxxTypography fontSizePx={24}><b>{@html service.title}</b></BitboxxTypography>
                             </div>
