@@ -11,6 +11,7 @@
     import Display from "$lib/infras/Display.svelte";
     import BitboxxLogo from "$lib/domains/BitboxxLogo.svelte";
     import Humberger from "./Humberger.svelte";
+    import Stardust from "./Stardust.svelte";
 
 </script>
 
@@ -26,6 +27,7 @@
 <slot></slot>
 
 <ThreeCube/>
+<Stardust/>
 
 <style>
     .logo {

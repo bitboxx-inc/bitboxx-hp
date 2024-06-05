@@ -1,14 +1,12 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import * as THREE from 'three';
+    import Stardust from './Stardust.svelte';
 
     let container;
-    let scene, camera, renderer, cube, stars, raycaster, mouse;
+    let scene, camera, renderer, cube, raycaster, mouse;
     let isDragging = false;
-    let previousMousePosition = {
-        x: 0,
-        y: 0
-    };
+    let previousMousePosition = { x: 0, y: 0 };
 
     const links = [
         { title: 'ABOUT US', link: '/#about-us', rotation: { x: 0, y: 0, z: 0 } },
@@ -29,65 +27,45 @@
             container.removeEventListener('mousemove', onMouseMove);
             container.removeEventListener('mouseup', onMouseUp);
             container.removeEventListener('mouseout', onMouseOut);
+            container.removeEventListener('touchstart', onTouchStart);
+            container.removeEventListener('touchmove', onTouchMove);
+            container.removeEventListener('touchend', onTouchEnd);
+            container.removeEventListener('click', handleClick);
         };
+
     });
 
     function init() {
-        // シーンの作成
         scene = new THREE.Scene();
 
-        // カメラの作成
         camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.z = 2.5; // カメラの初期位置
+        camera.position.z = 2.5;
 
-        // レンダラーの作成
         renderer = new THREE.WebGLRenderer({ alpha: true });
-        renderer.setClearColor(0xffffff, 0); // 背景色を白に設定
+        renderer.setClearColor(0xffffff, 0);
         renderer.setSize(window.innerWidth, window.innerHeight);
         container.appendChild(renderer.domElement);
 
-        // レイキャスターとマウスの作成
         raycaster = new THREE.Raycaster();
         mouse = new THREE.Vector2();
 
-        // 正六面体の作成
         const materials = [
-            createTextMaterial("ABOUT US"),
-            createTextMaterial("SERVICE"),
-            createTextMaterial("WORKS"),
-            createTextMaterial("COMPANY"),
-            createTextMaterial("CONTACT"),
-            createTextMaterial("OTHER")
+            createTextMaterial("!?"),
+            new THREE.MeshBasicMaterial({ color: 0xCCCCCC }),
+            new THREE.MeshBasicMaterial({ color: 0xCCCCCC }),
+            new THREE.MeshBasicMaterial({ color: 0xCCCCCC }),
+            new THREE.MeshBasicMaterial({ color: 0xCCCCCC }),
+            new THREE.MeshBasicMaterial({ color: 0xCCCCCC })
         ];
         const geometry = new THREE.BoxGeometry();
         cube = new THREE.Mesh(geometry, materials);
         scene.add(cube);
 
-        // エッジの追加
         const edges = new THREE.EdgesGeometry(geometry);
         const lineMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
         const lineSegments = new THREE.LineSegments(edges, lineMaterial);
         cube.add(lineSegments);
 
-        // 星の作成
-        const starGeometry = new THREE.BufferGeometry();
-        const starMaterial = new THREE.PointsMaterial({ color: 0x888888 });
-
-        const starVertices = [];
-        for (let i = 0; i < 10000; i++) {
-            const x = THREE.MathUtils.randFloatSpread(2000);
-            const y = THREE.MathUtils.randFloatSpread(2000);
-            const z = THREE.MathUtils.randFloatSpread(2000);
-            starVertices.push(x, y, z);
-        }
-
-        starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
-
-        stars = new THREE.Points(starGeometry, starMaterial);
-        scene.add(stars);
-
-        // 初期配置
-        updateCameraAndCubePosition();
         animate();
 
         container.addEventListener('mousedown', onMouseDown);
@@ -95,6 +73,11 @@
         container.addEventListener('mouseup', onMouseUp);
         container.addEventListener('mouseout', onMouseOut);
         container.addEventListener('click', handleClick);
+
+        // Adding touch events for mobile devices
+        container.addEventListener('touchstart', onTouchStart);
+        container.addEventListener('touchmove', onTouchMove);
+        container.addEventListener('touchend', onTouchEnd);
     }
 
     function createTextMaterial(text) {
@@ -117,30 +100,13 @@
         return new THREE.MeshBasicMaterial({ map: texture });
     }
 
-    function updateCameraAndCubePosition() {
-        // 画面サイズに基づいてカメラとCubeの位置を更新
-        const aspect = window.innerWidth / window.innerHeight;
-        const frustumHeight = 2 * camera.position.z * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
-        const frustumWidth = frustumHeight * aspect;
-
-        cube.position.x = frustumWidth / 2 - 1; // 右端にCubeを配置
-        cube.position.y = -frustumHeight / 2 + 1; // 下端にCubeを配置
-
-        camera.lookAt(cube.position); // カメラをCubeに向ける
-    }
-
     function animate() {
         requestAnimationFrame(animate);
 
-        // キューブの回転
         if (!isDragging) {
             cube.rotation.x += 0.001;
             cube.rotation.y += 0.001;
         }
-
-        // 星の回転
-        stars.rotation.x += 0.002;
-        stars.rotation.y += 0.001;
 
         renderer.render(scene, camera);
     }
@@ -149,23 +115,23 @@
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
-        updateCameraAndCubePosition(); // 画面リサイズ時に位置を更新
     }
 
     function handleClick(event: MouseEvent) {
-        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
-        raycaster.setFromCamera(mouse, camera);
-
-        const intersects = raycaster.intersectObject(cube);
-        if (intersects.length > 0) {
-            const faceIndex = Math.floor(intersects[0].faceIndex / 2);
-            const link = links[faceIndex];
-            if (link) {
-                window.location.hash = link.link;
-            }
-        }
+        // mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        // mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        //
+        // raycaster.setFromCamera(mouse, camera);
+        //
+        // const intersects = raycaster.intersectObject(cube);
+        // if (intersects.length > 0) {
+        //     const faceIndex = Math.floor(intersects[0].faceIndex / 2);
+        //     const link = links[faceIndex];
+        //     if (link) {
+        //         window.location.hash = link.link;
+        //     }
+        // }
     }
 
     function onMouseDown(event) {
@@ -185,8 +151,8 @@
 
             const deltaRotationQuaternion = new THREE.Quaternion()
                 .setFromEuler(new THREE.Euler(
-                    toRadians(deltaMove.y * 1),
-                    toRadians(deltaMove.x * 1),
+                    toRadians(deltaMove.y * 0.5),
+                    toRadians(deltaMove.x * 0.5),
                     0,
                     'XYZ'
                 ));
@@ -208,6 +174,42 @@
         isDragging = false;
     }
 
+    function onTouchStart(event) {
+        isDragging = true;
+        previousMousePosition = {
+            x: event.touches[0].clientX,
+            y: event.touches[0].clientY
+        };
+    }
+
+    function onTouchMove(event) {
+        if (isDragging) {
+            const deltaMove = {
+                x: event.touches[0].clientX - previousMousePosition.x,
+                y: event.touches[0].clientY - previousMousePosition.y
+            };
+
+            const deltaRotationQuaternion = new THREE.Quaternion()
+                .setFromEuler(new THREE.Euler(
+                    toRadians(deltaMove.y * 0.5),
+                    toRadians(deltaMove.x * 0.5),
+                    0,
+                    'XYZ'
+                ));
+
+            cube.quaternion.multiplyQuaternions(deltaRotationQuaternion, cube.quaternion);
+
+            previousMousePosition = {
+                x: event.touches[0].clientX,
+                y: event.touches[0].clientY
+            };
+        }
+    }
+
+    function onTouchEnd() {
+        isDragging = false;
+    }
+
     function toRadians(angle) {
         return angle * (Math.PI / 180);
     }
@@ -216,7 +218,7 @@
 <style>
     :global(body) {
         margin: 0;
-        background-color: white; /* 背景色を白に設定 */
+        background-color: white;
     }
     #container {
         position: fixed;
@@ -224,12 +226,31 @@
         left: 0;
         width: 100vw;
         height: 100vh;
-        z-index: -2; /* 背面に配置 */
         cursor: grab;
     }
     #container:active {
         cursor: grabbing;
     }
+    footer.fixed {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        text-align: center;
+        background: rgba(255, 255, 255, 0);
+        z-index: 4;
+        padding: 10px 0;
+    }
 </style>
 
-<div id="container" bind:this={container}></div>
+<div id="container" style="opacity: 1; z-index: -1" bind:this={container}></div>
+<footer class="fixed">
+    <span>
+<!--        <label for="opacity">Opacity:</label>-->
+        <input type="range" id="opacity" name="opacity" min="0" max="1" step="0.1" oninput="document.getElementById('container').style.opacity = this.value;">
+    </span>
+    <span>
+<!--        <label for="z-index-toggle">Z-Index:</label>-->
+        <input type="checkbox" id="z-index-toggle" name="z-index-toggle" onchange="document.getElementById('container').style.zIndex = this.checked ? 1 : -1;">
+        <label for="z-index-toggle" id="z-index-label">!?</label>
+    </span>
+</footer>
