@@ -66,7 +66,7 @@
         <div class="mt-48">&nbsp;</div>
         2024 &copy; bitboxx inc.
     </span>
-    <span slot="lg" class="vertical-copyright">
+    <span slot="md" class="vertical-copyright">
         <div class="mt-48">&nbsp;</div>
         2024 &copy; bitboxx inc.
     </span>
