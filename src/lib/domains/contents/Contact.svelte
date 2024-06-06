@@ -3,6 +3,7 @@
     import BitboxxContent from "$lib/infras/BitboxxContent.svelte";
     import BitboxxTypography from "$lib/infras/BitboxxTypography.svelte";
     import Display from "$lib/infras/Display.svelte";
+    import BitboxxText from "$lib/infras/BitboxxText.svelte";
 
     let yourname = '';
     let company = '';
@@ -37,8 +38,10 @@
                 <tbody>
                 <tr class="border-b-2 border-black">
                     <th class="w-96">
-                        <span class="w-96 h-24"><span
-                                style="letter-spacing: 32px; margin-right: -32px;">名前</span></span>
+                        <span class="w-96 h-24">
+                            <span style="letter-spacing: 32px; margin-right: -32px;"><BitboxxText
+                                    fontSizePx="20">名前</BitboxxText></span>
+                        </span>
                     </th>
                     <td class="w-96">
                         <input class="w-96 my-8 mx-4" style="background-color: #FFFFFF; border: solid 1px;"
@@ -48,7 +51,8 @@
                 <tr class="border-b-2 border-black">
                     <th class="w-96">
                         <span class="w-96 h-24"><span
-                                style="letter-spacing: 8px; margin-right: -8px;">会社名</span></span>
+                                style="letter-spacing: 8px; margin-right: -8px;"><BitboxxText
+                                fontSizePx="20">会社名</BitboxxText></span></span>
                     </th>
                     <td class="w-96">
                         <input class="w-96 my-8 mx-4" style="background-color: #FFFFFF; border: solid 1px;"
@@ -58,7 +62,9 @@
                 <tr class="border-b-2 border-black">
                     <th class="w-96">
                         <span class="w-96 h-24"><span
-                                style="letter-spacing: 8px; margin-right: -8px;">メール</span><br/>アドレス</span>
+                                style="letter-spacing: 8px; margin-right: -8px;"><BitboxxText
+                                fontSizePx="20">メール</BitboxxText></span><br/><BitboxxText
+                                fontSizePx="20">アドレス</BitboxxText></span>
                     </th>
                     <td class="w-96">
                         <input class="w-96 my-8 mx-4" style="background-color: #FFFFFF; border: solid 1px;"
@@ -67,7 +73,7 @@
                 </tr>
                 <tr class="border-b-2 border-black">
                     <th class="w-96">
-                        <span class="w-96 h-24">電話番号</span>
+                        <span class="w-96 h-24"><BitboxxText fontSizePx="20">電話番号</BitboxxText></span>
                     </th>
                     <td class="w-96">
                         <input class="w-96 my-8 mx-4" style="background-color: #FFFFFF; border: solid 1px;"
@@ -76,8 +82,8 @@
                 </tr>
                 <tr class="border-b-2 border-black">
                     <th class="w-96">
-                        <span class="w-96 h-24">問合わせ<br/><span
-                                style="letter-spacing: 32px; margin-right: -32px;">内容</span></span>
+                        <span class="w-96 h-24"><BitboxxText fontSizePx="20">問合わせ</BitboxxText><br/><span
+                                style="letter-spacing: 32px; margin-right: -32px;"><BitboxxText fontSizePx="20">内容</BitboxxText></span></span>
                     </th>
                     <td class="w-96">
                         <textarea class="w-96 h-48 my-8 mx-4" style="background-color: #FFFFFF; border: solid 1px;"
@@ -88,7 +94,7 @@
             </table>
             <div class="privacy flex justify-center mt-12">
                 <input class="mr-2" type="checkbox" bind:checked={pr}/>
-                <label>当社規定の<a href="/#" style="color: #00B3FF;">プライバシーポリシー</a>に同意する</label>
+                <label><BitboxxText fontSizePx="20">当社規定の<a href="/#" style="color: #00B3FF;">プライバシーポリシー</a>に同意する</BitboxxText></label>
             </div>
             <div class="w-full mt-6">
                 <button disabled={isDisabled(pr, yourname, company, email, tel, text)}
@@ -111,8 +117,10 @@
                 <tbody>
                 <tr class="border-b-2 border-black">
                     <th class="w-96">
-                        <span class="w-96 h-24"><span
-                                style="letter-spacing: 32px; margin-right: -32px;">名前</span></span>
+                        <span class="w-96 h-24">
+                            <span style="letter-spacing: 32px; margin-right: -32px;"><BitboxxText
+                                    fontSizePx="20">名前</BitboxxText></span>
+                        </span>
                     </th>
                     <td class="w-96">
                         <input class="w-96 my-8 mx-4" style="background-color: #FFFFFF; border: solid 1px;"
@@ -122,7 +130,8 @@
                 <tr class="border-b-2 border-black">
                     <th class="w-96">
                         <span class="w-96 h-24"><span
-                                style="letter-spacing: 8px; margin-right: -8px;">会社名</span></span>
+                                style="letter-spacing: 8px; margin-right: -8px;"><BitboxxText
+                                fontSizePx="20">会社名</BitboxxText></span></span>
                     </th>
                     <td class="w-96">
                         <input class="w-96 my-8 mx-4" style="background-color: #FFFFFF; border: solid 1px;"
@@ -132,7 +141,9 @@
                 <tr class="border-b-2 border-black">
                     <th class="w-96">
                         <span class="w-96 h-24"><span
-                                style="letter-spacing: 8px; margin-right: -8px;">メール</span><br/>アドレス</span>
+                                style="letter-spacing: 8px; margin-right: -8px;"><BitboxxText
+                                fontSizePx="20">メール</BitboxxText></span><br/><BitboxxText
+                                fontSizePx="20">アドレス</BitboxxText></span>
                     </th>
                     <td class="w-96">
                         <input class="w-96 my-8 mx-4" style="background-color: #FFFFFF; border: solid 1px;"
@@ -141,7 +152,7 @@
                 </tr>
                 <tr class="border-b-2 border-black">
                     <th class="w-96">
-                        <span class="w-96 h-24">電話番号</span>
+                        <span class="w-96 h-24"><BitboxxText fontSizePx="20">電話番号</BitboxxText></span>
                     </th>
                     <td class="w-96">
                         <input class="w-96 my-8 mx-4" style="background-color: #FFFFFF; border: solid 1px;"
@@ -150,8 +161,8 @@
                 </tr>
                 <tr class="border-b-2 border-black">
                     <th class="w-96">
-                        <span class="w-96 h-24">問合わせ<br/><span
-                                style="letter-spacing: 32px; margin-right: -32px;">内容</span></span>
+                        <span class="w-96 h-24"><BitboxxText fontSizePx="20">問合わせ</BitboxxText><br/><span
+                                style="letter-spacing: 32px; margin-right: -32px;"><BitboxxText fontSizePx="20">内容</BitboxxText></span></span>
                     </th>
                     <td class="w-96">
                         <textarea class="w-96 h-48 my-8 mx-4" style="background-color: #FFFFFF; border: solid 1px;"
@@ -162,7 +173,7 @@
             </table>
             <div class="privacy flex justify-center mt-12">
                 <input class="mr-2" type="checkbox" bind:checked={pr}/>
-                <label>当社規定の<a href="/#" style="color: #00B3FF;">プライバシーポリシー</a>に同意する</label>
+                <label><BitboxxText fontSizePx="20">当社規定の<a href="/#" style="color: #00B3FF;">プライバシーポリシー</a>に同意する</BitboxxText></label>
             </div>
             <div class="w-full mt-6">
                 <button disabled={isDisabled(pr, yourname, company, email, tel, text)}
@@ -236,7 +247,7 @@
             </table>
             <div class="privacy flex justify-center mt-8">
                 <input class="mr-2" type="checkbox" bind:checked={pr}/>
-                <label style="font-size: 12px;">当社規定の<a href="/#" style="color: #00B3FF;">プライバシーポリシー</a>に同意する</label>
+                <label><BitboxxText fontSizePx="14">当社規定の<a href="/#" style="color: #00B3FF;">プライバシーポリシー</a>に同意する</BitboxxText></label>
             </div>
             <div class="mx-4 mt-4">
                 <button disabled={isDisabled(pr, yourname, company, email, tel, text)}

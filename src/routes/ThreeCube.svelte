@@ -242,11 +242,11 @@
     }
 </style>
 
-<div id="container" style="opacity: 1; z-index: -1" bind:this={container}></div>
+<div id="container" style="opacity: 0.3; z-index: -1" bind:this={container}></div>
 <footer class="fixed">
     <span>
 <!--        <label for="opacity">Opacity:</label>-->
-        <input type="range" id="opacity" name="opacity" min="0" max="1" step="0.1" oninput="document.getElementById('container').style.opacity = this.value;">
+        <input type="range" id="opacity" name="opacity" min="0" max="1" step="0.1" value="0.3" oninput="document.getElementById('container').style.opacity = this.value;">
     </span>
     <span>
 <!--        <label for="z-index-toggle">Z-Index:</label>-->

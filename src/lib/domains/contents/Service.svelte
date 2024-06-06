@@ -3,6 +3,7 @@
     import BitboxxContent from "$lib/infras/BitboxxContent.svelte";
     import BitboxxTypography from "$lib/infras/BitboxxTypography.svelte";
     import Display from "$lib/infras/Display.svelte";
+    import BitboxxText from "$lib/infras/BitboxxText.svelte";
 
     let services = [
         {
@@ -27,15 +28,15 @@
             <BitboxxContentTitle num={2}>SERVICE</BitboxxContentTitle>
         </div>
         <div class="max-w-screen-xl flex justify-center items-center">
-            <table class="table-auto w-full mt-12">
+            <table>
                 <tbody>
                 {#each services as service}
                     <tr class="border-b-2 border-black" style="height: 190px;">
                         <th class="p-8 m-24">
-                            <BitboxxTypography fontSizePx={20}>{@html service.title}</BitboxxTypography>
+                            <BitboxxText fontSizePx="22"><b>{@html service.title}</b></BitboxxText>
                         </th>
-                        <td style="font-size: 24px;">
-                            {@html service.description}
+                        <td>
+                            <BitboxxText fontSizePx="22">{@html service.description}</BitboxxText>
                         </td>
                     </tr>
                 {/each}
@@ -52,12 +53,16 @@
             <table class="table-auto w-full mt-12">
                 <tbody>
                 {#each services as service}
-                    <tr class="border-b-2 border-black" style="height: 50px;">
-                        <th class="p-6 m-12">
-                            <BitboxxTypography fontSizePx={20}>{@html service.title}</BitboxxTypography>
-                        </th>
-                        <td style="font-size: 20px;">
-                            {@html service.description}
+                    <tr class="border-b-2 border-black">
+                        <td class="p-4 m-8">
+                            <div class="flex justify-center sp-service-title">
+                                <BitboxxTypography fontSizePx={24}>
+                                    <BitboxxText><b>{@html service.title}</b></BitboxxText>
+                                </BitboxxTypography>
+                            </div>
+                            <div class="mt-4 sp-service">
+                                <BitboxxText>{@html service.description}</BitboxxText>
+                            </div>
                         </td>
                     </tr>
                 {/each}
@@ -71,17 +76,19 @@
             <BitboxxContentTitle num={2} fontSizePx={48} widthPx={40}>SERVICE</BitboxxContentTitle>
         </div>
 
-        <div class="flex flex-col space-y-8 mt-20 mx-4">
+        <div class="flex flex-col space-y-8 mx-4">
             <table>
                 <tbody>
                 {#each services as service}
                     <tr class="border-b-2 border-black">
                         <td class="p-4 m-8">
                             <div class="flex justify-center sp-service-title">
-                                <BitboxxTypography fontSizePx={24}><b>{@html service.title}</b></BitboxxTypography>
+                                <BitboxxTypography fontSizePx={24}>
+                                    <BitboxxText><b>{@html service.title}</b></BitboxxText>
+                                </BitboxxTypography>
                             </div>
                             <div class="mt-4 sp-service">
-                                {@html service.description}
+                                <BitboxxText>{@html service.description}</BitboxxText>
                             </div>
                         </td>
                     </tr>
@@ -121,8 +128,8 @@
         font-family: 'Noto Sans JP';
         font-style: normal;
         font-weight: 400;
-        font-size: 12px;
-        line-height: 17px;
+        font-size: 16px;
+        line-height: 22px;
         /* leading-trim and text-edge are draft CSS properties.
 
         Read more: https://drafts.csswg.org/css-inline-3/#leading-trim

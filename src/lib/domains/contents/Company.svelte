@@ -2,6 +2,7 @@
     import BitboxxContentTitle from "$lib/infras/BitboxxContentTitle.svelte";
     import BitboxxContent from "$lib/infras/BitboxxContent.svelte";
     import Display from "$lib/infras/Display.svelte";
+    import BitboxxText from "$lib/infras/BitboxxText.svelte";
 
     let info = [
         {
@@ -44,10 +45,14 @@
                 {#each info as inf}
                     <tr class="border-b-2 border-black">
                         <th class="w-96 h-24">
-                            <span style={`letter-spacing: ${inf.letterSp}px; margin-right: -${inf.letterSp}px;`}>{@html inf.title}</span>
+                            <span style={`letter-spacing: ${inf.letterSp}px; margin-right: -${inf.letterSp}px;`}>
+                                <BitboxxText fontSizePx="20">{@html inf.title}</BitboxxText>
+                            </span>
                         </th>
                         <td class="w-96 h-24">
-                            <div class="w-full p-4" style="font-size: 16px;">{@html inf.description}</div>
+                            <div class="w-full p-4">
+                                <BitboxxText fontSizePx="18">{@html inf.description}</BitboxxText>
+                            </div>
                         </td>
                     </tr>
                 {/each}
@@ -66,10 +71,14 @@
                 {#each info as inf}
                     <tr class="border-b-2 border-black">
                         <th class="w-96 h-24">
-                            <span style={`letter-spacing: ${inf.letterSp}px; margin-right: -${inf.letterSp}px;`}>{@html inf.title}</span>
+                            <span style={`letter-spacing: ${inf.letterSp}px; margin-right: -${inf.letterSp}px;`}>
+                                <BitboxxText fontSizePx="20">{@html inf.title}</BitboxxText>
+                            </span>
                         </th>
                         <td class="w-96 h-24">
-                            <div class="w-full p-4" style="font-size: 16px;">{@html inf.description}</div>
+                            <div class="w-full p-4">
+                                <BitboxxText fontSizePx="18">{@html inf.description}</BitboxxText>
+                            </div>
                         </td>
                     </tr>
                 {/each}
