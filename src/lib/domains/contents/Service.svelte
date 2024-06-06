@@ -24,9 +24,7 @@
 <Display>
 
     <BitboxxContent slot="lg">
-        <div class="absolute top-0 left-0">
-            <BitboxxContentTitle num={2}>SERVICE</BitboxxContentTitle>
-        </div>
+        <BitboxxContentTitle slot="header" num={2}>SERVICE</BitboxxContentTitle>
         <div class="max-w-screen-xl flex justify-center items-center">
             <table>
                 <tbody>
@@ -46,9 +44,7 @@
     </BitboxxContent>
 
     <BitboxxContent slot="md">
-        <div class="absolute top-0 left-0">
-            <BitboxxContentTitle num={2}>SERVICE</BitboxxContentTitle>
-        </div>
+        <BitboxxContentTitle slot="header" num={2}>SERVICE</BitboxxContentTitle>
         <div class="max-w-screen-xl flex justify-center items-center">
             <table class="table-auto w-full mt-12">
                 <tbody>
@@ -72,10 +68,7 @@
     </BitboxxContent>
 
     <BitboxxContent slot="sm">
-        <div class="absolute top-0 left-4">
-            <BitboxxContentTitle num={2} fontSizePx={48} widthPx={40}>SERVICE</BitboxxContentTitle>
-        </div>
-
+        <BitboxxContentTitle slot="header" num={2} fontSizePx={48} widthPx={40}>SERVICE</BitboxxContentTitle>
         <div class="flex flex-col space-y-8 mx-4">
             <table>
                 <tbody>

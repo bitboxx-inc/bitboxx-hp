@@ -30,9 +30,7 @@
 
 <Display>
     <BitboxxContent slot="lg">
-        <div class="absolute top-0 left-0">
-            <BitboxxContentTitle num={5}>CONTACT</BitboxxContentTitle>
-        </div>
+        <BitboxxContentTitle slot="header" num={5}>CONTACT</BitboxxContentTitle>
         <div>
             <table>
                 <tbody>
@@ -109,9 +107,7 @@
     </BitboxxContent>
 
     <BitboxxContent slot="md">
-        <div class="absolute top-0 left-0">
-            <BitboxxContentTitle num={5}>CONTACT</BitboxxContentTitle>
-        </div>
+        <BitboxxContentTitle slot="header" num={5}>CONTACT</BitboxxContentTitle>
         <div>
             <table>
                 <tbody>
@@ -188,9 +184,7 @@
     </BitboxxContent>
 
     <BitboxxContent slot="sm">
-        <div class="absolute top-0 left-4">
-            <BitboxxContentTitle num={5} fontSizePx={48} widthPx={40}>CONTACT</BitboxxContentTitle>
-        </div>
+        <BitboxxContentTitle slot="header" num={5} fontSizePx={48} widthPx={40}>CONTACT</BitboxxContentTitle>
         <div>
             <table class="mx-4">
                 <tbody>
