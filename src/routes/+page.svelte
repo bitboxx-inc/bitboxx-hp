@@ -32,7 +32,6 @@
 </script>
 
 <div>
-
     <!-- TOP -->
     <Top contents={contents}/>
 
@@ -60,18 +59,37 @@
     <section id="contact">
         <Contact/>
     </section>
-
-    <Display>
-        <footer>
-            <div class="flex justify-center py-12" style="font-family: 'Noto Sans JP'">
-                2024 &copy; bitboxx inc.
-            </div>
-        </footer>
-    </Display>
 </div>
+
+<div class="mt-48">
+&nbsp;
+</div>
+
+<Display>
+    <span slot="lg" class="vertical-copyright">2024 &copy; bitboxx inc.</span>
+    <span slot="md" class="vertical-copyright">2024 &copy; bitboxx inc.</span>
+    <span slot="sm" class="sp-copyright">2024 &copy; bitboxx inc.</span>
+</Display>
 
 <style>
     div {
         backdrop-filter: blur(0.01em);
+    }
+
+    .vertical-copyright {
+        font-family: 'Noto Sans JP';
+        position: fixed;
+        left: 45px;
+        bottom: 15%;
+        transform: translateY(-50%) rotate(-270deg);
+        transform-origin: left top;
+        z-index: -1; /* 高いz-indexを設定して常に前面に表示 */
+        background-color: rgba(255, 255, 255, 0.0); /* 背景色を設定して見やすくする（オプション） */
+        padding: 0.5em; /* パディングを設定してテキストが切れないようにする（オプション） */
+    }
+
+    .sp-copyright {
+        font-family: 'Noto Sans JP';
+        padding: 0.5em; /* パディングを設定してテキストが切れないようにする（オプション） */
     }
 </style>
