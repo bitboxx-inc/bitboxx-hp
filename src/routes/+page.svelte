@@ -95,6 +95,5 @@
 
     .sp-copyright {
         font-family: 'Noto Sans JP';
-        padding: 0.5em; /* パディングを設定してテキストが切れないようにする（オプション） */
     }
 </style>
