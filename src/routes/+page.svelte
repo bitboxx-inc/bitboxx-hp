@@ -61,16 +61,10 @@
     </section>
 </div>
 
-<Display>
-    <span slot="lg" class="vertical-copyright">
+<span class="vertical-copyright">
         <div class="mt-48">&nbsp;</div>
         2024 &copy; bitboxx inc.
     </span>
-    <span slot="md" class="vertical-copyright">
-        <div class="mt-48">&nbsp;</div>
-        2024 &copy; bitboxx inc.
-    </span>
-</Display>
 
 <style>
     div {
@@ -87,9 +81,5 @@
         z-index: -1; /* 高いz-indexを設定して常に前面に表示 */
         background-color: rgba(255, 255, 255, 0.0); /* 背景色を設定して見やすくする（オプション） */
         padding: 0.5em; /* パディングを設定してテキストが切れないようにする（オプション） */
-    }
-
-    .sp-copyright {
-        font-family: 'Noto Sans JP';
     }
 </style>
