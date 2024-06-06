@@ -61,13 +61,15 @@
     </section>
 </div>
 
-<div class="mt-48">
-&nbsp;
-</div>
-
 <Display>
-    <span slot="lg" class="vertical-copyright">2024 &copy; bitboxx inc.</span>
-    <span slot="md" class="vertical-copyright">2024 &copy; bitboxx inc.</span>
+    <span slot="lg" class="vertical-copyright">
+        <div class="mt-48">&nbsp;</div>
+        2024 &copy; bitboxx inc.
+    </span>
+    <span slot="lg" class="vertical-copyright">
+        <div class="mt-48">&nbsp;</div>
+        2024 &copy; bitboxx inc.
+    </span>
     <span slot="sm" class="sp-copyright">2024 &copy; bitboxx inc.</span>
 </Display>
 
