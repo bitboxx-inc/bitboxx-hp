@@ -70,7 +70,10 @@
         <div class="mt-48">&nbsp;</div>
         2024 &copy; bitboxx inc.
     </span>
-    <span slot="sm" class="sp-copyright">2024 &copy; bitboxx inc.</span>
+    <span slot="sm" class="sp-copyright">
+        <div class="mt-4">&nbsp;</div>
+        2024 &copy; bitboxx inc.
+    </span>
 </Display>
 
 <style>
