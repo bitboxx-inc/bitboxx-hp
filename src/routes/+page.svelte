@@ -71,7 +71,7 @@
         2024 &copy; bitboxx inc.
     </span>
     <span slot="sm" class="sp-copyright">
-        <div class="mt-4">&nbsp;</div>
+        <div>&nbsp;</div>
         2024 &copy; bitboxx inc.
     </span>
 </Display>
