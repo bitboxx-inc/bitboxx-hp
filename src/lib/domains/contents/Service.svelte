@@ -84,11 +84,11 @@
                         <td class="p-4 m-8">
                             <div class="flex justify-center sp-service-title">
                                 <BitboxxTypography fontSizePx={24}>
-                                    <BitboxxText><b>{@html service.title}</b></BitboxxText>
+                                    <BitboxxText fontSizePx="18"><b>{@html service.title}</b></BitboxxText>
                                 </BitboxxTypography>
                             </div>
                             <div class="mt-4 sp-service">
-                                <BitboxxText>{@html service.description}</BitboxxText>
+                                <BitboxxText fontSizePx="16">{@html service.description}</BitboxxText>
                             </div>
                         </td>
                     </tr>
@@ -129,7 +129,7 @@
         font-style: normal;
         font-weight: 400;
         font-size: 16px;
-        line-height: 22px;
+        line-height: 20px;
         /* leading-trim and text-edge are draft CSS properties.
 
         Read more: https://drafts.csswg.org/css-inline-3/#leading-trim
