@@ -25,12 +25,10 @@
     </header>
 </Display>
 
-<FadeIn>
-    <slot></slot>
-</FadeIn>
 
-<ThreeCube/>
-<Stardust/>
+<slot></slot>
+<!--<ThreeCube/>-->
+<!--<Stardust/>-->
 
 <style>
     .logo {
