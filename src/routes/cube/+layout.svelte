@@ -3,31 +3,34 @@
     import Top from "$lib/domains/contents/Top.svelte";
     import AboutUs from "$lib/domains/contents/AboutUs.svelte";
     import Contact from "$lib/domains/contents/Contact.svelte";
-    import {onMount} from "svelte";
+    import { onMount } from "svelte";
     import FadeIn from "$lib/infras/fade/FadeIn.svelte";
+    import Service from "$lib/domains/contents/Service.svelte";
+    import Works from "$lib/domains/contents/Works.svelte";
+    import Company from "$lib/domains/contents/Company.svelte";
 
     let cube;
 
     let contents = [
         {
             title: 'ABOUT US',
-            link: '/cube/about-us'
+            link: '#about-us',
         },
         {
             title: 'SERVICE',
-            link: '/cube/service'
+            link: '#service',
         },
         {
             title: 'WORKS',
-            link: '/cube/works'
+            link: '#works',
         },
         {
             title: 'COMPANY',
-            link: '/cube/company'
+            link: '#company',
         },
         {
             title: 'CONTACT',
-            link: '/cube/contact'
+            link: '#contact',
         }
     ];
 
@@ -37,7 +40,7 @@
     }
 
     function handleFaceClick(event) {
-        const {slotName} = event.detail;
+        const { slotName } = event.detail;
         console.log(`Clicked face: ${slotName}`);
     }
 
@@ -57,22 +60,53 @@
         cube.rotateDown();
     }
 
-    function clickLink(link: string) {
-        window.location.href = '/cube/' + link
+    function handleLinkClick(event, rotation) {
+        event.preventDefault();
+        switch (rotation) {
+            case 'left':
+                triggerLeftRotation();
+                break;
+            case 'right':
+                triggerRightRotation();
+                break;
+            case 'up':
+                triggerUpRotation();
+                break;
+            case 'down':
+                triggerDownRotation();
+                break;
+        }
+    }
+
+    let currentHash = '';
+    function handleHashChange() {
+        currentHash = window.location.hash;
+        switch (currentHash) {
+            case '#contact':
+                triggerRightRotation();
+                break;
+            case '#about-us':
+            case '#service':
+            case '#works':
+            case '#company':
+                triggerLeftRotation();
+            default:
+                break;
+        }
     }
 
     onMount(() => {
-        if (window.location.pathname === '/cube/about-us') {
-            triggerLeftRotation();
-        } else if (window.location.pathname === '/cube/contact') {
-            triggerRightRotation();
-        }
-    })
+        handleHashChange();
+        window.addEventListener('hashchange', handleHashChange);
+        return () => {
+            window.removeEventListener('hashchange', handleHashChange);
+        };
+    });
 </script>
 
 <Cube bind:this={cube} operatable="{false}" on:faceClick={handleFaceClick} on:rotationComplete={handleRotationComplete}>
     <div slot="front">
-        <Top contents="{contents}"></Top>
+        <Top {contents} on:clickLink={handleLinkClick}></Top>
     </div>
     <div slot="back">Back Content</div>
     <div slot="left">
@@ -80,10 +114,19 @@
     </div>
     <div slot="right">
         <FadeIn>
-            <slot/>
+            {#if currentHash === '#about-us'}
+                <AboutUs></AboutUs>
+            {:else if currentHash === '#service'}
+                <Service></Service>
+            {:else if currentHash === '#works'}
+                <Works></Works>
+            {:else if currentHash === '#company'}
+                <Company></Company>
+            {:else if currentHash === '#contact'}
+                <Contact></Contact>
+            {/if}
         </FadeIn>
     </div>
     <div slot="top">Top Content</div>
     <div slot="bottom">Bottom Content</div>
 </Cube>
-
