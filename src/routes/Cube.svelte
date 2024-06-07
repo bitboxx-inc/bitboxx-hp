@@ -17,7 +17,7 @@
 
     function updateCubeRotation() {
         const cube = document.querySelector(".cube");
-        cube.style.transform = `translateZ(-50vmin) rotateX(${currentFace * 90}deg)`;
+        cube.style.transform = `translateZ(-50vmin) rotateY(${currentFace * 90}deg)`;
     }
 
     onMount(() => {
@@ -72,11 +72,11 @@
 
 <div class="scene">
     <div class="cube">
-        <div class="face front">Front</div>
-        <div class="face back">Back</div>
-        <div class="face left">Left</div>
-        <div class="face right">Right</div>
-        <div class="face top">Top</div>
-        <div class="face bottom">Bottom</div>
+        <div class="face front"><slot name="front"></slot></div>
+        <div class="face back"><slot name="back"></slot></div>
+        <div class="face left"><slot name="left"></slot></div>
+        <div class="face right"><slot name="right"></slot></div>
+        <div class="face top"><slot name="top"></slot></div>
+        <div class="face bottom"><slot name="bottom"></slot></div>
     </div>
 </div>

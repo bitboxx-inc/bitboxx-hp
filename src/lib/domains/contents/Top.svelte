@@ -31,7 +31,7 @@
             <div class="flex-1 flex justify-center">
                 <BitboxxLogo/>
             </div>
-            <div class="flex-1 relative">
+            <div class="flex-1 relative ml-24">
                 {#each contents as content, index}
                     <div class="hover-container" style="line-height: 0.85">
                         <FadeIn>
@@ -40,11 +40,11 @@
                                on:click|preventDefault={(event) => handleLinkClick(event, content.link)}
                                on:mouseenter={() => handleMouseEnter(index)}
                                on:mouseleave={handleMouseLeave}>
-                                <BitboxxTypography widthPx={88} fontSizePx={160} outlined={true}>
+                                <BitboxxTypography widthPx={35} fontSizePx={60} outlined={true}>
                                     {String(index + 1).padStart(2, '0')}
                                 </BitboxxTypography>
-                                <BitboxxTypography fontSizePx={160}>&nbsp;</BitboxxTypography>
-                                <BitboxxTypography fontSizePx={160}>{content.title}</BitboxxTypography>
+                                <BitboxxTypography fontSizePx={60}>&nbsp;</BitboxxTypography>
+                                <BitboxxTypography fontSizePx={60}>{content.title}</BitboxxTypography>
                             </a>
                         </FadeIn>
                         {#if $hoverState === index}
@@ -60,7 +60,7 @@
             <div class="flex-1 flex justify-center">
                 <BitboxxLogo/>
             </div>
-            <div class="flex-1 relative">
+            <div class="flex-1 relative ml-24">
                 {#each contents as content, index}
                     <div class="hover-container" style="line-height: 0.85">
                         <FadeIn>
@@ -69,11 +69,11 @@
                                on:click|preventDefault={(event) => handleLinkClick(event, content.link)}
                                on:mouseenter={() => handleMouseEnter(index)}
                                on:mouseleave={handleMouseLeave}>
-                                <BitboxxTypography widthPx={64} fontSizePx={100} outlined={true}>
+                                <BitboxxTypography widthPx={35} fontSizePx={60} outlined={true}>
                                     {String(index + 1).padStart(2, '0')}
                                 </BitboxxTypography>
-                                <BitboxxTypography fontSizePx={100}>&nbsp;</BitboxxTypography>
-                                <BitboxxTypography fontSizePx={100}>{content.title}</BitboxxTypography>
+                                <BitboxxTypography fontSizePx={60}>&nbsp;</BitboxxTypography>
+                                <BitboxxTypography fontSizePx={60}>{content.title}</BitboxxTypography>
                             </a>
                         </FadeIn>
                         {#if $hoverState === index}
