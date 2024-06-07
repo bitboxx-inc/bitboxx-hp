@@ -34,7 +34,9 @@
 <div>
 
     <!-- TOP -->
-    <Top contents={contents}/>
+    <section id="top">
+        <Top contents={contents}/>
+    </section>
 
     <!-- ABOUT US -->
     <section id="about-us">

@@ -73,8 +73,6 @@
 <Cube bind:this={cube} operatable="{false}" on:faceClick={handleFaceClick} on:rotationComplete={handleRotationComplete}>
     <div slot="front">
         <Top contents="{contents}"></Top>
-        <a on:click={() => clickLink('about-us')}>about us</a>
-        <a on:click={() => clickLink('contact')}>contact</a>
     </div>
     <div slot="back">Back Content</div>
     <div slot="left">
