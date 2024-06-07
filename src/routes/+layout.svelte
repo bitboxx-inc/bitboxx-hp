@@ -13,7 +13,6 @@
     import Humberger from "./Humberger.svelte";
     import Stardust from "./Stardust.svelte";
     import FadeIn from "$lib/infras/fade/FadeIn.svelte";
-    import Cube from "./Cube.svelte";
 
 </script>
 

@@ -6,9 +6,6 @@
     import Works from "$lib/domains/contents/Works.svelte";
     import Contact from "$lib/domains/contents/Contact.svelte";
     import Display from "$lib/infras/Display.svelte";
-    import BitboxxContents from "$lib/infras/contents/BitboxxContents.svelte";
-    import SplitContent from "$lib/infras/contents/SplitContent.svelte";
-    import BitboxxLogo from "$lib/domains/BitboxxLogo.svelte";
 
     let contents = [
         {
@@ -37,7 +34,7 @@
 <div>
 
     <!-- TOP -->
-    <Top contents="{contents}"></Top>
+    <Top contents={contents}/>
 
     <!-- ABOUT US -->
     <section id="about-us">
@@ -64,8 +61,13 @@
         <Contact/>
     </section>
 
-<!--    <Display>-->
-<!--    </Display>-->
+    <Display>
+        <footer>
+            <div class="flex justify-center py-12" style="font-family: 'Noto Sans JP'">
+                2024 &copy; bitboxx inc.
+            </div>
+        </footer>
+    </Display>
 </div>
 
 <style>
