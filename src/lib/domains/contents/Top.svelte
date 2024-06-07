@@ -20,7 +20,8 @@
     function handleLinkClick(event: Event, link: string) {
         event.preventDefault();
         const targetId = link.replace('/#', '');
-        scrollToTarget(targetId);
+        window.location.href = link;
+        // scrollToTarget(targetId);
     }
 </script>
 

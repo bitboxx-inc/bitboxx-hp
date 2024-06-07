@@ -1,5 +1,6 @@
 <script lang="ts">
     import {onMount} from "svelte";
+    import FadeIn from "$lib/infras/fade/FadeIn.svelte";
 
     let isLgSize = false;
     let isMdSize = false;

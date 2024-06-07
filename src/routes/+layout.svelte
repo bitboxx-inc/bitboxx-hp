@@ -12,6 +12,8 @@
     import BitboxxLogo from "$lib/domains/BitboxxLogo.svelte";
     import Humberger from "./Humberger.svelte";
     import Stardust from "./Stardust.svelte";
+    import FadeIn from "$lib/infras/fade/FadeIn.svelte";
+    import Cube from "./Cube.svelte";
 
 </script>
 
@@ -24,7 +26,9 @@
     </header>
 </Display>
 
-<slot></slot>
+<FadeIn>
+    <slot></slot>
+</FadeIn>
 
 <ThreeCube/>
 <Stardust/>

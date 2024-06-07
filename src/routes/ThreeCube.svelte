@@ -243,14 +243,14 @@
 </style>
 
 <div id="container" style="opacity: 0.3; z-index: -1" bind:this={container}></div>
-<footer class="fixed">
-    <span>
-<!--        <label for="opacity">Opacity:</label>-->
-        <input type="range" id="opacity" name="opacity" min="0" max="1" step="0.1" value="0.3" oninput="document.getElementById('container').style.opacity = this.value;">
-    </span>
-    <span>
-<!--        <label for="z-index-toggle">Z-Index:</label>-->
-        <input type="checkbox" id="z-index-toggle" name="z-index-toggle" onchange="document.getElementById('container').style.zIndex = this.checked ? 1 : -1;">
-        <label for="z-index-toggle" id="z-index-label">!?</label>
-    </span>
-</footer>
+<!--<footer class="fixed">-->
+<!--    <span>-->
+<!--&lt;!&ndash;        <label for="opacity">Opacity:</label>&ndash;&gt;-->
+<!--        <input type="range" id="opacity" name="opacity" min="0" max="1" step="0.1" value="0.3" oninput="document.getElementById('container').style.opacity = this.value;">-->
+<!--    </span>-->
+<!--    <span>-->
+<!--&lt;!&ndash;        <label for="z-index-toggle">Z-Index:</label>&ndash;&gt;-->
+<!--        <input type="checkbox" id="z-index-toggle" name="z-index-toggle" onchange="document.getElementById('container').style.zIndex = this.checked ? 1 : -1;">-->
+<!--        <label for="z-index-toggle" id="z-index-label">!?</label>-->
+<!--    </span>-->
+<!--</footer>-->
