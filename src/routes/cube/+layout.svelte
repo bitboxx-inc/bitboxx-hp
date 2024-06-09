@@ -110,7 +110,9 @@
     </div>
     <div slot="back">Back Content</div>
     <div slot="left">
-        <Contact></Contact>
+        {#if currentHash === '#contact'}
+            <Contact/>
+        {/if}
     </div>
     <div slot="right">
         <FadeIn>
@@ -123,7 +125,7 @@
             {:else if currentHash === '#company'}
                 <Company></Company>
             {:else if currentHash === '#contact'}
-                <Contact></Contact>
+                !?
             {/if}
         </FadeIn>
     </div>
