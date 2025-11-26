@@ -3,7 +3,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Noto+Serif+JP&display=swap"
           rel="stylesheet">
-    <title>株式会社bitboxx | まだ見ぬ最高を、確かな品質で。</title>
+    <title>株式会社bitboxx</title>
 </svelte:head>
 
 <script lang="ts">
