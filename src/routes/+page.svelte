@@ -67,17 +67,21 @@
 
 <main class="flex-1">
 
-    <section class="max-w-7xl mx-auto px-6 pt-32 pb-40 text-center">
-        <h1 class="text-7xl md:text-9xl font-extrabold tracking-tighter leading-none">
-                <span class="bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-                    まだ見ぬ最高を、<br class="sm:hidden"/>確かな品質で。
-                </span>
+    <section class="max-w-7xl mx-auto px-6 py-28 md:py-40 text-center">
+
+        <h1 class="text-[3.8rem] md:text-9xl font-extrabold tracking-tighter leading-none">
+        <span class="bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+            <span class="whitespace-nowrap">まだ見ぬ最高を、</span><br class="sm:hidden"/>
+            <span class="whitespace-nowrap">確かな品質で。</span>
+        </span>
         </h1>
-        <p class="mt-12 max-w-3xl mx-auto text-gray-600 text-xl leading-relaxed font-light">
+
+        <p class="mt-10 md:mt-12 max-w-3xl mx-auto text-gray-600 text-xl leading-relaxed font-light">
             私たち bitboxx (ビットボックス) の使命は、唯一無二のアイデアを卓越した技術で実現し、
             人々の心を満たす愛着あるプロダクトとして世界に届けることです。
         </p>
-        <div class="mt-16">
+
+        <div class="mt-14 md:mt-16">
             <a href="#contact-form" class="inline-flex items-center justify-center px-10 py-3 border border-transparent text-base font-medium rounded-full shadow-lg text-white bg-gray-900 hover:bg-gray-700 transition-colors">
                 プロジェクトのご相談
             </a>
