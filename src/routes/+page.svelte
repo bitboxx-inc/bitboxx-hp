@@ -69,7 +69,7 @@
 
     <section class="max-w-7xl mx-auto px-6 py-28 md:py-40 text-center">
 
-        <h1 class="text-[3.8rem] md:text-9xl font-extrabold tracking-tighter leading-none">
+        <h1 class="**text-6xl** md:text-9xl font-extrabold tracking-tighter leading-none">
         <span class="bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
             <span class="whitespace-nowrap">まだ見ぬ最高を、</span><br class="sm:hidden"/>
             <span class="whitespace-nowrap">確かな品質で。</span>
