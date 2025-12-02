@@ -64,6 +64,11 @@
   }
 </script>
 
+<style>
+    .mincho {
+        font-family: 'Noto Serif JP', serif;
+    }
+</style>
 
 <main class="flex-1">
 
@@ -73,7 +78,7 @@
                     まだ見ぬ最高を、<br class="sm:hidden"/>確かな品質で。
                 </span>
         </h1>
-        <p class="mt-12 max-w-3xl mx-auto text-gray-600 text-xl leading-relaxed font-light">
+        <p class="mincho mt-12 max-w-3xl mx-auto text-gray-600 text-xl leading-relaxed font-light">
             私たち bitboxx (ビットボックス) の使命は、唯一無二のアイデアを卓越した技術で実現し、
             人々の心を満たす愛着あるプロダクトとして世界に届けることです。
         </p>
@@ -84,7 +89,7 @@
         </div>
     </section>
 
-    <section id="philosophy" class="max-w-7xl mx-auto px-6 py-28 bg-gray-50 border-t border-b border-gray-100 mt-24 scroll-mt-24">
+    <section id="philosophy" class="mincho max-w-7xl mx-auto px-6 py-28 bg-gray-50 border-t border-b border-gray-100 mt-24 scroll-mt-24">
         <h2 class="text-3xl font-bold text-center mb-4 text-gray-700">私たちの哲学</h2>
         <p class="text-xl text-center text-gray-500 font-light mb-16">Excellent / Kawaii / Unique</p>
         <div class="max-w-6xl mx-auto grid md:grid-cols-3 gap-10 text-left">
@@ -118,7 +123,7 @@
         </div>
     </section>
 
-    <section id="business" class="max-w-7xl mx-auto px-6 py-24 mt-24 scroll-mt-24">
+    <section id="business" class="mincho max-w-7xl mx-auto px-6 py-24 mt-24 scroll-mt-24">
         <h2 class="text-3xl font-bold text-center mb-16">事業内容</h2>
         <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div class="p-8 rounded-2xl border border-gray-100 bg-white shadow-sm hover:shadow-md transition">
@@ -160,7 +165,7 @@
         </div>
     </section>
 
-    <section id="company" class="max-w-4xl mx-auto px-6 pt-16 pb-24 mt-24 scroll-mt-24">
+    <section id="company" class="mincho max-w-4xl mx-auto px-6 pt-16 pb-24 mt-24 scroll-mt-24">
         <h2 class="text-3xl font-bold mb-12 text-center">会社概要</h2>
         <div class="bg-gray-50 rounded-2xl p-10 border border-gray-100 shadow-sm">
             <dl class="space-y-5 text-gray-700 text-base">
@@ -195,7 +200,7 @@
         </div>
     </section>
 
-    <section id="contact-form" class="w-full py-24 mt-24 mb-32 bg-gray-900 scroll-mt-24">
+    <section id="contact-form" class="mincho w-full py-24 mt-24 mb-32 bg-gray-900 scroll-mt-24">
         <div class="max-w-4xl mx-auto px-6">
             <h2 class="text-3xl font-bold text-center mb-16 tracking-wider text-white">お問い合わせ</h2>
 
