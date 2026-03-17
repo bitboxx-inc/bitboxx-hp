@@ -76,19 +76,24 @@
 </script>
 
 <style>
-    .mincho {
-        font-family: 'Noto Serif JP', serif;
+    .plans-page {
+        font-family: 'Noto Sans JP', sans-serif;
+    }
+    .plans-heading {
+        font-family: 'Noto Sans JP', sans-serif;
+        letter-spacing: -0.02em;
     }
 </style>
 
-<section class="border-b border-gray-200 bg-white">
+<div class="plans-page">
+<section class="bg-white">
     <div class="max-w-6xl mx-auto px-6 pt-20 pb-16 md:pt-24 md:pb-20">
-        <h1 class="mt-4 text-4xl md:text-6xl font-bold tracking-tight text-gray-900">
-            相談、開発、運用を
+        <h1 class="plans-heading mt-4 text-4xl md:text-6xl font-bold tracking-tight text-gray-900">
+            ITに関することを
             <br class="hidden sm:block"/>
             必要な範囲で支援します。
         </h1>
-        <p class="mincho mt-6 max-w-3xl text-base md:text-lg leading-8 text-gray-600">
+        <p class="mt-6 max-w-3xl text-base md:text-lg leading-8 text-gray-600">
             bitboxxでは、事業と開発を一体で支援するフルスタックプラン、
             スポットで依頼できるシステム開発プラン、定期的な運用や保守に対応する運用保守プランをご用意しています。
         </p>
@@ -105,11 +110,11 @@
 
 <section class="bg-white">
     <div class="max-w-6xl mx-auto px-6 py-16 md:py-20">
-        <div class="border-t border-gray-200 pt-6">
+        <div class="pt-6">
             <div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-500">bitboxxを選ぶ理由</p>
-                    <h2 class="mincho mt-2 text-3xl text-gray-900">事業のためのシステムをご提案します</h2>
+                    <h2 class="plans-heading mt-2 text-3xl text-gray-900">事業のためのシステムをご提案します</h2>
                 </div>
                 <p class="text-sm leading-7 text-gray-600">
                     システム導入そのものが目的にならないよう、必要性と運用負荷の両方を見ながら設計します。
@@ -118,7 +123,7 @@
 
             <div class="mt-10 grid gap-8 md:grid-cols-2">
                 {#each reasons as reason}
-                    <div class="border border-gray-200 bg-gray-50 px-6 py-6">
+                    <div class="bg-gray-50 px-6 py-6">
                         <h3 class="text-xl font-semibold text-gray-900">{reason.title}</h3>
                         <p class="mt-4 text-sm leading-7 text-gray-700">{reason.description}</p>
                     </div>
@@ -130,19 +135,19 @@
 
 <section class="bg-white">
     <div class="max-w-6xl mx-auto px-6 py-16 md:py-20">
-        <div class="border-t border-gray-900 pt-6">
+        <div class="pt-6">
             <div class="grid gap-8 lg:grid-cols-[280px_1fr]">
                 <div>
                     <p class="text-sm font-medium text-gray-500">プラン 01</p>
-                    <h2 class="mincho mt-2 text-3xl text-gray-900">フルスタックプラン</h2>
+                    <h2 class="plans-heading mt-2 text-3xl text-gray-900">フルスタックプラン</h2>
                     <p class="mt-5 text-3xl font-bold tracking-tight text-gray-900">月額 77万円から</p>
                     <p class="mt-5 text-sm leading-7 text-gray-600">
                         コンサルティング、システム開発、運用保守をまとめて依頼したい企業向けの包括プランです。
                     </p>
                 </div>
 
-                <div class="border border-gray-200">
-                    <div class="grid border-b border-gray-200 md:grid-cols-[220px_1fr]">
+                <div class="bg-gray-50">
+                    <div class="grid md:grid-cols-[220px_1fr]">
                         <div class="bg-gray-50 px-6 py-5 text-sm font-medium text-gray-700">支援内容</div>
                         <div class="px-6 py-5">
                             <ul class="space-y-3 text-sm leading-7 text-gray-700">
@@ -153,7 +158,7 @@
                         </div>
                     </div>
 
-                    <div class="grid border-b border-gray-200 md:grid-cols-[220px_1fr]">
+                    <div class="grid md:grid-cols-[220px_1fr]">
                         <div class="bg-gray-50 px-6 py-5 text-sm font-medium text-gray-700">開発範囲</div>
                         <div class="px-6 py-5">
                             <ul class="space-y-3 text-sm leading-7 text-gray-700">
@@ -164,7 +169,7 @@
                         </div>
                     </div>
 
-                    <div class="grid border-b border-gray-200 md:grid-cols-[220px_1fr]">
+                    <div class="grid md:grid-cols-[220px_1fr]">
                         <div class="bg-gray-50 px-6 py-5 text-sm font-medium text-gray-700">伴走体制</div>
                         <div class="px-6 py-5">
                             <ul class="space-y-3 text-sm leading-7 text-gray-700">
@@ -189,19 +194,19 @@
             </div>
         </div>
 
-        <div class="mt-16 border-t border-gray-300 pt-6">
+        <div class="mt-16 pt-6">
             <div class="grid gap-8 lg:grid-cols-[280px_1fr]">
                 <div>
                     <p class="text-sm font-medium text-gray-500">プラン 02</p>
-                    <h2 class="mincho mt-2 text-3xl text-gray-900">運用保守プラン</h2>
+                    <h2 class="plans-heading mt-2 text-3xl text-gray-900">運用保守プラン</h2>
                     <p class="mt-5 text-3xl font-bold tracking-tight text-gray-900">月額 15万円から</p>
                     <p class="mt-5 text-sm leading-7 text-gray-600">
                         社内の定期運用や既存システムの保守を継続的に任せたい場合に適したプランです。
                     </p>
                 </div>
 
-                <div class="border border-gray-200">
-                    <div class="grid border-b border-gray-200 md:grid-cols-[220px_1fr]">
+                <div class="bg-gray-50">
+                    <div class="grid md:grid-cols-[220px_1fr]">
                         <div class="bg-gray-50 px-6 py-5 text-sm font-medium text-gray-700">支援内容</div>
                         <div class="px-6 py-5">
                             <ul class="space-y-3 text-sm leading-7 text-gray-700">
@@ -226,19 +231,19 @@
             </div>
         </div>
 
-        <div class="mt-16 border-t border-gray-300 pt-6">
+        <div class="mt-16 pt-6">
             <div class="grid gap-8 lg:grid-cols-[280px_1fr]">
                 <div>
                     <p class="text-sm font-medium text-gray-500">プラン 03</p>
-                    <h2 class="mincho mt-2 text-3xl text-gray-900">システム開発プラン</h2>
+                    <h2 class="plans-heading mt-2 text-3xl text-gray-900">システム開発プラン</h2>
                     <p class="mt-5 text-3xl font-bold tracking-tight text-gray-900">料金はご相談</p>
                     <p class="mt-5 text-sm leading-7 text-gray-600">
                         必要な機能や課題に応じて、スポットでシステム開発を依頼したい場合に適したプランです。
                     </p>
                 </div>
 
-                <div class="border border-gray-200">
-                    <div class="grid border-b border-gray-200 md:grid-cols-[220px_1fr]">
+                <div class="bg-gray-50">
+                    <div class="grid md:grid-cols-[220px_1fr]">
                         <div class="bg-gray-50 px-6 py-5 text-sm font-medium text-gray-700">支援内容</div>
                         <div class="px-6 py-5">
                             <ul class="space-y-3 text-sm leading-7 text-gray-700">
@@ -265,12 +270,12 @@
     </div>
 </section>
 
-<section class="border-t border-gray-200 bg-gray-50">
+<section class="bg-gray-50">
     <div class="max-w-6xl mx-auto px-6 py-16 md:py-20">
         <div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div>
                 <p class="text-sm font-medium text-gray-500">導入事例</p>
-                <h2 class="mincho mt-2 text-3xl text-gray-900">ご支援イメージ</h2>
+                <h2 class="plans-heading mt-2 text-3xl text-gray-900">ご支援イメージ</h2>
             </div>
             <p class="text-sm leading-7 text-gray-600">
                 実際の支援内容が伝わるよう、代表的なケースを掲載しています。
@@ -278,17 +283,17 @@
         </div>
 
         <div class="mt-10 space-y-8">
-            <article class="border border-gray-200 bg-white">
-                <div class="border-b border-gray-200 px-6 py-5">
+            <article class="bg-white">
+                <div class="px-6 py-5">
                     <p class="text-sm font-medium text-gray-500">フルスタックプラン</p>
-                    <h3 class="mincho mt-2 text-2xl text-gray-900">美容系事業会社</h3>
+                    <h3 class="plans-heading mt-2 text-2xl text-gray-900">美容系事業会社</h3>
                 </div>
                 <div class="px-6 py-6">
                     <p class="text-sm leading-7 text-gray-700">
                         HP制作、事業用システム開発、事業方針に関する相談までを一体で支援しています。
                         事業フェーズに応じたシステム整備や開発方針の整理も含めて、継続的にサポートしています。
                     </p>
-                    <dl class="mt-6 divide-y divide-gray-200 border-t border-b border-gray-200">
+                    <dl class="mt-6 divide-y divide-gray-200">
                         <div class="grid gap-2 py-4 md:grid-cols-[180px_1fr]">
                             <dt class="text-sm font-medium text-gray-700">主な支援内容</dt>
                             <dd class="text-sm leading-7 text-gray-600">HP制作、システム開発、事業方針相談を一括で支援</dd>
@@ -305,17 +310,17 @@
                 </div>
             </article>
 
-            <article class="border border-gray-200 bg-white">
-                <div class="border-b border-gray-200 px-6 py-5">
+            <article class="bg-white">
+                <div class="px-6 py-5">
                     <p class="text-sm font-medium text-gray-500">運用保守プラン</p>
-                    <h3 class="mincho mt-2 text-2xl text-gray-900">不動産会社</h3>
+                    <h3 class="plans-heading mt-2 text-2xl text-gray-900">不動産会社</h3>
                 </div>
                 <div class="px-6 py-6">
                     <p class="text-sm leading-7 text-gray-700">
                         HPの運用保守や社内アカウント管理などの日常的な運用業務を継続して支援しています。
                         あわせて、社内ツールの整備やコラム作成などのスポット対応も行っています。
                     </p>
-                    <dl class="mt-6 divide-y divide-gray-200 border-t border-b border-gray-200">
+                    <dl class="mt-6 divide-y divide-gray-200">
                         <div class="grid gap-2 py-4 md:grid-cols-[180px_1fr]">
                             <dt class="text-sm font-medium text-gray-700">主な支援内容</dt>
                             <dd class="text-sm leading-7 text-gray-600">HPの更新、運用保守、軽微な改善対応を継続支援</dd>
@@ -340,7 +345,7 @@
         <div class="grid gap-10 lg:grid-cols-[1fr_320px]">
             <div>
                 <p class="text-sm font-medium text-gray-500">ご相談の流れ</p>
-                <h2 class="mincho mt-2 text-3xl text-gray-900">開始までの進め方</h2>
+                <h2 class="plans-heading mt-2 text-3xl text-gray-900">開始までの進め方</h2>
                 <ol class="mt-8 divide-y divide-gray-200 border-t border-b border-gray-200">
                     {#each flow as item, index}
                         <li class="grid gap-3 py-5 md:grid-cols-[56px_1fr]">
@@ -351,9 +356,9 @@
                 </ol>
             </div>
 
-            <aside class="border border-gray-200 bg-gray-50 p-6">
+            <aside class="bg-gray-50 p-6">
                 <p class="text-sm font-medium text-gray-500">ご相談</p>
-                <h2 class="mincho mt-2 text-2xl text-gray-900">個別のご提案も可能です</h2>
+                <h2 class="plans-heading mt-2 text-2xl text-gray-900">個別のご提案も可能です</h2>
                 <p class="mt-5 text-sm leading-7 text-gray-600">
                     新規開発だけでなく、既存システムの運用切り替えや移行についても対応可能です。
                     現在の運用状況や課題を含めて、お気軽にご相談ください。
@@ -365,3 +370,4 @@
         </div>
     </div>
 </section>
+</div>
