@@ -23,8 +23,8 @@
   const plans = [
     {
       label: 'PLAN 01',
-      title: 'フルスタックプラン',
-      price: '月額 80万円（税込）から',
+      title: 'アーキテクト伴走プラン',
+      price: '月額 80 万円から',
       description: 'ITアーキテクト水準の判断と実行を、継続的に任せたい場合のプラン。',
       sections: [
         {
@@ -40,7 +40,7 @@
     {
       label: 'PLAN 02',
       title: '運用保守プラン',
-      price: '月額 15万円（税込）から',
+      price: '月額 15 万円から',
       description: '日々の運用や保守を継続して任せたい場合のプラン。',
       sections: [
         {
