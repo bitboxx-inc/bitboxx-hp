@@ -1,6 +1,6 @@
 <svelte:head>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Noto+Sans+JP:wght@400;500;700;800&family=Noto+Serif+JP&display=swap"
           rel="stylesheet">
 </svelte:head>
@@ -27,6 +27,9 @@
   const sectionLinks = {
     philosophy: `${base}/#philosophy`,
     business: `${base}/#business`,
+    reasons: `${base}/#reasons`,
+    plans: `${base}/#plans`,
+    caseStudies: `${base}/#case-studies`,
     company: `${base}/#company`,
     contact: `${base}/#contact-form`
   };
@@ -42,18 +45,19 @@
                 <img src="{base}/black.svg" alt="bitboxx logo" class="h-8"/>
             </a>
 
-            <nav class="hidden md:flex items-center space-x-10 text-base font-medium text-gray-700">
+            <nav class="hidden lg:flex items-center space-x-10 text-base font-medium text-gray-700">
                 <a href={sectionLinks.philosophy} class="hover:text-gray-900 transition">私たちの哲学</a>
                 <a href={sectionLinks.business} class="hover:text-gray-900 transition">事業内容</a>
+                <a href={sectionLinks.plans} class="hover:text-gray-900 transition">サービス</a>
                 <a href={sectionLinks.company} class="hover:text-gray-900 transition">会社概要</a>
                 <a href={sectionLinks.contact} class="hover:text-gray-900 transition">お問い合わせ</a>
             </nav>
 
-            <a href={sectionLinks.contact} class="hidden md:inline-flex px-5 py-2 text-sm font-medium border border-gray-300 rounded-full hover:bg-gray-50 transition">
+            <a href={sectionLinks.contact} class="hidden lg:inline-flex px-5 py-2 text-sm font-medium border border-gray-300 rounded-full hover:bg-gray-50 transition">
                 お問い合わせ
             </a>
 
-            <button class="md:hidden text-2xl text-gray-700 z-50" on:click={toggleMenu}>
+            <button class="lg:hidden text-2xl text-gray-700 z-50" on:click={toggleMenu}>
                 {#if isMenuOpen}
                     ✕
                 {:else}
@@ -66,7 +70,7 @@
     {#if isMenuOpen}
         <div
                 transition:fade={{ duration: 150 }}
-                class="fixed inset-0 z-[999] bg-white md:hidden flex flex-col pt-24 px-6"
+                class="fixed inset-0 z-[999] bg-white lg:hidden flex flex-col pt-24 px-6"
                 on:click={closeMenu}
         >
             <nav
@@ -76,6 +80,7 @@
             >
                 <a href={sectionLinks.philosophy} class="hover:text-gray-900 transition" on:click={closeMenu}>私たちの哲学</a>
                 <a href={sectionLinks.business} class="hover:text-gray-900 transition" on:click={closeMenu}>事業内容</a>
+                <a href={sectionLinks.plans} class="hover:text-gray-900 transition" on:click={closeMenu}>サービス</a>
                 <a href={sectionLinks.company} class="hover:text-gray-900 transition" on:click={closeMenu}>会社概要</a>
 
                 <div class="pt-8 border-t border-gray-100">

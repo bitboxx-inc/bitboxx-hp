@@ -1,36 +1,127 @@
 <svelte:head>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Noto+Sans+JP:wght@400;500;700;800&display=swap"
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Noto+Serif+JP&display=swap"
           rel="stylesheet">
-    <title>株式会社bitboxx</title>
+    <title>株式会社bitboxx | まだ見ぬ最高を、確かな品質で。</title>
 </svelte:head>
 
 <script lang="ts">
-  // 会社情報JSONファイルをインポート
   import companyInfo from '$lib/data/company_info.json';
-
-  // 修正: プライバシーポリシーコンポーネントをインポート
   import PrivacyPolicy from '$lib/domains/PrivacyPolicy.svelte';
 
-  // --- コンタクトフォームのロジック ---
+  const icons = {
+    excellent: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z',
+    kawaii: 'M17 8c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm-5 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zM7 16c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z',
+    unique: 'M12 2L6 22h12L12 2zm0 3.82L15.34 16h-6.68L12 5.82z',
+    development: 'M16 4h2l2 2v10l-2 2h-4l-2-2v-4l2-2h4V8H8v8h8',
+    ai: 'M19 14.5c0 1.95-1.55 3.5-3.5 3.5s-3.5-1.55-3.5-3.5c0-.97.4-1.85 1.04-2.5l-.04-.04c.04-.04.08-.08.13-.12.65-.65 1.52-1.05 2.47-1.05 1.95 0 3.5 1.55 3.5 3.5z',
+    design: 'M17 12c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm-5-8H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h6v2h2v-2h4v-2h-4V4z',
+    outdoor: 'M12 2l-5 5h10l-5-5zM4 10v9h16v-9H4zm2 2h12v5H6v-5z'
+  };
+
+  const plans = [
+    {
+      label: 'PLAN 01',
+      title: 'フルスタックプラン',
+      price: '月額 80万円（税込）から',
+      description: 'ITアーキテクト水準の判断と実行を、継続的に任せたい場合のプラン。',
+      sections: [
+        {
+          title: '支援内容',
+          items: ['事業課題の整理と優先順位付け', '技術選定、設計、開発、改善まで一貫対応', '運用を見据えた継続支援']
+        },
+        {
+          title: '提供価値',
+          items: ['高単価案件で求められるアーキテクト水準で対応', '単なる開発要員追加ではなく、技術判断ごと委任可能', '週1回以上の定例で進行と意思決定を前進']
+        }
+      ]
+    },
+    {
+      label: 'PLAN 02',
+      title: '運用保守プラン',
+      price: '月額 15万円（税込）から',
+      description: '日々の運用や保守を継続して任せたい場合のプラン。',
+      sections: [
+        {
+          title: '支援内容',
+          items: ['日々の運用作業の代行', '既存システムの保守・軽微修正', '不具合時の一次切り分け']
+        },
+        {
+          title: '契約条件',
+          items: ['対象業務に応じて内容を調整', '作業量が大きい場合は別途見積もり']
+        }
+      ]
+    },
+    {
+      label: 'PLAN 03',
+      title: 'システム開発プラン',
+      price: '料金はご相談',
+      description: '必要な機能や課題に応じて、スポットで開発したい場合のプラン。',
+      sections: [
+        {
+          title: '支援内容',
+          items: ['新規開発、機能追加、改修', '要件整理から設計、実装、リリースまで対応', '運用を見据えて進行']
+        },
+        {
+          title: '契約形態',
+          items: ['内容、規模、期間に応じて個別見積もり', '運用保守契約への移行も可能']
+        }
+      ]
+    }
+  ];
+
+  const reasons = [
+    {
+      title: '事業に集中できる進行設計',
+      description: '本当に必要な施策や開発を整理し、優先順位を明確にしたうえで進行します。運用に追われる時間や判断コストを減らし、事業に集中できる状態をつくります。'
+    },
+    {
+      title: '幅広い実績に裏打ちされた技術選定力',
+      description: '数千万規模が利用するWebサービス開発から、ホームページ制作、決済導入、クラウド移行まで幅広く対応。経験をもとに、課題や事業フェーズに合った技術を選定します。'
+    },
+    {
+      title: '選定だけで終わらない実行力',
+      description: '提案だけで終わらせず、設計、開発、導入、運用まで一貫して対応します。方針をそのまま実行につなげ、成果に結びつく形で支援します。'
+    }
+  ];
+
+  const caseStudies = [
+    {
+      label: 'アーキテクト伴走',
+      company: '美容系事業会社',
+      description: 'ホームページ制作、事業用システム開発、事業方針に関する相談まで一貫して支援。事業フェーズに応じた技術選定と開発方針の整理を継続的に行っています。',
+      items: [
+        'HP制作、システム開発、事業方針の相談を一体で支援',
+        'システム選定や進め方の整理まで含めて伴走',
+        'コスト管理や今後の投資判断まで提案'
+      ]
+    },
+    {
+      label: '運用保守',
+      company: '不動産会社',
+      description: 'ホームページの運用保守や社内アカウント管理など、日常的な運用業務を継続支援。必要なタイミングで社内ツール整備などのスポット対応も行っています。',
+      items: [
+        'HPの更新、運用保守、軽微な改善を継続支援',
+        '社内アカウント管理などの定期運用に対応',
+        '社内ツール整備なども必要に応じて実施'
+      ]
+    }
+  ];
+
   let yourname = '';
   let company = '';
   let email = '';
   let tel = '';
   let text = '';
   let pr = false;
-
-  // 修正: モーダルの表示状態
   let showPrivacyModal = false;
 
-  // 修正: モーダルを開く関数
   function openPrivacyModal(event: MouseEvent) {
-    event.preventDefault(); // リンクのデフォルト動作（ページ遷移）を防ぐ
+    event.preventDefault();
     showPrivacyModal = true;
   }
 
-  // 修正: モーダルを閉じる関数
   function closePrivacyModal() {
     showPrivacyModal = false;
   }
@@ -52,82 +143,196 @@
 </script>
 
 <style>
-    .top-page {
-        font-family: 'Noto Sans JP', sans-serif;
-    }
-
-    .top-heading {
-        font-family: 'Noto Sans JP', sans-serif;
-        letter-spacing: -0.02em;
+    .mincho {
+        font-family: 'Noto Serif JP', serif;
     }
 </style>
 
-<main class="top-page flex-1">
+<main class="flex-1">
 
-    <section class="max-w-6xl mx-auto px-6 pt-28 pb-24 md:pt-32 md:pb-28">
-        <h1 class="top-heading text-5xl md:text-7xl font-bold tracking-tight leading-[1.05] text-gray-900">
-            必要なものだけを見極め、
-            <br class="hidden sm:block"/>
-            事業に合う形でつくる。
+    <section class="max-w-7xl mx-auto px-6 pt-32 pb-40 text-center">
+        <h1 class="text-7xl md:text-9xl font-extrabold tracking-tighter leading-none">
+                <span class="bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+                    まだ見ぬ最高を、<br class="sm:hidden"/>確かな品質で。
+                </span>
         </h1>
-        <p class="mt-8 max-w-3xl text-base md:text-lg leading-8 text-gray-600">
-            bitboxx は、事業に必要なシステムの見極めから開発、運用までを支援します。
-            不必要に複雑な仕組みを増やさず、使い続けられる設計を重視しています。
+        <p class="mincho mt-12 max-w-3xl mx-auto text-gray-600 text-xl leading-relaxed font-light">
+            私たち bitboxx (ビットボックス) の使命は、唯一無二のアイデアを卓越した技術で実現し、
+            人々の心を満たす愛着あるプロダクトとして世界に届けることです。
         </p>
-        <div class="mt-10">
-            <a href="#contact-form" class="inline-flex items-center justify-center rounded-md bg-gray-900 px-6 py-3 text-sm font-medium text-white transition hover:bg-gray-700">
+        <div class="mt-16">
+            <a href="#contact-form" class="inline-flex items-center justify-center px-10 py-3 border border-transparent text-base font-medium rounded-full shadow-lg text-white bg-gray-900 hover:bg-gray-700 transition-colors">
                 プロジェクトのご相談
             </a>
         </div>
     </section>
 
-    <section id="philosophy" class="max-w-6xl mx-auto px-6 py-20 md:py-24 scroll-mt-24">
-        <div class="grid gap-8 lg:grid-cols-[240px_1fr]">
-            <div>
-                <p class="text-sm font-medium text-gray-500">私たちの考え方</p>
-                <h2 class="top-heading mt-2 text-3xl text-gray-900">システムは事業のためにある</h2>
-            </div>
-            <div class="space-y-6 text-base leading-8 text-gray-600">
-                <p>
-                    私たちは、必要以上に複雑な仕組みや過剰な導入を避け、本当に必要なものだけを見極めて提案します。
+    <section id="philosophy" class="mincho max-w-7xl mx-auto px-6 py-28 bg-gray-50 border-t border-b border-gray-100 mt-24 scroll-mt-24">
+        <h2 class="text-3xl font-bold text-center mb-4 text-gray-700">私たちの哲学</h2>
+        <p class="text-xl text-center text-gray-500 font-light mb-16">Excellent / Kawaii / Unique</p>
+        <div class="max-w-6xl mx-auto grid md:grid-cols-3 gap-10 text-left">
+            <div class="p-10 bg-white border border-gray-100 rounded-3xl shadow-lg hover:shadow-xl transition">
+                <div class="w-10 h-10 mb-4 text-gray-900">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d={icons.excellent}/></svg>
+                </div>
+                <h3 class="text-xl font-bold mb-2">Excellent</h3>
+                <p class="text-gray-600 leading-relaxed text-sm">
+                    確かな技術力と洗練された設計思想に基づき、企業の基盤を支える高品質かつ持続可能なプロダクトを創造します。
                 </p>
-                <p>
-                    大切にしているのは、事業が前に進むこと、現場が無理なく使い続けられること、そして運用に振り回されないことです。
+            </div>
+            <div class="p-10 bg-white border border-gray-100 rounded-3xl shadow-lg hover:shadow-xl transition">
+                <div class="w-10 h-10 mb-4 text-gray-900">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d={icons.kawaii}/></svg>
+                </div>
+                <h3 class="text-xl font-bold mb-2">Kawaii</h3>
+                <p class="text-gray-600 leading-relaxed text-sm">
+                    思わず微笑むような愛らしさと、使う人の気持ちに寄り添う心地よさを設計。プロダクトに感情的なつながりをもたらします。
+                </p>
+            </div>
+            <div class="p-10 bg-white border border-gray-100 rounded-3xl shadow-lg hover:shadow-xl transition">
+                <div class="w-10 h-10 mb-4 text-gray-900">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d={icons.unique}/></svg>
+                </div>
+                <h3 class="text-xl font-bold mb-2">Unique</h3>
+                <p class="text-gray-600 leading-relaxed text-sm">
+                    既成概念にとらわれない発想と専門性で、市場に新たな価値を生み出す唯一無二のソリューションを提供します。
                 </p>
             </div>
         </div>
     </section>
 
-    <section id="business" class="max-w-6xl mx-auto px-6 py-20 md:py-24 scroll-mt-24">
-        <div class="grid gap-8 lg:grid-cols-[240px_1fr]">
-            <div>
-                <p class="text-sm font-medium text-gray-500">事業内容</p>
-                <h2 class="top-heading mt-2 text-3xl text-gray-900">支援領域</h2>
+    <section id="business" class="mincho max-w-7xl mx-auto px-6 py-24 mt-24 scroll-mt-24">
+        <h2 class="text-3xl font-bold text-center mb-16">事業内容</h2>
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div class="p-8 rounded-2xl border border-gray-100 bg-white shadow-sm hover:shadow-md transition">
+                <div class="w-8 h-8 mb-4 text-gray-700">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d={icons.development}/></svg>
+                </div>
+                <h3 class="text-lg font-semibold mb-2">システム・プロダクト開発</h3>
+                <p class="text-gray-600 text-sm leading-relaxed">
+                    お客様のビジネスの「核」となるプロダクトを共に創り上げます。堅牢な設計と、使う人への配慮を大切にします。
+                </p>
             </div>
-            <div class="space-y-10">
-                <div class="grid gap-2 md:grid-cols-[220px_1fr]">
-                    <h3 class="text-lg font-semibold text-gray-900">システム・プロダクト開発</h3>
-                    <p class="text-sm leading-7 text-gray-600">事業の核となるシステムやプロダクトを、設計から実装、改善まで一貫して支援します。</p>
+            <div class="p-8 rounded-2xl border border-gray-100 bg-white shadow-sm hover:shadow-md transition">
+                <div class="w-8 h-8 mb-4 text-gray-700">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d={icons.ai}/></svg>
                 </div>
-                <div class="grid gap-2 md:grid-cols-[220px_1fr]">
-                    <h3 class="text-lg font-semibold text-gray-900">事業に合わせた技術導入</h3>
-                    <p class="text-sm leading-7 text-gray-600">新しい技術を目的化せず、現場の運用と事業計画に合う形で導入を検討し、無理のない変化を支援します。</p>
+                <h3 class="text-lg font-semibold mb-2">先進技術による事業変革</h3>
+                <p class="text-gray-600 text-sm leading-relaxed">
+                    最新技術を道具として捉え、人々の働き方をより豊かに、よりクリエイティブにするための仕組みを設計し、未来を見据えた変革を支援します。
+                </p>
+            </div>
+            <div class="p-8 rounded-2xl border border-gray-100 bg-white shadow-sm hover:shadow-md transition">
+                <div class="w-8 h-8 mb-4 text-gray-700">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d={icons.design}/></svg>
                 </div>
-                <div class="grid gap-2 md:grid-cols-[220px_1fr]">
-                    <h3 class="text-lg font-semibold text-gray-900">UI/UX 設計</h3>
-                    <p class="text-sm leading-7 text-gray-600">見た目だけでなく、使い続けやすさや運用しやすさまで含めて設計します。</p>
+                <h3 class="text-lg font-semibold mb-2">UI/UX クラフトと設計</h3>
+                <p class="text-gray-600 text-sm leading-relaxed">
+                    「美しい」だけでなく「使いやすい」を極めるデザイン。製品を愛せるようになるまでのプロセスを共に作り上げます。
+                </p>
+            </div>
+            <div class="p-8 rounded-2xl border border-gray-100 bg-white shadow-sm hover:shadow-md transition">
+                <div class="w-8 h-8 mb-4 text-gray-700">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d={icons.outdoor}/></svg>
                 </div>
-                <div class="grid gap-2 md:grid-cols-[220px_1fr]">
-                    <h3 class="text-lg font-semibold text-gray-900">業界特化の共創支援</h3>
-                    <p class="text-sm leading-7 text-gray-600">業種ごとの業務理解を前提に、既存業務の整理、改善、DX化を中長期で支援します。</p>
-                </div>
+                <h3 class="text-lg font-semibold mb-2">アウトドア事業・共創支援</h3>
+                <p class="text-gray-600 text-sm leading-relaxed">
+                    デジタルの力でアウトドアの価値を再定義。五感を刺激する新しい体験を持つ製品開発と、サプライチェーンの変革を含む産業全体のDX化を両軸で支援し、持続可能な成長基盤を提供します。
+                </p>
             </div>
         </div>
     </section>
 
-    <section id="company" class="max-w-4xl mx-auto px-6 py-20 md:py-24 scroll-mt-24">
-        <h2 class="top-heading text-3xl font-bold mb-12 text-center">会社概要</h2>
-        <div class="bg-gray-50 p-8 md:p-10">
+    <section id="plans" class="mincho max-w-7xl mx-auto px-6 py-28 bg-gray-50 border-t border-b border-gray-100 mt-24 scroll-mt-24">
+        <div class="text-center">
+            <h2 class="text-3xl font-bold text-gray-700">代表的な支援プラン</h2>
+            <p class="mt-4 text-lg text-gray-500 font-light">事業フェーズと必要な関わり方に応じて、最適な形で伴走します。</p>
+        </div>
+
+        <div class="mt-16 grid gap-8 lg:grid-cols-3">
+            {#each plans as plan}
+                <article class="rounded-3xl border border-gray-100 bg-white p-8 shadow-lg transition hover:shadow-xl">
+                    <p class="text-xs tracking-[0.24em] text-gray-400">{plan.label}</p>
+                    <h3 class="mt-3 text-2xl font-bold text-gray-900">{plan.title}</h3>
+                    <p class="mt-4 text-3xl font-semibold text-gray-900">{plan.price}</p>
+                    <p class="mt-5 text-sm leading-7 text-gray-600">{plan.description}</p>
+
+                    <div class="mt-8 space-y-6">
+                        {#each plan.sections as section}
+                            <div class="border-t border-gray-100 pt-5">
+                                <p class="text-sm font-semibold text-gray-900">{section.title}</p>
+                                <ul class="mt-3 space-y-2 text-sm leading-7 text-gray-600">
+                                    {#each section.items as item}
+                                        <li>{item}</li>
+                                    {/each}
+                                </ul>
+                            </div>
+                        {/each}
+
+                        {#if plan.title === '運用保守プラン'}
+                            <div class="border-t border-gray-100 pt-5">
+                                <p class="text-sm font-semibold text-gray-900">ホームページ向けサービス</p>
+                                <a
+                                    href="https://pages.bitboxx.co.jp"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    class="mt-3 inline-flex text-sm leading-7 text-gray-700 underline underline-offset-4 hover:text-gray-900"
+                                >
+                                    ホームページ開発運用に特化したサービスはこちら
+                                </a>
+                            </div>
+                        {/if}
+                    </div>
+                </article>
+            {/each}
+        </div>
+    </section>
+
+    <section id="reasons" class="mincho max-w-7xl mx-auto px-6 py-24 mt-24 scroll-mt-24">
+        <div class="text-center">
+            <p class="text-sm tracking-[0.22em] text-gray-400">WHY BITBOXX</p>
+            <h2 class="mt-4 text-3xl font-bold text-gray-900">選ばれる理由</h2>
+            <p class="mt-4 text-lg text-gray-500 font-light">事業理解、技術選定、実行まで切り離さず支援します。</p>
+        </div>
+
+        <div class="mt-16 grid gap-8 md:grid-cols-3">
+            {#each reasons as reason}
+                <article class="rounded-3xl border border-gray-100 bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
+                    <h3 class="text-xl font-bold text-gray-900">{reason.title}</h3>
+                    <p class="mt-5 text-sm leading-8 text-gray-600">
+                        {reason.description}
+                    </p>
+                </article>
+            {/each}
+        </div>
+    </section>
+
+    <section id="case-studies" class="mincho max-w-7xl mx-auto px-6 py-24 mt-24 scroll-mt-24">
+        <div class="text-center">
+            <p class="text-sm tracking-[0.22em] text-gray-400">CASE STUDIES</p>
+            <h2 class="mt-4 text-3xl font-bold text-gray-900">支援実績</h2>
+            <p class="mt-4 text-lg text-gray-500 font-light">実際の関わり方が伝わる、代表的な支援事例です。</p>
+        </div>
+
+        <div class="mt-16 space-y-8">
+            {#each caseStudies as study}
+                <article class="rounded-3xl border border-gray-100 bg-white p-8 shadow-sm">
+                    <p class="text-sm tracking-[0.18em] text-gray-400">{study.label}</p>
+                    <h3 class="mt-3 text-2xl font-bold text-gray-900">{study.company}</h3>
+                    <p class="mt-5 text-sm leading-8 text-gray-600">{study.description}</p>
+                    <ul class="mt-6 space-y-3 border-t border-gray-100 pt-6 text-sm leading-7 text-gray-600">
+                        {#each study.items as item}
+                            <li>{item}</li>
+                        {/each}
+                    </ul>
+                </article>
+            {/each}
+        </div>
+    </section>
+
+    <section id="company" class="mincho max-w-4xl mx-auto px-6 pt-16 pb-24 mt-24 scroll-mt-24">
+        <h2 class="text-3xl font-bold mb-12 text-center">会社概要</h2>
+        <div class="bg-gray-50 rounded-2xl p-10 border border-gray-100 shadow-sm">
             <dl class="space-y-5 text-gray-700 text-base">
                 <div class="flex border-b border-gray-200 pb-2">
                     <dt class="font-semibold w-1/4 min-w-[100px]">会社名</dt>
@@ -160,13 +365,13 @@
         </div>
     </section>
 
-    <section id="contact-form" class="w-full py-24 mt-12 mb-24 bg-gray-900 scroll-mt-24">
+    <section id="contact-form" class="mincho w-full py-24 mt-24 mb-32 bg-gray-900 scroll-mt-24">
         <div class="max-w-4xl mx-auto px-6">
-            <h2 class="top-heading text-3xl font-bold text-center mb-16 text-white">お問い合わせ</h2>
+            <h2 class="text-3xl font-bold text-center mb-16 tracking-wider text-white">お問い合わせ</h2>
 
-            <div class="bg-white p-8 md:p-12">
-                <p class="mb-10 text-center text-gray-600">
-                    新規開発、運用保守、既存システムの見直しや移行まで、お気軽にご相談ください。
+            <div class="bg-white p-8 md:p-12 border border-gray-100 rounded-2xl shadow-xl">
+                <p class="mb-10 text-center text-gray-600 font-light">
+                    次の「最高」の創造に向けた、プロジェクトのご相談や協業のご提案をお待ちしております。
                 </p>
 
                 <form on:submit|preventDefault={send} class="space-y-8">
@@ -176,7 +381,7 @@
                                 id="yourname"
                                 type="text"
                                 bind:value={yourname}
-                                class="w-full p-2 border-b-2 border-gray-300 focus:border-gray-900 outline-none transition duration-300 text-lg"
+                                class="w-full p-2 border-b-2 border-gray-300 focus:border-gray-900 outline-none transition duration-300 text-lg font-light"
                                 style="background-color: transparent;"
                         />
                     </div>
@@ -187,7 +392,7 @@
                                 id="company"
                                 type="text"
                                 bind:value={company}
-                                class="w-full p-2 border-b-2 border-gray-300 focus:border-gray-900 outline-none transition duration-300 text-lg"
+                                class="w-full p-2 border-b-2 border-gray-300 focus:border-gray-900 outline-none transition duration-300 text-lg font-light"
                                 style="background-color: transparent;"
                         />
                     </div>
@@ -198,7 +403,7 @@
                                 id="email"
                                 type="email"
                                 bind:value={email}
-                                class="w-full p-2 border-b-2 border-gray-300 focus:border-gray-900 outline-none transition duration-300 text-lg"
+                                class="w-full p-2 border-b-2 border-gray-300 focus:border-gray-900 outline-none transition duration-300 text-lg font-light"
                                 style="background-color: transparent;"
                         />
                     </div>
@@ -209,7 +414,7 @@
                                 id="tel"
                                 type="tel"
                                 bind:value={tel}
-                                class="w-full p-2 border-b-2 border-gray-300 focus:border-gray-900 outline-none transition duration-300 text-lg"
+                                class="w-full p-2 border-b-2 border-gray-300 focus:border-gray-900 outline-none transition duration-300 text-lg font-light"
                                 style="background-color: transparent;"
                         />
                     </div>
@@ -220,7 +425,7 @@
                                 id="text"
                                 bind:value={text}
                                 rows="6"
-                                class="w-full p-3 border border-gray-300 focus:border-gray-900 outline-none transition duration-300 text-lg resize-none"
+                                class="w-full p-3 border border-gray-300 focus:border-gray-900 outline-none transition duration-300 rounded-lg text-lg font-light resize-none"
                                 style="background-color: transparent;"
                         ></textarea>
                     </div>
@@ -245,7 +450,7 @@
                                 type="submit"
                                 disabled={isDisabled(pr, yourname, company, email, tel, text)}
                                 class={`
-                                    w-full py-4 text-lg font-semibold rounded-md transition-all duration-300
+                                    w-full py-4 text-lg font-semibold rounded-full transition-all duration-300
                                     ${isDisabled(pr, yourname, company, email, tel, text)
                                        ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
                                        : 'bg-gray-900 text-white hover:bg-gray-700 shadow-lg'}
@@ -255,12 +460,10 @@
                             送信する
                         </button>
                     </div>
-
                 </form>
             </div>
         </div>
     </section>
-
 
     {#if showPrivacyModal}
         <div

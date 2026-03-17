@@ -10,27 +10,27 @@
   import { base } from '$app/paths';
 
   const fullStackOverview = [
-    '事業や業務の整理',
-    'システム開発（依頼上限なし）',
-    '運用保守'
+    '事業課題の整理と優先順位付け',
+    '技術選定、設計、開発、改善',
+    '運用を見据えた継続支援'
   ];
 
   const fullStackDetails = [
     '課題整理、要件整理、優先順位付け',
     '新規開発、機能追加、改修',
     '設計、実装、公開後の改善まで対応',
-    '運用や継続的な作業を除く開発は追加料金不要。開発期間や内容によっては同時進行が難しい場合あり'
+    '運用を除く開発は追加料金不要。内容により同時進行が難しい場合あり'
   ];
 
   const executiveSupport = [
-    '代表、または同水準のスタッフが外部CTOとして対応（ご希望に応じて）',
-    '必要なシステムやツールの選定提案、必要に応じた制作対応',
-    'コスト感を踏まえた開発方針の整理を支援',
-    '最低週1回のミーティングによる状況共有と次週方針の確認'
+    'ITアーキテクト水準で継続的に対応',
+    '必要なシステムや技術を見極め、設計と実装まで一貫支援',
+    '場当たりではなく、将来コストまで踏まえて開発方針を整理',
+    '週1回以上のミーティングで進捗確認と意思決定を前進'
   ];
 
   const fullStackPricing = [
-    '基本料金は月額77万円から'
+    '基本料金は月額80万円（税込）から'
   ];
 
   const fullStackNotes = [
@@ -46,9 +46,9 @@
   ];
 
   const developmentPlanItems = [
-    '新規システム開発、機能追加、改修のスポット対応',
+    '新規開発、機能追加、改修のスポット対応',
     '要件整理から設計、実装、リリースまで対応',
-    '開発後の運用を見据えた進行'
+    '運用を見据えて進行'
   ];
 
   const developmentPlanPricing = [
@@ -61,7 +61,7 @@
   ];
 
   const operationSupportPricing = [
-    '月額15万円から'
+    '月額15万円（税込）から'
   ];
 
   const operationSupportNotes = [
@@ -77,12 +77,16 @@
 
   const reasons = [
     {
-      title: '事業に集中する時間の確保',
-      description: '事業を前に進めるための時間の確保を最優先に置く方針。運用に追われる時間や判断コストを減らし、本来向き合うべき事業に時間を使える状態の実現。'
+      title: '事業に集中できる進行設計',
+      description: '事業を前に進めるうえで本当に必要な施策や開発を整理し、優先順位を明確にしたうえで進行します。運用に追われる時間や判断コストを減らし、お客様が本来向き合うべき事業に集中できる状態をつくります。'
     },
     {
-      title: '必要な IT の選定と実行',
-      description: 'AIや脱Excelといった技術要素や一般的な課題を先行させず、事業に必要なものだけを選定。導入判断だけで終わらせず、必要に応じて制作や運用まで一体で対応。'
+      title: '幅広い実績に裏打ちされた技術選定力',
+      description: '数千万人規模が利用するWebサービスの開発をはじめ、ホームページ制作、決済サービス導入、クラウド移行まで、幅広い領域で実績を重ねてきました。豊富な経験をもとに、見た目や価格、流行だけで判断せず、お客様の課題や事業フェーズに本当に合った技術を選定し、成果につながる構成をご提案します。'
+    },
+    {
+      title: '選定だけで終わらない実行力',
+      description: '必要なシステムやツールの判断だけで終わらせず、設計、開発、導入、運用まで一貫して対応します。提案内容をそのまま実行までつなげられるため、方針だけが残ることなく、事業成果に結びつく形で支援できます。'
     }
   ];
 </script>
@@ -126,14 +130,14 @@
             <div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-500">bitboxxが選ばれる理由</p>
-                    <h2 class="plans-heading mt-2 text-3xl text-gray-900">事業に集中できる状態の構築</h2>
+                    <h2 class="plans-heading mt-2 text-3xl text-gray-900">事業成果につながるIT支援</h2>
                 </div>
                 <p class="text-sm leading-7 text-gray-600">
-                    事業を前に進めるための時間を確保することを第一に置き、ITをそのための手段として設計する姿勢。
+                    事業理解、技術選定、実行までを切り離さず、目的に合ったIT活用を一貫して支援します。
                 </p>
             </div>
 
-            <div class="mt-10 grid gap-8 md:grid-cols-2">
+            <div class="mt-10 grid gap-8 md:grid-cols-3">
                 {#each reasons as reason}
                     <div class="bg-gray-50 px-6 py-6">
                         <h3 class="text-xl font-semibold text-gray-900">{reason.title}</h3>
@@ -152,9 +156,9 @@
                 <div>
                     <p class="text-sm font-medium text-gray-500">プラン 01</p>
                     <h2 class="plans-heading mt-2 text-3xl text-gray-900">フルスタックプラン</h2>
-                    <p class="mt-5 text-3xl font-bold tracking-tight text-gray-900">月額 77万円から</p>
+                    <p class="mt-5 text-3xl font-bold tracking-tight text-gray-900">月額 80万円（税込）から</p>
                     <p class="mt-5 text-sm leading-7 text-gray-600">
-                        開発と運用をまとめて任せたい場合のプラン。事業の状況を見ながら、優先順位を整理して進行。
+                        ITアーキテクト水準の判断と実行を、継続的に任せたい場合のプラン。
                     </p>
                 </div>
 
@@ -182,7 +186,7 @@
                     </div>
 
                     <div class="grid md:grid-cols-[220px_1fr]">
-                        <div class="bg-gray-50 px-6 py-5 text-sm font-medium text-gray-700">伴走体制</div>
+                        <div class="bg-gray-50 px-6 py-5 text-sm font-medium text-gray-700">提供価値</div>
                         <div class="px-6 py-5">
                             <ul class="space-y-3 text-sm leading-7 text-gray-700">
                                 {#each executiveSupport as item}
@@ -222,9 +226,9 @@
                 <div>
                     <p class="text-sm font-medium text-gray-500">プラン 02</p>
                     <h2 class="plans-heading mt-2 text-3xl text-gray-900">運用保守プラン</h2>
-                    <p class="mt-5 text-3xl font-bold tracking-tight text-gray-900">月額 15万円から</p>
+                    <p class="mt-5 text-3xl font-bold tracking-tight text-gray-900">月額 15万円（税込）から</p>
                     <p class="mt-5 text-sm leading-7 text-gray-600">
-                        日々の運用や既存システムの保守を継続して任せたい場合のプラン。
+                        日々の運用や保守を継続して任せたい場合のプラン。
                     </p>
                 </div>
 
@@ -261,6 +265,20 @@
                             </ul>
                         </div>
                     </div>
+
+                    <div class="grid md:grid-cols-[220px_1fr]">
+                        <div class="bg-gray-50 px-6 py-5 text-sm font-medium text-gray-700">ホームページ向け</div>
+                        <div class="px-6 py-5">
+                            <a
+                                href="https://pages.bitboxx.co.jp"
+                                target="_blank"
+                                rel="noreferrer"
+                                class="text-sm leading-7 text-gray-700 underline underline-offset-4 hover:text-gray-900"
+                            >
+                                ホームページ開発運用に特化したサービスはこちら
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -272,7 +290,7 @@
                     <h2 class="plans-heading mt-2 text-3xl text-gray-900">システム開発プラン</h2>
                     <p class="mt-5 text-3xl font-bold tracking-tight text-gray-900">料金はご相談</p>
                     <p class="mt-5 text-sm leading-7 text-gray-600">
-                        必要な機能や課題に合わせて、スポットで開発を依頼したい場合のプラン。
+                        必要な機能や課題に応じて、スポットで開発したい場合のプラン。
                     </p>
                 </div>
 
