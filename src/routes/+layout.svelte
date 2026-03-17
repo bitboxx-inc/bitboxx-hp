@@ -23,6 +23,13 @@
   function closeMenu() {
     isMenuOpen = false;
   }
+
+  const sectionLinks = {
+    philosophy: `${base}/#philosophy`,
+    business: `${base}/#business`,
+    company: `${base}/#company`,
+    contact: `${base}/#contact-form`
+  };
 </script>
 
 
@@ -36,13 +43,13 @@
             </a>
 
             <nav class="hidden md:flex items-center space-x-10 text-base font-medium text-gray-700">
-                <a href="#philosophy" class="hover:text-gray-900 transition">私たちの哲学</a>
-                <a href="#business" class="hover:text-gray-900 transition">事業内容</a>
-                <a href="#company" class="hover:text-gray-900 transition">会社概要</a>
-                <a href="#contact-form" class="hover:text-gray-900 transition">お問い合わせ</a>
+                <a href={sectionLinks.philosophy} class="hover:text-gray-900 transition">私たちの哲学</a>
+                <a href={sectionLinks.business} class="hover:text-gray-900 transition">事業内容</a>
+                <a href={sectionLinks.company} class="hover:text-gray-900 transition">会社概要</a>
+                <a href={sectionLinks.contact} class="hover:text-gray-900 transition">お問い合わせ</a>
             </nav>
 
-            <a href="#contact-form" class="hidden md:inline-flex px-5 py-2 text-sm font-medium border border-gray-300 rounded-full hover:bg-gray-50 transition">
+            <a href={sectionLinks.contact} class="hidden md:inline-flex px-5 py-2 text-sm font-medium border border-gray-300 rounded-full hover:bg-gray-50 transition">
                 お問い合わせ
             </a>
 
@@ -59,7 +66,7 @@
     {#if isMenuOpen}
         <div
                 transition:fade={{ duration: 150 }}
-                class="fixed inset-0 bg-white **z-[999]** md:hidden flex flex-col pt-24 px-6"
+                class="fixed inset-0 z-[999] bg-white md:hidden flex flex-col pt-24 px-6"
                 on:click={closeMenu}
         >
             <nav
@@ -67,12 +74,12 @@
                     class="flex flex-col space-y-8 text-2xl font-bold text-gray-800"
                     on:click|stopPropagation
             >
-                <a href="#philosophy" class="hover:text-gray-900 transition" on:click={closeMenu}>私たちの哲学</a>
-                <a href="#business" class="hover:text-gray-900 transition" on:click={closeMenu}>事業内容</a>
-                <a href="#company" class="hover:text-gray-900 transition" on:click={closeMenu}>会社概要</a>
+                <a href={sectionLinks.philosophy} class="hover:text-gray-900 transition" on:click={closeMenu}>私たちの哲学</a>
+                <a href={sectionLinks.business} class="hover:text-gray-900 transition" on:click={closeMenu}>事業内容</a>
+                <a href={sectionLinks.company} class="hover:text-gray-900 transition" on:click={closeMenu}>会社概要</a>
 
                 <div class="pt-8 border-t border-gray-100">
-                    <a href="#contact-form" class="text-xl font-medium text-white bg-gray-900 hover:bg-gray-700 transition px-6 py-3 rounded-full inline-block w-full text-center" on:click={closeMenu}>
+                    <a href={sectionLinks.contact} class="text-xl font-medium text-white bg-gray-900 hover:bg-gray-700 transition px-6 py-3 rounded-full inline-block w-full text-center" on:click={closeMenu}>
                         お問い合わせ
                     </a>
                 </div>
