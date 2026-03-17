@@ -95,7 +95,7 @@
         <div class="max-w-7xl mx-auto px-6 text-sm text-gray-500 flex flex-col md:flex-row justify-between gap-6">
 
             <div class="space-y-3">
-                <span class="font-bold text-lg text-gray-900">bitboxx</span>
+                <span class="font-bold text-lg text-gray-900">株式会社bitboxx</span>
                 <p>© 2025 bitboxx Inc.</p>
             </div>
 
