@@ -77,12 +77,12 @@
       description: '本当に必要な施策や開発を整理し、優先順位を明確にしたうえで進行します。運用に追われる時間や判断コストを減らし、事業に集中できる状態をつくります。'
     },
     {
-      title: '幅広い実績に裏打ちされた技術選定力',
-      description: '数千万規模が利用するWebサービス開発から、ホームページ制作、決済導入、クラウド移行まで幅広く対応。経験をもとに、課題や事業フェーズに合った技術を選定します。'
+      title: '幅広い実績に裏打ちされた技術判断',
+      description: '数千万人規模が利用するWebサービス開発から、ホームページ制作、決済導入、クラウド移行まで幅広く対応。技術を先に決めるのではなく、経験をもとに課題や事業フェーズに合った進め方と技術を判断します。'
     },
     {
       title: '選定だけで終わらない実行力',
-      description: '提案だけで終わらせず、設計、開発、導入、運用まで一貫して対応します。方針をそのまま実行につなげ、成果に結びつく形で支援します。'
+      description: 'UI/UX設計から開発、運用保守まで一貫して対応します。方針づくりだけで終わらせず、そのまま実装と運用につなげ、成果に結びつく形で支援します。'
     }
   ];
 
@@ -226,7 +226,7 @@
                 <div class="w-8 h-8 mb-4 text-gray-700">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d={icons.design}/></svg>
                 </div>
-                <h3 class="text-lg font-semibold mb-2">UI/UX クラフトと設計</h3>
+                <h3 class="text-lg font-semibold mb-2">UI/UX設計</h3>
                 <p class="text-gray-600 text-sm leading-relaxed">
                     「美しい」だけでなく「使いやすい」を極めるデザイン。製品を愛せるようになるまでのプロセスを共に作り上げます。
                 </p>
@@ -292,7 +292,7 @@
         <div class="text-center">
             <p class="text-sm tracking-[0.22em] text-gray-400">WHY BITBOXX</p>
             <h2 class="mt-4 text-3xl font-bold text-gray-900">選ばれる理由</h2>
-            <p class="mt-4 text-lg text-gray-500 font-light">事業理解、技術選定、実行まで切り離さず支援します。</p>
+            <p class="mt-4 text-lg text-gray-500 font-light">進行設計、技術判断、実行を切り離さず支援します。</p>
         </div>
 
         <div class="mt-16 grid gap-8 md:grid-cols-3">
