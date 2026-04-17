@@ -9,6 +9,7 @@
   import HeroCanvas from '$lib/components/HeroCanvas.svelte';
   import Reveal from '$lib/components/Reveal.svelte';
   import Mascot from '$lib/components/Mascot.svelte';
+  import ParticleBox from '$lib/components/ParticleBox.svelte';
 
   const philosophy = [
     {
@@ -41,30 +42,30 @@
     {
       num: '01',
       title: 'システム・プロダクト開発',
-      en: 'Systems & Products',
-      body: '事業の核となるプロダクトを共創。要件整理から設計、実装、運用までを一貫して担います。',
-      bullets: ['Web / モバイル / バックエンド', 'クラウド基盤とインフラ設計', '数千万ユーザー規模の運用実績']
+      en: 'Development',
+      body: '事業の基盤となるシステムやアプリケーションを、要件整理から設計・実装・リリースまで一貫して担います。',
+      bullets: ['Web・モバイル・サーバーの一貫開発', 'クラウド基盤とインフラの設計・構築', '大規模運用に耐える設計と検証']
     },
     {
       num: '02',
-      title: '先進技術による事業変革',
-      en: 'AI · Automation',
-      body: 'AIや自動化を「道具」として捉え、事業課題を前進させる仕組みに落とし込みます。',
-      bullets: ['LLM / 機械学習の実装', '業務プロセスの自動化', 'データ基盤と計測設計']
+      title: '運用・保守・改善',
+      en: 'Operations',
+      body: '日々の運用から機能追加、性能改善まで。安定稼働と継続的な成長を、同じチームで支えます。',
+      bullets: ['継続的な保守と軽微な改修', '障害対応とパフォーマンス改善', '拡張・リニューアルへの段階的移行']
     },
     {
       num: '03',
-      title: 'UI / UX デザイン',
-      en: 'Design · Craft',
-      body: '美しいだけでなく使いやすさを極める。細部まで丁寧に設計された、愛される体験を。',
-      bullets: ['プロダクトデザイン', 'デザインシステム整備', 'ブランド表現の設計']
+      title: 'UI / UX 設計',
+      en: 'Design',
+      body: '使いやすさと美しさの両立。事業の意図が正しく伝わり、日々の業務を邪魔しないインターフェイスを設計します。',
+      bullets: ['プロダクトの情報設計と画面設計', 'デザインシステムの整備', 'ブランドから落としたビジュアル設計']
     },
     {
       num: '04',
-      title: 'アウトドア事業・共創支援',
-      en: 'Outdoor × DX',
-      body: 'アウトドアの価値をデジタルで再定義。五感を刺激する製品とサプライチェーン変革を両輪で。',
-      bullets: ['プロダクト企画・開発', '産業のDX化支援', 'ブランド・コミュニティ形成']
+      title: '技術顧問・アドバイザリー',
+      en: 'Advisory',
+      body: '技術選定や開発体制づくりをともに考え、意思決定と実行まで伴走します。経営の技術パートナーとしてお使いください。',
+      bullets: ['技術戦略と開発体制のレビュー', '採用・育成を含めた組織づくり支援', '中長期のロードマップ策定']
     }
   ];
 
@@ -86,7 +87,7 @@
       title: '運用保守',
       price: '¥150,000',
       unit: '/ 月 〜',
-      accent: '#FF7A8A',
+      accent: '#111014',
       description: '日々の運用や保守を、継続して安心して任せたい事業に。',
       sections: [
         { title: '支援内容', items: ['日々の運用作業の代行', '既存システムの保守・軽微修正', '不具合時の一次切り分け'] },
@@ -132,7 +133,7 @@
       label: 'Architect Partnership',
       jp: 'アーキテクト伴走',
       company: '美容系事業会社',
-      accent: '#111014',
+      accent: '#1F1D24',
       body: 'ホームページ制作・事業用システム開発・事業方針の相談まで一貫支援。事業フェーズに応じた技術選定と開発方針の整理を継続的に。',
       items: ['HP制作・システム開発・事業方針の相談を一体で支援', 'システム選定や進め方の整理まで伴走', 'コスト管理や投資判断まで提案']
     },
@@ -489,6 +490,20 @@
           </Reveal>
         {/each}
       </div>
+    </div>
+  </section>
+
+  <!-- PARTICLE INTERMISSION -->
+  <section class="relative py-8 md:py-16 overflow-hidden">
+    <div class="max-w-[1400px] mx-auto px-6 md:px-10">
+      <div class="flex items-center justify-between mb-6 md:mb-8 text-ink/50">
+        <p class="font-mono text-[11px] tracking-[0.32em] uppercase">— Identity</p>
+        <p class="font-mono text-[11px] tracking-[0.28em] uppercase hidden md:block">bit · box · x</p>
+      </div>
+      <ParticleBox height={360} />
+      <p class="mt-6 md:mt-10 text-center font-mincho text-sm md:text-base text-ink/55 tracking-[0.08em]">
+        小さな点の積み重ねが、かたちになる。
+      </p>
     </div>
   </section>
 

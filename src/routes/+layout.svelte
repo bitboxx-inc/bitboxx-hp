@@ -112,7 +112,7 @@
   {#if isMenuOpen}
     <div
       transition:fade={{ duration: 180 }}
-      class="fixed inset-0 z-[60] bg-white lg:hidden flex flex-col pt-28 px-8 overflow-y-auto paper-grain"
+      class="fixed inset-0 z-[60] bg-white lg:hidden flex flex-col pt-28 px-8 overflow-y-auto"
       on:click={closeMenu}
       on:keydown
       role="presentation"

@@ -74,9 +74,6 @@
     mix-blend-mode: multiply;
   }
 
-  .paper-grain {
-    position: relative;
-  }
   .paper-grain::before {
     content: "";
     position: absolute;
