@@ -19,8 +19,13 @@
   body {
     background: #FFFFFF;
     color: var(--ink);
+    font-family: "Space Grotesk", -apple-system, BlinkMacSystemFont,
+      "Helvetica Neue", "Noto Sans JP", "Hiragino Kaku Gothic ProN",
+      system-ui, sans-serif;
     font-feature-settings: "palt";
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
   ::selection {
@@ -56,8 +61,21 @@
   }
 
   .mask-fade-y {
+    -webkit-mask-image: linear-gradient(to bottom, transparent, black 12%, black 88%, transparent);
     mask-image: linear-gradient(to bottom, transparent, black 12%, black 88%, transparent);
   }
+
+  /* Dark CTA pill — asserted explicitly so Safari/iOS always renders it
+     even if Tailwind's custom colors race the paint. */
+  .btn-ink {
+    background-color: #111014;
+    color: #ffffff;
+  }
+  .btn-ink:hover {
+    background-color: #FF7A8A;
+  }
+  .btn-ink svg { color: #ffffff; }
+  .btn-ink:hover svg { color: #ffffff; }
 
   .hover-lift {
     transition: transform .5s cubic-bezier(.2,.8,.2,1), box-shadow .5s;

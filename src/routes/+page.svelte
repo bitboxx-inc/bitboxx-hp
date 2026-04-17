@@ -175,7 +175,7 @@
 
 <main class="relative">
   <!-- HERO -->
-  <section class="relative min-h-[100svh] flex items-end pt-24 pb-20 overflow-hidden paper-grain">
+  <section class="relative min-h-screen min-h-[100svh] flex items-end pt-24 pb-20 overflow-hidden paper-grain">
     <!-- 3D canvas -->
     <div class="absolute inset-0 z-0 mask-fade-y">
       <HeroCanvas />
@@ -232,7 +232,7 @@
           <div class="shrink-0">
             <a
               href="#contact-form"
-              class="group inline-flex items-center gap-3 px-7 py-3.5 bg-ink text-white rounded-full text-base font-medium hover:bg-sakura transition-colors duration-300"
+              class="btn-ink group inline-flex items-center gap-3 px-7 py-3.5 rounded-full text-base font-medium transition-colors duration-300"
             >
               <span class="font-display italic text-lg whitespace-nowrap">プロジェクトを相談する</span>
               <svg class="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>

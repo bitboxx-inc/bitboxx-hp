@@ -2,7 +2,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
     <link
-      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700;800&family=Noto+Serif+JP:wght@300;400;600&family=JetBrains+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@300;400;600&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
 </svelte:head>
@@ -54,7 +54,7 @@
   ];
 </script>
 
-<div class="relative min-h-screen bg-cream-50 text-ink font-sans flex flex-col overflow-x-clip">
+<div class="relative min-h-screen bg-cream-50 text-ink font-sans flex flex-col overflow-x-hidden">
   <Cursor />
 
   <!-- Top nav -->
@@ -138,7 +138,7 @@
         <div class="pt-10">
           <a
             href={sectionLinks.contact}
-            class="inline-flex items-center gap-3 px-6 py-4 bg-ink text-white rounded-full text-base not-italic font-sans font-medium"
+            class="btn-ink inline-flex items-center gap-3 px-6 py-4 rounded-full text-base not-italic font-sans font-medium transition-colors duration-300"
             on:click={closeMenu}
           >
             お問い合わせ →

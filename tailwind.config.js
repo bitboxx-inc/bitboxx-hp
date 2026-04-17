@@ -34,10 +34,31 @@ export default {
         }
       },
       fontFamily: {
-        sans: ['"Space Grotesk"', '"Noto Sans JP"', 'system-ui', 'sans-serif'],
-        display: ['"Fraunces"', '"Noto Serif JP"', 'serif'],
-        mincho: ['"Noto Serif JP"', 'serif'],
-        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace']
+        sans: [
+          '"Space Grotesk"',
+          '-apple-system',
+          'BlinkMacSystemFont',
+          '"Helvetica Neue"',
+          '"Noto Sans JP"',
+          '"Hiragino Kaku Gothic ProN"',
+          'system-ui',
+          'sans-serif'
+        ],
+        display: [
+          '"Fraunces"',
+          'ui-serif',
+          'Georgia',
+          '"Hiragino Mincho ProN"',
+          '"Noto Serif JP"',
+          'serif'
+        ],
+        mincho: [
+          '"Noto Serif JP"',
+          '"Hiragino Mincho ProN"',
+          'ui-serif',
+          'serif'
+        ],
+        mono: ['"JetBrains Mono"', 'ui-monospace', 'Menlo', 'monospace']
       },
       letterSpacing: {
         hyper: '-0.04em'
