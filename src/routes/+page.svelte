@@ -16,21 +16,21 @@
       code: 'E',
       word: 'Excellent',
       jp: '卓越',
-      body: '確かな技術判断と洗練された設計。事業の核になる、十年後も壊れないプロダクトを。',
+      body: '確かな技術判断と洗練された設計。事業の核になる、十年後も<span class="underline-handwritten">壊れない</span>プロダクトを。',
       tags: ['Architecture', 'Scalability', 'Quality']
     },
     {
       code: 'K',
       word: 'Kawaii',
       jp: '愛らしさ',
-      body: '使う人が思わず微笑むディテール。愛着が生まれるプロダクトは、長く使われ、長く育つ。',
+      body: '使う人が思わず微笑むディテール。<span class="text-sakura">愛着</span>が生まれるプロダクトは、長く使われ、長く育つ。',
       tags: ['UI · UX', 'Craft', 'Delight']
     },
     {
       code: 'U',
       word: 'Unique',
       jp: '唯一無二',
-      body: '既成概念にとらわれない発想。他にはないものづくりを、技術で成立させる。',
+      body: '既成概念にとらわれない発想。他にはないものづくりを、技術で成立させる<span class="text-sakura">。</span>',
       tags: ['Invention', 'Identity', 'Edge']
     }
   ];
@@ -265,7 +265,7 @@
                     {p.word}<span class="text-sakura">.</span>
                   {/if}
                 </h3>
-                <p class="mt-5 text-sm leading-7 text-ink/75">{p.body}</p>
+                <p class="mt-5 text-sm leading-7 text-ink/75">{@html p.body}</p>
                 <div class="mt-7 flex flex-wrap gap-2">
                   {#each p.tags as tag}
                     <span class="text-[11px] font-mono tracking-widest uppercase px-3 py-1 rounded-full border border-ink/15">
