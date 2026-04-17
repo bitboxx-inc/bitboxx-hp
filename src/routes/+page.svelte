@@ -16,7 +16,6 @@
       code: 'E',
       word: 'Excellent',
       jp: '卓越',
-      accent: '#111014',
       body: '確かな技術判断と洗練された設計。事業の核になる、十年後も壊れないプロダクトを。',
       tags: ['Architecture', 'Scalability', 'Quality']
     },
@@ -24,7 +23,6 @@
       code: 'K',
       word: 'Kawaii',
       jp: '愛らしさ',
-      accent: '#FF7A8A',
       body: '使う人が思わず微笑むディテール。愛着が生まれるプロダクトは、長く使われ、長く育つ。',
       tags: ['UI · UX', 'Craft', 'Delight']
     },
@@ -32,7 +30,6 @@
       code: 'U',
       word: 'Unique',
       jp: '唯一無二',
-      accent: '#111014',
       body: '既成概念にとらわれない発想。他にはないものづくりを、技術で成立させる。',
       tags: ['Invention', 'Identity', 'Edge']
     }
@@ -252,14 +249,22 @@
               <span class="cm-br"></span>
               <div class="absolute inset-0 bg-dotgrid-lite opacity-70 pointer-events-none"></div>
               <div class="relative flex items-start justify-between">
-                <div class="font-display italic text-[9rem] leading-none tracking-hyper" style="color: {p.accent}">
+                <div class="font-display italic text-[9rem] leading-none tracking-hyper text-ink">
                   {p.code}
                 </div>
-                <Mascot klass="w-14 h-14 animate-floaty" color="#FFFFFF" cheekColor={p.accent === '#FF7A8A' ? '#FFB5B5' : '#ECECEA'} eyeColor="#111014"/>
+                <Mascot klass="w-14 h-14 animate-floaty" color="#FFFFFF" cheekColor="#ECECEA" eyeColor="#111014"/>
               </div>
               <div class="relative mt-6">
                 <p class="font-mono text-[11px] tracking-[0.3em] uppercase text-ink/50">{p.jp}</p>
-                <h3 class="mt-2 font-display italic text-4xl tracking-hyper">{p.word}.</h3>
+                <h3 class="mt-2 font-display italic text-4xl tracking-hyper">
+                  {#if p.code === 'E'}
+                    <span class="underline-handwritten">{p.word}</span>.
+                  {:else if p.code === 'K'}
+                    <span class="text-sakura">{p.word}</span>.
+                  {:else}
+                    {p.word}<span class="text-sakura">.</span>
+                  {/if}
+                </h3>
                 <p class="mt-5 text-sm leading-7 text-ink/75">{p.body}</p>
                 <div class="mt-7 flex flex-wrap gap-2">
                   {#each p.tags as tag}
