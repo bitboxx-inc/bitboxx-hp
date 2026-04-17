@@ -43,6 +43,37 @@
     background-size: 180px 180px;
   }
 
+  /* bit-style dot grid — evokes pixel/CPU substrate */
+  .bg-dotgrid {
+    background-image: radial-gradient(circle, rgba(17,16,20,0.14) 1px, transparent 1.2px);
+    background-size: 22px 22px;
+    background-position: center;
+  }
+  .bg-dotgrid-lite {
+    background-image: radial-gradient(circle, rgba(17,16,20,0.08) 1px, transparent 1.2px);
+    background-size: 28px 28px;
+  }
+  .bg-dotgrid-dark {
+    background-image: radial-gradient(circle, rgba(255,255,255,0.12) 1px, transparent 1.2px);
+    background-size: 22px 22px;
+  }
+
+  /* subtle CRT scan line */
+  .bg-scanline::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 3px,
+      rgba(17,16,20,0.035) 3px,
+      rgba(17,16,20,0.035) 4px
+    );
+    mix-blend-mode: multiply;
+  }
+
   .paper-grain {
     position: relative;
   }
@@ -142,6 +173,34 @@
 
   .chip-dot {
     width: .5rem; height: .5rem; border-radius: 9999px; display: inline-block;
+  }
+
+  /* crosshair-style pixel corners for technical/bit feel */
+  .corner-marks::before,
+  .corner-marks::after,
+  .corner-marks > .cm-br,
+  .corner-marks > .cm-bl {
+    content: "";
+    position: absolute;
+    width: 10px; height: 10px;
+    border: 1.5px solid currentColor;
+    opacity: 0.55;
+  }
+  .corner-marks::before {
+    top: 14px; left: 14px;
+    border-right: 0; border-bottom: 0;
+  }
+  .corner-marks::after {
+    top: 14px; right: 14px;
+    border-left: 0; border-bottom: 0;
+  }
+  .corner-marks > .cm-bl {
+    bottom: 14px; left: 14px;
+    border-right: 0; border-top: 0;
+  }
+  .corner-marks > .cm-br {
+    bottom: 14px; right: 14px;
+    border-left: 0; border-top: 0;
   }
 }
 

@@ -32,15 +32,15 @@
     renderer.toneMappingExposure = 1.1;
     container.appendChild(renderer.domElement);
 
-    // Lights
-    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+    // Lights — pared back to warm/cool white for a more monochrome scene.
+    scene.add(new THREE.AmbientLight(0xffffff, 0.7));
     const key = new THREE.DirectionalLight(0xffffff, 2.2);
     key.position.set(4, 6, 6);
     scene.add(key);
-    const fill = new THREE.DirectionalLight(0xffc6d1, 0.9);
+    const fill = new THREE.DirectionalLight(0xe8e8e4, 0.8);
     fill.position.set(-5, -2, 3);
     scene.add(fill);
-    const rim = new THREE.PointLight(0x7aa2ff, 1.6, 20);
+    const rim = new THREE.PointLight(0xffffff, 1.2, 20);
     rim.position.set(-3, 2, -4);
     scene.add(rim);
 
@@ -60,12 +60,15 @@
       return g;
     };
 
+    // Mostly monochrome — one sakura spark survives as the single accent.
     const palette = [
-      new THREE.Color('#FF7A8A'), // sakura
-      new THREE.Color('#7AA2FF'), // sora
-      new THREE.Color('#9DE8C3'), // mint
-      new THREE.Color('#FFD166'), // sun
-      new THREE.Color('#111014')  // ink
+      new THREE.Color('#111014'), // ink
+      new THREE.Color('#1F1D24'), // near ink
+      new THREE.Color('#2A272F'),
+      new THREE.Color('#4B4752'),
+      new THREE.Color('#E6E6E2'), // light gray
+      new THREE.Color('#CFCFC9'),
+      new THREE.Color('#FF7A8A')  // single sakura accent
     ];
 
     // bitboxx logo texture (!? mark) — rendered onto a generated canvas so
@@ -123,6 +126,18 @@
       );
       mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
       group.add(mesh);
+
+      // Thin edge lines — gives each cube a subtle wireframe overlay
+      // reminiscent of a blueprint / CPU render.
+      const edges = new THREE.EdgesGeometry(geo, 18);
+      const edgeMat = new THREE.LineBasicMaterial({
+        color: '#111014',
+        transparent: true,
+        opacity: isLogoCube ? 0.18 : 0.3
+      });
+      const lines = new THREE.LineSegments(edges, edgeMat);
+      mesh.add(lines);
+      materialsToDispose.push(edgeMat);
 
       cubes.push({
         mesh,
@@ -234,7 +249,12 @@
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onResize);
       renderer.dispose();
-      cubes.forEach((c) => c.mesh.geometry.dispose());
+      cubes.forEach((c) => {
+        c.mesh.geometry.dispose();
+        c.mesh.children.forEach((child: { geometry?: { dispose?: () => void } }) => {
+          child.geometry?.dispose?.();
+        });
+      });
       materialsToDispose.forEach((m) => m.dispose?.());
       mascotGeo.dispose();
       mascotMats.forEach((m) => m.dispose());

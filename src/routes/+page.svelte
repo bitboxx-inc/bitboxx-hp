@@ -15,7 +15,7 @@
       code: 'E',
       word: 'Excellent',
       jp: '卓越',
-      accent: '#7AA2FF',
+      accent: '#111014',
       body: '確かな技術判断と洗練された設計。事業の核になる、十年後も壊れないプロダクトを。',
       tags: ['Architecture', 'Scalability', 'Quality']
     },
@@ -31,7 +31,7 @@
       code: 'U',
       word: 'Unique',
       jp: '唯一無二',
-      accent: '#9DE8C3',
+      accent: '#111014',
       body: '既成概念にとらわれない発想。他にはないものづくりを、技術で成立させる。',
       tags: ['Invention', 'Identity', 'Edge']
     }
@@ -74,7 +74,7 @@
       title: 'アーキテクト伴走',
       price: '¥800,000',
       unit: '/ 月 〜',
-      accent: '#7AA2FF',
+      accent: '#111014',
       description: 'ITアーキテクト水準の判断と実行を継続的に任せたい事業に。',
       sections: [
         { title: '支援内容', items: ['事業課題の整理と優先順位付け', '技術選定・設計・開発・改善まで一貫', '運用を見据えた継続支援'] },
@@ -100,7 +100,7 @@
       title: 'システム開発',
       price: 'ASK',
       unit: 'スポット',
-      accent: '#9DE8C3',
+      accent: '#111014',
       description: '必要な機能や課題に応じ、スポットでつくりきりたい事業に。',
       sections: [
         { title: '支援内容', items: ['新規開発・機能追加・改修', '要件整理から設計・実装・リリースまで', '運用を見据えて進行'] },
@@ -132,7 +132,7 @@
       label: 'Architect Partnership',
       jp: 'アーキテクト伴走',
       company: '美容系事業会社',
-      accent: '#FF7A8A',
+      accent: '#111014',
       body: 'ホームページ制作・事業用システム開発・事業方針の相談まで一貫支援。事業フェーズに応じた技術選定と開発方針の整理を継続的に。',
       items: ['HP制作・システム開発・事業方針の相談を一体で支援', 'システム選定や進め方の整理まで伴走', 'コスト管理や投資判断まで提案']
     },
@@ -140,7 +140,7 @@
       label: 'Maintenance Partnership',
       jp: '運用保守',
       company: '不動産会社',
-      accent: '#7AA2FF',
+      accent: '#2A272F',
       body: 'ホームページの運用保守や社内アカウント管理など、日常的な運用業務を継続支援。必要時には社内ツール整備などスポット対応も。',
       items: ['HPの更新・運用保守・軽微な改善を継続支援', '社内アカウント管理などの定期運用に対応', '社内ツール整備なども必要に応じて実施']
     }
@@ -246,19 +246,15 @@
       <div class="grid md:grid-cols-3 gap-6 md:gap-8">
         {#each philosophy as p, i}
           <Reveal delay={i + 1}>
-            <article
-              class="relative soft-card p-8 md:p-10 hover-lift h-full overflow-hidden group"
-              data-cursor="hover"
-            >
-              <div
-                class="absolute -top-16 -right-16 w-52 h-52 rounded-full opacity-60 blur-2xl transition-transform duration-700 group-hover:scale-125"
-                style="background: {p.accent}"
-              ></div>
+            <article class="relative corner-marks soft-card p-8 md:p-10 h-full overflow-hidden bg-white text-ink">
+              <span class="cm-bl"></span>
+              <span class="cm-br"></span>
+              <div class="absolute inset-0 bg-dotgrid-lite opacity-70 pointer-events-none"></div>
               <div class="relative flex items-start justify-between">
                 <div class="font-display italic text-[9rem] leading-none tracking-hyper" style="color: {p.accent}">
                   {p.code}
                 </div>
-                <Mascot klass="w-14 h-14 animate-floaty" color={p.accent} cheekColor="#ffffff" eyeColor="#111014"/>
+                <Mascot klass="w-14 h-14 animate-floaty" color="#FFFFFF" cheekColor={p.accent === '#FF7A8A' ? '#FFB5B5' : '#ECECEA'} eyeColor="#111014"/>
               </div>
               <div class="relative mt-6">
                 <p class="font-mono text-[11px] tracking-[0.3em] uppercase text-ink/50">{p.jp}</p>
@@ -282,14 +278,7 @@
   <!-- SERVICES -->
   <section id="business" class="relative py-28 md:py-40 bg-ink text-cream-50 scroll-mt-24 overflow-hidden">
     <div class="pointer-events-none absolute inset-0 bg-noise opacity-20"></div>
-    <div
-      class="pointer-events-none absolute -top-24 -left-24 w-[40rem] h-[40rem] rounded-full blur-3xl opacity-30"
-      style="background: radial-gradient(closest-side, #7AA2FF, transparent)"
-    ></div>
-    <div
-      class="pointer-events-none absolute -bottom-32 -right-20 w-[42rem] h-[42rem] rounded-full blur-3xl opacity-25"
-      style="background: radial-gradient(closest-side, #FF7A8A, transparent)"
-    ></div>
+    <div class="pointer-events-none absolute inset-0 bg-dotgrid-dark opacity-30"></div>
 
     <div class="relative max-w-[1400px] mx-auto px-6 md:px-10">
       <Reveal>
@@ -297,7 +286,7 @@
           <div>
             <p class="font-mono text-xs tracking-[0.32em] uppercase text-cream-50/50">— 02 / Services</p>
             <h2 class="mt-6 font-display italic text-6xl md:text-8xl tracking-hyper leading-[0.9]">
-              What we <span class="text-sakura">craft</span>.
+              What we craft.
             </h2>
           </div>
           <p class="max-w-sm font-mincho text-base leading-8 text-cream-50/70">
@@ -321,7 +310,7 @@
               <ul class="mt-8 space-y-2">
                 {#each s.bullets as b}
                   <li class="flex items-baseline gap-3 text-sm text-cream-50/80">
-                    <span class="inline-block w-1.5 h-1.5 rounded-full bg-sakura translate-y-[-2px]"></span>
+                    <span class="inline-block w-[6px] h-[6px] bg-cream-50/90 translate-y-[-2px]"></span>
                     {b}
                   </li>
                 {/each}
@@ -341,7 +330,7 @@
           <div>
             <p class="font-mono text-xs tracking-[0.32em] uppercase text-ink/50">— 03 / Plans</p>
             <h2 class="mt-6 font-display italic text-6xl md:text-8xl tracking-hyper leading-[0.9]">
-              三つの<br class="md:hidden"/>関わり方<span class="text-sakura">.</span>
+              三つの<br class="md:hidden"/>関わり方.
             </h2>
           </div>
           <p class="max-w-sm font-mincho text-base leading-8 text-ink/70">
@@ -452,7 +441,7 @@
           <div>
             <p class="font-mono text-xs tracking-[0.32em] uppercase text-ink/50">— 05 / Works</p>
             <h2 class="mt-6 font-display italic text-6xl md:text-8xl tracking-hyper leading-[0.9]">
-              支援の<span class="text-sakura">軌跡</span>.
+              支援の軌跡.
             </h2>
           </div>
           <p class="max-w-sm font-mincho text-base leading-8 text-ink/70">
@@ -469,7 +458,7 @@
             >
               <div class="md:col-span-4 flex md:flex-col items-start md:items-start gap-4 md:gap-6">
                 <div
-                  class="relative w-20 h-20 md:w-28 md:h-28 rounded-2xl flex items-center justify-center font-display italic text-4xl md:text-5xl"
+                  class="relative w-20 h-20 md:w-28 md:h-28 rounded-xl flex items-center justify-center font-display italic text-4xl md:text-5xl text-white"
                   style="background: {study.accent}"
                 >
                   {String(i + 1).padStart(2, '0')}
@@ -490,7 +479,7 @@
                 <ul class="mt-8 pt-8 border-t border-ink/10 grid sm:grid-cols-2 gap-x-6 gap-y-3 text-sm leading-7 text-ink/80">
                   {#each study.items as item}
                     <li class="flex items-baseline gap-3">
-                      <span class="inline-block w-1.5 h-1.5 rounded-full" style="background: {study.accent}"></span>
+                      <span class="inline-block w-[6px] h-[6px]" style="background: {study.accent}"></span>
                       <span>{item}</span>
                     </li>
                   {/each}
@@ -510,14 +499,14 @@
         <Reveal klass="md:col-span-5">
           <p class="font-mono text-xs tracking-[0.32em] uppercase text-ink/50">— 06 / Company</p>
           <h2 class="mt-6 font-display italic text-6xl md:text-8xl tracking-hyper leading-[0.88]">
-            会社<br/>概要<span class="text-sakura">.</span>
+            会社<br/>概要.
           </h2>
           <p class="mt-8 font-mincho text-base leading-8 text-ink/70 max-w-md">
             東京・日本橋箱崎を拠点に、EKU思想のプロダクトづくりを行うエンジニアリング会社です。
           </p>
 
           <div class="mt-10 flex items-center gap-4">
-            <Mascot klass="w-20 h-20 animate-floaty" color="#9DE8C3"/>
+            <Mascot klass="w-20 h-20 animate-floaty" color="#FFFFFF"/>
             <div class="font-mono text-[11px] tracking-[0.28em] uppercase text-ink/60 leading-7">
               Hello!<br/>
               We are<br/>
@@ -552,17 +541,14 @@
   <!-- CONTACT -->
   <section id="contact-form" class="relative py-28 md:py-40 bg-ink text-cream-50 scroll-mt-24 overflow-hidden">
     <div class="pointer-events-none absolute inset-0 bg-noise opacity-20"></div>
-    <div
-      class="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[80rem] h-[80rem] rounded-full blur-3xl opacity-20"
-      style="background: radial-gradient(closest-side, #FF7A8A, transparent)"
-    ></div>
+    <div class="pointer-events-none absolute inset-0 bg-dotgrid-dark opacity-25"></div>
 
     <div class="relative max-w-[1400px] mx-auto px-6 md:px-10">
       <Reveal>
         <p class="font-mono text-xs tracking-[0.32em] uppercase text-cream-50/50">— 07 / Contact</p>
         <h2 class="mt-6 font-display italic text-6xl md:text-[10rem] tracking-hyper leading-[0.85] text-balance">
           Let's make<br/>
-          something <span class="text-sakura not-italic">wonderful</span>.
+          something wonderful.
         </h2>
         <p class="mt-8 font-mincho text-base md:text-lg leading-8 text-cream-50/75 max-w-xl">
           次の「最高」をつくる相談を、お待ちしています。プロジェクトのご相談、協業のご提案、その他お気軽にどうぞ。
