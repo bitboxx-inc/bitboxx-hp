@@ -1,111 +1,148 @@
 <svelte:head>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
-    <link href="https://fonts.googleapis.com/css2?family=League+Gothic&family=Noto+Serif+JP&display=swap"
-          rel="stylesheet">
-    <title>株式会社bitboxx | まだ見ぬ最高を、確かな品質で。</title>
+    <title>bitboxx | Excellent. Kawaii. Unique.</title>
+    <meta name="description" content="bitboxx (ビットボックス) は、Excellent / Kawaii / Unique の三つのものさしで、事業の核となるプロダクトとシステムを設計・開発する東京のエンジニアリング会社です。"/>
 </svelte:head>
 
 <script lang="ts">
   import companyInfo from '$lib/data/company_info.json';
   import PrivacyPolicy from '$lib/domains/PrivacyPolicy.svelte';
+  import HeroCanvas from '$lib/components/HeroCanvas.svelte';
+  import Reveal from '$lib/components/Reveal.svelte';
+  import Mascot from '$lib/components/Mascot.svelte';
 
-  const icons = {
-    excellent: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z',
-    kawaii: 'M17 8c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm-5 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zM7 16c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z',
-    unique: 'M12 2L6 22h12L12 2zm0 3.82L15.34 16h-6.68L12 5.82z',
-    development: 'M16 4h2l2 2v10l-2 2h-4l-2-2v-4l2-2h4V8H8v8h8',
-    ai: 'M19 14.5c0 1.95-1.55 3.5-3.5 3.5s-3.5-1.55-3.5-3.5c0-.97.4-1.85 1.04-2.5l-.04-.04c.04-.04.08-.08.13-.12.65-.65 1.52-1.05 2.47-1.05 1.95 0 3.5 1.55 3.5 3.5z',
-    design: 'M17 12c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm-5-8H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h6v2h2v-2h4v-2h-4V4z',
-    outdoor: 'M12 2l-5 5h10l-5-5zM4 10v9h16v-9H4zm2 2h12v5H6v-5z'
-  };
+  const philosophy = [
+    {
+      code: 'E',
+      word: 'Excellent',
+      jp: '卓越',
+      accent: '#7AA2FF',
+      body: '確かな技術判断と洗練された設計。事業の核になる、十年後も壊れないプロダクトを。',
+      tags: ['Architecture', 'Scalability', 'Quality']
+    },
+    {
+      code: 'K',
+      word: 'Kawaii',
+      jp: '愛らしさ',
+      accent: '#FF7A8A',
+      body: '使う人が思わず微笑むディテール。愛着が生まれるプロダクトは、長く使われ、長く育つ。',
+      tags: ['UI · UX', 'Craft', 'Delight']
+    },
+    {
+      code: 'U',
+      word: 'Unique',
+      jp: '唯一無二',
+      accent: '#9DE8C3',
+      body: '既成概念にとらわれない発想。他にはないものづくりを、技術で成立させる。',
+      tags: ['Invention', 'Identity', 'Edge']
+    }
+  ];
+
+  const services = [
+    {
+      num: '01',
+      title: 'システム・プロダクト開発',
+      en: 'Systems & Products',
+      body: '事業の核となるプロダクトを共創。要件整理から設計、実装、運用までを一貫して担います。',
+      bullets: ['Web / モバイル / バックエンド', 'クラウド基盤とインフラ設計', '数千万ユーザー規模の運用実績']
+    },
+    {
+      num: '02',
+      title: '先進技術による事業変革',
+      en: 'AI · Automation',
+      body: 'AIや自動化を「道具」として捉え、事業課題を前進させる仕組みに落とし込みます。',
+      bullets: ['LLM / 機械学習の実装', '業務プロセスの自動化', 'データ基盤と計測設計']
+    },
+    {
+      num: '03',
+      title: 'UI / UX デザイン',
+      en: 'Design · Craft',
+      body: '美しいだけでなく使いやすさを極める。細部まで丁寧に設計された、愛される体験を。',
+      bullets: ['プロダクトデザイン', 'デザインシステム整備', 'ブランド表現の設計']
+    },
+    {
+      num: '04',
+      title: 'アウトドア事業・共創支援',
+      en: 'Outdoor × DX',
+      body: 'アウトドアの価値をデジタルで再定義。五感を刺激する製品とサプライチェーン変革を両輪で。',
+      bullets: ['プロダクト企画・開発', '産業のDX化支援', 'ブランド・コミュニティ形成']
+    }
+  ];
 
   const plans = [
     {
       label: 'PLAN 01',
-      title: 'アーキテクト伴走プラン',
-      price: '月額 80 万円から',
-      description: 'ITアーキテクト水準の判断と実行を、継続的に任せたい場合のプラン。',
+      title: 'アーキテクト伴走',
+      price: '¥800,000',
+      unit: '/ 月 〜',
+      accent: '#7AA2FF',
+      description: 'ITアーキテクト水準の判断と実行を継続的に任せたい事業に。',
       sections: [
-        {
-          title: '支援内容',
-          items: ['事業課題の整理と優先順位付け', '技術選定、設計、開発、改善まで一貫対応', '運用を見据えた継続支援']
-        },
-        {
-          title: '提供価値',
-          items: ['高単価案件で求められるアーキテクト水準で対応', '単なる開発要員追加ではなく、技術判断ごと委任可能', '週1回以上の定例で進行と意思決定を前進']
-        }
+        { title: '支援内容', items: ['事業課題の整理と優先順位付け', '技術選定・設計・開発・改善まで一貫', '運用を見据えた継続支援'] },
+        { title: '提供価値', items: ['高単価案件水準のアーキテクトが専属で対応', '単なる要員追加ではなく、技術判断ごと委任可能', '週1以上の定例で意思決定を前進'] }
       ]
     },
     {
       label: 'PLAN 02',
-      title: '運用保守プラン',
-      price: '月額 15 万円から',
-      description: '日々の運用や保守を継続して任せたい場合のプラン。',
+      title: '運用保守',
+      price: '¥150,000',
+      unit: '/ 月 〜',
+      accent: '#FF7A8A',
+      description: '日々の運用や保守を、継続して安心して任せたい事業に。',
       sections: [
-        {
-          title: '支援内容',
-          items: ['日々の運用作業の代行', '既存システムの保守・軽微修正', '不具合時の一次切り分け']
-        },
-        {
-          title: '契約条件',
-          items: ['対象業務に応じて内容を調整', '作業量が大きい場合は別途見積もり']
-        }
-      ]
+        { title: '支援内容', items: ['日々の運用作業の代行', '既存システムの保守・軽微修正', '不具合時の一次切り分け'] },
+        { title: '契約条件', items: ['対象業務に応じて内容を調整', '作業量が大きい場合は別途見積もり'] }
+      ],
+      linkUrl: 'https://pages.bitboxx.co.jp',
+      linkLabel: 'ホームページ向けサービス →'
     },
     {
       label: 'PLAN 03',
-      title: 'システム開発プラン',
-      price: '料金はご相談',
-      description: '必要な機能や課題に応じて、スポットで開発したい場合のプラン。',
+      title: 'システム開発',
+      price: 'ASK',
+      unit: 'スポット',
+      accent: '#9DE8C3',
+      description: '必要な機能や課題に応じ、スポットでつくりきりたい事業に。',
       sections: [
-        {
-          title: '支援内容',
-          items: ['新規開発、機能追加、改修', '要件整理から設計、実装、リリースまで対応', '運用を見据えて進行']
-        },
-        {
-          title: '契約形態',
-          items: ['内容、規模、期間に応じて個別見積もり', '運用保守契約への移行も可能']
-        }
+        { title: '支援内容', items: ['新規開発・機能追加・改修', '要件整理から設計・実装・リリースまで', '運用を見据えて進行'] },
+        { title: '契約形態', items: ['内容・規模・期間に応じて個別見積もり', '運用保守契約への移行も可能'] }
       ]
     }
   ];
 
   const reasons = [
     {
+      num: '01',
       title: '事業に集中できる進行設計',
-      description: '本当に必要な施策や開発を整理し、優先順位を明確にしたうえで進行します。運用に追われる時間や判断コストを減らし、事業に集中できる状態をつくります。'
+      body: '必要な施策と開発を整理し、優先順位を明確化。運用に追われる時間や判断コストを減らし、事業に集中できる状態をつくります。'
     },
     {
+      num: '02',
       title: '幅広い実績に裏打ちされた技術判断',
-      description: '数千万人規模が利用するWebサービス開発から、ホームページ制作、決済導入、クラウド移行まで幅広く対応。技術を先に決めるのではなく、経験をもとに課題や事業フェーズに合った進め方と技術を判断します。'
+      body: '数千万人規模のWebサービスからホームページ制作、決済導入、クラウド移行まで。技術を先に決めず、経験から最適解を導きます。'
     },
     {
+      num: '03',
       title: '選定だけで終わらない実行力',
-      description: 'UI/UX設計から開発、運用保守まで一貫して対応します。方針づくりだけで終わらせず、そのまま実装と運用につなげ、成果に結びつく形で支援します。'
+      body: 'UI/UX設計から開発、運用保守まで一貫対応。方針づくりで終わらせず、実装と運用まで成果に結びつけます。'
     }
   ];
 
   const caseStudies = [
     {
-      label: 'アーキテクト伴走',
+      label: 'Architect Partnership',
+      jp: 'アーキテクト伴走',
       company: '美容系事業会社',
-      description: 'ホームページ制作、事業用システム開発、事業方針に関する相談まで一貫して支援。事業フェーズに応じた技術選定と開発方針の整理を継続的に行っています。',
-      items: [
-        'HP制作、システム開発、事業方針の相談を一体で支援',
-        'システム選定や進め方の整理まで含めて伴走',
-        'コスト管理や今後の投資判断まで提案'
-      ]
+      accent: '#FF7A8A',
+      body: 'ホームページ制作・事業用システム開発・事業方針の相談まで一貫支援。事業フェーズに応じた技術選定と開発方針の整理を継続的に。',
+      items: ['HP制作・システム開発・事業方針の相談を一体で支援', 'システム選定や進め方の整理まで伴走', 'コスト管理や投資判断まで提案']
     },
     {
-      label: '運用保守',
+      label: 'Maintenance Partnership',
+      jp: '運用保守',
       company: '不動産会社',
-      description: 'ホームページの運用保守や社内アカウント管理など、日常的な運用業務を継続支援。必要なタイミングで社内ツール整備などのスポット対応も行っています。',
-      items: [
-        'HPの更新、運用保守、軽微な改善を継続支援',
-        '社内アカウント管理などの定期運用に対応',
-        '社内ツール整備なども必要に応じて実施'
-      ]
+      accent: '#7AA2FF',
+      body: 'ホームページの運用保守や社内アカウント管理など、日常的な運用業務を継続支援。必要時には社内ツール整備などスポット対応も。',
+      items: ['HPの更新・運用保守・軽微な改善を継続支援', '社内アカウント管理などの定期運用に対応', '社内ツール整備なども必要に応じて実施']
     }
   ];
 
@@ -121,16 +158,10 @@
     event.preventDefault();
     showPrivacyModal = true;
   }
-
-  function closePrivacyModal() {
-    showPrivacyModal = false;
-  }
+  function closePrivacyModal() { showPrivacyModal = false; }
 
   function send() {
-    if (isDisabled(pr, yourname, company, email, tel, text)) {
-      return;
-    }
-
+    if (isDisabled(pr, yourname, company, email, tel, text)) return;
     const mailto = `mailto:contact@bitboxx.co.jp?subject=ホームページからのお問い合わせ&body=${encodeURIComponent(
       `問い合わせ内容:\n${text}\n\n---\n氏名: ${yourname}\n会社名: ${company}\n電話番号: ${tel}\nメールアドレス: ${email}\n---`
     )}`;
@@ -142,350 +173,560 @@
   }
 </script>
 
-<style>
-    .mincho {
-        font-family: 'Noto Serif JP', serif;
-    }
-</style>
+<main class="relative">
+  <!-- HERO -->
+  <section class="relative min-h-[100svh] flex items-end pt-24 pb-20 overflow-hidden paper-grain">
+    <!-- 3D canvas -->
+    <div class="absolute inset-0 z-0 mask-fade-y">
+      <HeroCanvas />
+    </div>
 
-<main class="flex-1">
+    <!-- Top meta row -->
+    <div class="pointer-events-none absolute top-28 left-0 right-0 z-20 px-6 md:px-10">
+      <div class="max-w-[1400px] mx-auto flex items-start justify-between">
+        <div class="pill pointer-events-auto">
+          <span class="chip-dot bg-sakura animate-floaty"></span>
+          Tokyo · Est. 2024
+        </div>
+        <div class="hidden md:flex flex-col items-end gap-2 font-mono text-[11px] tracking-[0.28em] uppercase text-ink/60">
+          <span>N 35.6854</span>
+          <span>E 139.7925</span>
+        </div>
+      </div>
+    </div>
 
-    <section class="max-w-7xl mx-auto px-6 pt-32 pb-40 text-center">
-        <h1 class="text-7xl md:text-9xl font-extrabold tracking-tighter leading-none">
-                <span class="bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-                    まだ見ぬ最高を、<br class="sm:hidden"/>確かな品質で。
-                </span>
-        </h1>
-        <p class="mincho mt-12 max-w-3xl mx-auto text-gray-600 text-xl leading-relaxed font-light">
-            私たち bitboxx (ビットボックス) の使命は、唯一無二のアイデアを卓越した技術で実現し、
-            人々の心を満たす愛着あるプロダクトとして世界に届けることです。
+    <!-- Main title -->
+    <div class="relative z-10 w-full px-6 md:px-10 pb-4">
+      <div class="max-w-[1400px] mx-auto">
+        <p class="font-mono text-[11px] md:text-xs tracking-[0.32em] uppercase text-ink/50 mb-6 md:mb-10">
+          <span class="inline-block w-8 h-px bg-ink/40 align-middle mr-3"></span>
+          bitboxx — engineering with craft
         </p>
-        <div class="mt-16">
-            <a href="#contact-form" class="inline-flex items-center justify-center px-10 py-3 border border-transparent text-base font-medium rounded-full shadow-lg text-white bg-gray-900 hover:bg-gray-700 transition-colors">
-                プロジェクトのご相談
-            </a>
-        </div>
-    </section>
 
-    <section id="philosophy" class="mincho max-w-7xl mx-auto px-6 py-28 bg-gray-50 border-t border-b border-gray-100 mt-24 scroll-mt-24">
-        <h2 class="text-3xl font-bold text-center mb-4 text-gray-700">私たちの哲学</h2>
-        <p class="text-xl text-center text-gray-500 font-light mb-16">Excellent / Kawaii / Unique</p>
-        <div class="max-w-6xl mx-auto grid md:grid-cols-3 gap-10 text-left">
-            <div class="p-10 bg-white border border-gray-100 rounded-3xl shadow-lg hover:shadow-xl transition">
-                <div class="w-10 h-10 mb-4 text-gray-900">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d={icons.excellent}/></svg>
-                </div>
-                <h3 class="text-xl font-bold mb-2">Excellent</h3>
-                <p class="text-gray-600 leading-relaxed text-sm">
-                    確かな技術力と洗練された設計思想に基づき、企業の基盤を支える高品質かつ持続可能なプロダクトを創造します。
-                </p>
-            </div>
-            <div class="p-10 bg-white border border-gray-100 rounded-3xl shadow-lg hover:shadow-xl transition">
-                <div class="w-10 h-10 mb-4 text-gray-900">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d={icons.kawaii}/></svg>
-                </div>
-                <h3 class="text-xl font-bold mb-2">Kawaii</h3>
-                <p class="text-gray-600 leading-relaxed text-sm">
-                    思わず微笑むような愛らしさと、使う人の気持ちに寄り添う心地よさを設計。プロダクトに感情的なつながりをもたらします。
-                </p>
-            </div>
-            <div class="p-10 bg-white border border-gray-100 rounded-3xl shadow-lg hover:shadow-xl transition">
-                <div class="w-10 h-10 mb-4 text-gray-900">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d={icons.unique}/></svg>
-                </div>
-                <h3 class="text-xl font-bold mb-2">Unique</h3>
-                <p class="text-gray-600 leading-relaxed text-sm">
-                    既成概念にとらわれない発想と専門性で、市場に新たな価値を生み出す唯一無二のソリューションを提供します。
-                </p>
-            </div>
-        </div>
-    </section>
+        <h1 class="font-display leading-[0.82] tracking-hyper break-words">
+          <span class="block text-[14vw] md:text-[11vw] lg:text-[9.5rem] italic">
+            <span class="underline-handwritten">Excellent.</span>
+          </span>
+          <span class="block text-[14vw] md:text-[11vw] lg:text-[9.5rem] pl-[6vw] md:pl-[12vw]">
+            <span class="text-sakura italic">Kawaii.</span>
+          </span>
+          <span class="block text-[14vw] md:text-[11vw] lg:text-[9.5rem] pl-[2vw] md:pl-[4vw]">
+            Unique<span class="text-sakura">.</span>
+          </span>
+        </h1>
 
-    <section id="business" class="mincho max-w-7xl mx-auto px-6 py-24 mt-24 scroll-mt-24">
-        <h2 class="text-3xl font-bold text-center mb-16">事業内容</h2>
-        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div class="p-8 rounded-2xl border border-gray-100 bg-white shadow-sm hover:shadow-md transition">
-                <div class="w-8 h-8 mb-4 text-gray-700">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d={icons.development}/></svg>
-                </div>
-                <h3 class="text-lg font-semibold mb-2">システム・プロダクト開発</h3>
-                <p class="text-gray-600 text-sm leading-relaxed">
-                    お客様のビジネスの「核」となるプロダクトを共に創り上げます。堅牢な設計と、使う人への配慮を大切にします。
-                </p>
-            </div>
-            <div class="p-8 rounded-2xl border border-gray-100 bg-white shadow-sm hover:shadow-md transition">
-                <div class="w-8 h-8 mb-4 text-gray-700">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d={icons.ai}/></svg>
-                </div>
-                <h3 class="text-lg font-semibold mb-2">先進技術による事業変革</h3>
-                <p class="text-gray-600 text-sm leading-relaxed">
-                    最新技術を道具として捉え、人々の働き方をより豊かに、よりクリエイティブにするための仕組みを設計し、未来を見据えた変革を支援します。
-                </p>
-            </div>
-            <div class="p-8 rounded-2xl border border-gray-100 bg-white shadow-sm hover:shadow-md transition">
-                <div class="w-8 h-8 mb-4 text-gray-700">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d={icons.design}/></svg>
-                </div>
-                <h3 class="text-lg font-semibold mb-2">UI/UX設計</h3>
-                <p class="text-gray-600 text-sm leading-relaxed">
-                    「美しい」だけでなく「使いやすい」を極めるデザイン。製品を愛せるようになるまでのプロセスを共に作り上げます。
-                </p>
-            </div>
-            <div class="p-8 rounded-2xl border border-gray-100 bg-white shadow-sm hover:shadow-md transition">
-                <div class="w-8 h-8 mb-4 text-gray-700">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d={icons.outdoor}/></svg>
-                </div>
-                <h3 class="text-lg font-semibold mb-2">アウトドア事業・共創支援</h3>
-                <p class="text-gray-600 text-sm leading-relaxed">
-                    デジタルの力でアウトドアの価値を再定義。五感を刺激する新しい体験を持つ製品開発と、サプライチェーンの変革を含む産業全体のDX化を両軸で支援し、持続可能な成長基盤を提供します。
-                </p>
-            </div>
-        </div>
-    </section>
-
-    <section id="plans" class="mincho max-w-7xl mx-auto px-6 py-28 bg-gray-50 border-t border-b border-gray-100 mt-24 scroll-mt-24">
-        <div class="text-center">
-            <h2 class="text-3xl font-bold text-gray-700">代表的な支援プラン</h2>
-            <p class="mt-4 text-lg text-gray-500 font-light">事業フェーズと必要な関わり方に応じて、最適な形で伴走します。</p>
-        </div>
-
-        <div class="mt-16 grid gap-8 lg:grid-cols-3">
-            {#each plans as plan}
-                <article class="rounded-3xl border border-gray-100 bg-white p-8 shadow-lg transition hover:shadow-xl">
-                    <p class="text-xs tracking-[0.24em] text-gray-400">{plan.label}</p>
-                    <h3 class="mt-3 text-2xl font-bold text-gray-900">{plan.title}</h3>
-                    <p class="mt-4 text-3xl font-semibold text-gray-900">{plan.price}</p>
-                    <p class="mt-5 text-sm leading-7 text-gray-600">{plan.description}</p>
-
-                    <div class="mt-8 space-y-6">
-                        {#each plan.sections as section}
-                            <div class="border-t border-gray-100 pt-5">
-                                <p class="text-sm font-semibold text-gray-900">{section.title}</p>
-                                <ul class="mt-3 space-y-2 text-sm leading-7 text-gray-600">
-                                    {#each section.items as item}
-                                        <li>{item}</li>
-                                    {/each}
-                                </ul>
-                            </div>
-                        {/each}
-
-                        {#if plan.title === '運用保守プラン'}
-                            <div class="border-t border-gray-100 pt-5">
-                                <p class="text-sm font-semibold text-gray-900">ホームページ向けサービス</p>
-                                <a
-                                    href="https://pages.bitboxx.co.jp"
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    class="mt-3 inline-flex text-sm leading-7 text-gray-700 underline underline-offset-4 hover:text-gray-900"
-                                >
-                                    ホームページ開発運用に特化したサービスはこちら
-                                </a>
-                            </div>
-                        {/if}
-                    </div>
-                </article>
-            {/each}
-        </div>
-    </section>
-
-    <section id="reasons" class="mincho max-w-7xl mx-auto px-6 py-24 mt-24 scroll-mt-24">
-        <div class="text-center">
-            <p class="text-sm tracking-[0.22em] text-gray-400">WHY BITBOXX</p>
-            <h2 class="mt-4 text-3xl font-bold text-gray-900">選ばれる理由</h2>
-            <p class="mt-4 text-lg text-gray-500 font-light">進行設計、技術判断、実行を切り離さず支援します。</p>
-        </div>
-
-        <div class="mt-16 grid gap-8 md:grid-cols-3">
-            {#each reasons as reason}
-                <article class="rounded-3xl border border-gray-100 bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
-                    <h3 class="text-xl font-bold text-gray-900">{reason.title}</h3>
-                    <p class="mt-5 text-sm leading-8 text-gray-600">
-                        {reason.description}
-                    </p>
-                </article>
-            {/each}
-        </div>
-    </section>
-
-    <section id="case-studies" class="mincho max-w-7xl mx-auto px-6 py-24 mt-24 scroll-mt-24">
-        <div class="text-center">
-            <p class="text-sm tracking-[0.22em] text-gray-400">CASE STUDIES</p>
-            <h2 class="mt-4 text-3xl font-bold text-gray-900">支援実績</h2>
-            <p class="mt-4 text-lg text-gray-500 font-light">実際の関わり方が伝わる、代表的な支援事例です。</p>
-        </div>
-
-        <div class="mt-16 space-y-8">
-            {#each caseStudies as study}
-                <article class="rounded-3xl border border-gray-100 bg-white p-8 shadow-sm">
-                    <p class="text-sm tracking-[0.18em] text-gray-400">{study.label}</p>
-                    <h3 class="mt-3 text-2xl font-bold text-gray-900">{study.company}</h3>
-                    <p class="mt-5 text-sm leading-8 text-gray-600">{study.description}</p>
-                    <ul class="mt-6 space-y-3 border-t border-gray-100 pt-6 text-sm leading-7 text-gray-600">
-                        {#each study.items as item}
-                            <li>{item}</li>
-                        {/each}
-                    </ul>
-                </article>
-            {/each}
-        </div>
-    </section>
-
-    <section id="company" class="mincho max-w-4xl mx-auto px-6 pt-16 pb-24 mt-24 scroll-mt-24">
-        <h2 class="text-3xl font-bold mb-12 text-center">会社概要</h2>
-        <div class="bg-gray-50 rounded-2xl p-10 border border-gray-100 shadow-sm">
-            <dl class="space-y-5 text-gray-700 text-base">
-                <div class="flex border-b border-gray-200 pb-2">
-                    <dt class="font-semibold w-1/4 min-w-[100px]">会社名</dt>
-                    <dd class="w-3/4">{companyInfo.name}</dd>
-                </div>
-                <div class="flex border-b border-gray-200 pb-2">
-                    <dt class="font-semibold w-1/4 min-w-[100px]">所在地</dt>
-                    <dd class="w-3/4">
-                        {companyInfo.postcode}<br/>
-                        {companyInfo.address}
-                    </dd>
-                </div>
-                <div class="flex border-b border-gray-200 pb-2">
-                    <dt class="font-semibold w-1/4 min-w-[100px]">代表者</dt>
-                    <dd class="w-3/4">{companyInfo.representative}</dd>
-                </div>
-                <div class="flex border-b border-gray-200 pb-2">
-                    <dt class="font-semibold w-1/4 min-w-[100px]">設立</dt>
-                    <dd class="w-3/4">
-                        {companyInfo.established.substring(0, 4)}年
-                        {companyInfo.established.substring(5, 7)}月
-                        {companyInfo.established.substring(8, 10)}日
-                    </dd>
-                </div>
-                <div class="flex">
-                    <dt class="font-semibold w-1/4 min-w-[100px]">事業内容</dt>
-                    <dd class="w-3/4">{companyInfo.business}</dd>
-                </div>
-            </dl>
-        </div>
-    </section>
-
-    <section id="contact-form" class="mincho w-full py-24 mt-24 mb-32 bg-gray-900 scroll-mt-24">
-        <div class="max-w-4xl mx-auto px-6">
-            <h2 class="text-3xl font-bold text-center mb-16 tracking-wider text-white">お問い合わせ</h2>
-
-            <div class="bg-white p-8 md:p-12 border border-gray-100 rounded-2xl shadow-xl">
-                <p class="mb-10 text-center text-gray-600 font-light">
-                    次の「最高」の創造に向けた、プロジェクトのご相談や協業のご提案をお待ちしております。
-                </p>
-
-                <form on:submit|preventDefault={send} class="space-y-8">
-                    <div class="relative group">
-                        <label for="yourname" class="block text-sm font-medium text-gray-500 mb-2">お名前</label>
-                        <input
-                                id="yourname"
-                                type="text"
-                                bind:value={yourname}
-                                class="w-full p-2 border-b-2 border-gray-300 focus:border-gray-900 outline-none transition duration-300 text-lg font-light"
-                                style="background-color: transparent;"
-                        />
-                    </div>
-
-                    <div class="relative group">
-                        <label for="company" class="block text-sm font-medium text-gray-500 mb-2">会社名</label>
-                        <input
-                                id="company"
-                                type="text"
-                                bind:value={company}
-                                class="w-full p-2 border-b-2 border-gray-300 focus:border-gray-900 outline-none transition duration-300 text-lg font-light"
-                                style="background-color: transparent;"
-                        />
-                    </div>
-
-                    <div class="relative group">
-                        <label for="email" class="block text-sm font-medium text-gray-500 mb-2">メールアドレス</label>
-                        <input
-                                id="email"
-                                type="email"
-                                bind:value={email}
-                                class="w-full p-2 border-b-2 border-gray-300 focus:border-gray-900 outline-none transition duration-300 text-lg font-light"
-                                style="background-color: transparent;"
-                        />
-                    </div>
-
-                    <div class="relative group">
-                        <label for="tel" class="block text-sm font-medium text-gray-500 mb-2">電話番号</label>
-                        <input
-                                id="tel"
-                                type="tel"
-                                bind:value={tel}
-                                class="w-full p-2 border-b-2 border-gray-300 focus:border-gray-900 outline-none transition duration-300 text-lg font-light"
-                                style="background-color: transparent;"
-                        />
-                    </div>
-
-                    <div class="relative group">
-                        <label for="text" class="block text-sm font-medium text-gray-500 mb-2">お問い合わせ内容</label>
-                        <textarea
-                                id="text"
-                                bind:value={text}
-                                rows="6"
-                                class="w-full p-3 border border-gray-300 focus:border-gray-900 outline-none transition duration-300 rounded-lg text-lg font-light resize-none"
-                                style="background-color: transparent;"
-                        ></textarea>
-                    </div>
-
-                    <div class="flex items-center justify-center pt-4">
-                        <input
-                                id="privacy-check"
-                                type="checkbox"
-                                bind:checked={pr}
-                                class="mr-3 h-4 w-4 text-gray-900 border-gray-300 rounded focus:ring-gray-800"
-                        />
-                        <label for="privacy-check" class="text-sm text-gray-600 select-none">
-                            <button type="button" on:click={openPrivacyModal} class="text-gray-900 underline hover:text-gray-700 transition">
-                                当社規定のプライバシーポリシー
-                            </button>
-                            に同意する
-                        </label>
-                    </div>
-
-                    <div class="pt-6">
-                        <button
-                                type="submit"
-                                disabled={isDisabled(pr, yourname, company, email, tel, text)}
-                                class={`
-                                    w-full py-4 text-lg font-semibold rounded-full transition-all duration-300
-                                    ${isDisabled(pr, yourname, company, email, tel, text)
-                                       ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                                       : 'bg-gray-900 text-white hover:bg-gray-700 shadow-lg'}
-                                `}
-                                on:click={send}
-                        >
-                            送信する
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </section>
-
-    {#if showPrivacyModal}
-        <div
-                class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-[1000]"
-                on:click={closePrivacyModal}
-        >
-            <div
-                    class="bg-white rounded-xl shadow-2xl w-full max-w-3xl m-4 p-6 md:p-10 max-h-[90vh] flex flex-col"
-                    on:click|stopPropagation
+        <div class="mt-14 md:mt-20 flex flex-col md:flex-row md:items-end md:justify-between gap-10">
+          <div class="max-w-2xl">
+            <p class="font-mincho font-light text-[26px] md:text-[44px] leading-[1.5] tracking-[0.04em] text-ink">
+              まだ見ぬ<span class="relative inline-block">
+                <span class="relative z-10">最高</span>
+                <span class="absolute inset-x-0 bottom-[0.12em] h-[0.28em] bg-sakura/60 -z-0" aria-hidden="true"></span>
+              </span>を、<br class="hidden sm:block"/>
+              確かな品質で。
+            </p>
+            <p class="mt-7 md:mt-10 font-mincho text-[15px] md:text-[17px] leading-[2.1] text-ink/60 max-w-lg tracking-[0.06em]">
+              唯一無二のアイデアを卓越した技術で実現し、<br class="hidden md:block"/>
+              愛着あるプロダクトとして世界に届ける。
+            </p>
+          </div>
+          <div class="shrink-0">
+            <a
+              href="#contact-form"
+              class="group inline-flex items-center gap-3 px-7 py-3.5 bg-ink text-white rounded-full text-base font-medium hover:bg-sakura transition-colors duration-300"
             >
-                <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-100">
-                    <h2 class="text-2xl font-bold text-gray-900">プライバシーポリシー</h2>
-                    <button class="text-gray-500 hover:text-gray-900 text-3xl" on:click={closePrivacyModal}>
-                        &times;
-                    </button>
-                </div>
-
-                <div class="overflow-y-auto pr-2 flex-1">
-                    <PrivacyPolicy showTitle={false}/>
-                </div>
-            </div>
+              <span class="font-display italic text-lg whitespace-nowrap">プロジェクトを相談する</span>
+              <svg class="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+            </a>
+          </div>
         </div>
-    {/if}
+      </div>
+    </div>
 
+    <!-- scroll indicator -->
+    <div class="pointer-events-none absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 text-ink/50">
+      <span class="font-mono text-[10px] tracking-[0.3em] uppercase">Scroll</span>
+      <span class="w-px h-10 bg-ink/30 relative overflow-hidden">
+        <span class="absolute top-0 left-0 w-full h-3 bg-ink animate-[floaty_2s_ease-in-out_infinite]"></span>
+      </span>
+    </div>
+  </section>
+
+  <!-- PHILOSOPHY -->
+  <section id="philosophy" class="relative py-28 md:py-40 scroll-mt-24 overflow-hidden">
+    <div class="max-w-[1400px] mx-auto px-6 md:px-10">
+      <Reveal>
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-16 md:mb-24">
+          <div>
+            <p class="font-mono text-xs tracking-[0.32em] uppercase text-ink/50">— 01 / Philosophy</p>
+            <h2 class="mt-6 font-display italic text-6xl md:text-8xl tracking-hyper leading-[0.9]">
+              三つのものさし、<br/>
+              <span class="not-italic">E.K.U.</span>
+            </h2>
+          </div>
+          <p class="max-w-sm font-mincho text-base leading-8 text-ink/70">
+            私たちは、作るものすべてを「卓越しているか」「愛らしいか」「唯一無二か」で測ります。どれが欠けても、私たちの仕事ではありません。
+          </p>
+        </div>
+      </Reveal>
+
+      <div class="grid md:grid-cols-3 gap-6 md:gap-8">
+        {#each philosophy as p, i}
+          <Reveal delay={i + 1}>
+            <article
+              class="relative soft-card p-8 md:p-10 hover-lift h-full overflow-hidden group"
+              data-cursor="hover"
+            >
+              <div
+                class="absolute -top-16 -right-16 w-52 h-52 rounded-full opacity-60 blur-2xl transition-transform duration-700 group-hover:scale-125"
+                style="background: {p.accent}"
+              ></div>
+              <div class="relative flex items-start justify-between">
+                <div class="font-display italic text-[9rem] leading-none tracking-hyper" style="color: {p.accent}">
+                  {p.code}
+                </div>
+                <Mascot klass="w-14 h-14 animate-floaty" color={p.accent} cheekColor="#ffffff" eyeColor="#111014"/>
+              </div>
+              <div class="relative mt-6">
+                <p class="font-mono text-[11px] tracking-[0.3em] uppercase text-ink/50">{p.jp}</p>
+                <h3 class="mt-2 font-display italic text-4xl tracking-hyper">{p.word}.</h3>
+                <p class="mt-5 text-sm leading-7 text-ink/75">{p.body}</p>
+                <div class="mt-7 flex flex-wrap gap-2">
+                  {#each p.tags as tag}
+                    <span class="text-[11px] font-mono tracking-widest uppercase px-3 py-1 rounded-full border border-ink/15">
+                      {tag}
+                    </span>
+                  {/each}
+                </div>
+              </div>
+            </article>
+          </Reveal>
+        {/each}
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section id="business" class="relative py-28 md:py-40 bg-ink text-cream-50 scroll-mt-24 overflow-hidden">
+    <div class="pointer-events-none absolute inset-0 bg-noise opacity-20"></div>
+    <div
+      class="pointer-events-none absolute -top-24 -left-24 w-[40rem] h-[40rem] rounded-full blur-3xl opacity-30"
+      style="background: radial-gradient(closest-side, #7AA2FF, transparent)"
+    ></div>
+    <div
+      class="pointer-events-none absolute -bottom-32 -right-20 w-[42rem] h-[42rem] rounded-full blur-3xl opacity-25"
+      style="background: radial-gradient(closest-side, #FF7A8A, transparent)"
+    ></div>
+
+    <div class="relative max-w-[1400px] mx-auto px-6 md:px-10">
+      <Reveal>
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-16 md:mb-24">
+          <div>
+            <p class="font-mono text-xs tracking-[0.32em] uppercase text-cream-50/50">— 02 / Services</p>
+            <h2 class="mt-6 font-display italic text-6xl md:text-8xl tracking-hyper leading-[0.9]">
+              What we <span class="text-sakura">craft</span>.
+            </h2>
+          </div>
+          <p class="max-w-sm font-mincho text-base leading-8 text-cream-50/70">
+            事業の核になるプロダクトから、先進技術による仕組みづくり、UI/UX、アウトドア領域まで。技術と craft を掛け合わせて、一貫して担います。
+          </p>
+        </div>
+      </Reveal>
+
+      <div class="grid md:grid-cols-2 gap-px bg-cream-50/10 rounded-3xl overflow-hidden border border-cream-50/10">
+        {#each services as s, i}
+          <Reveal delay={(i % 4) + 1}>
+            <article class="relative bg-ink p-8 md:p-12 h-full">
+              <div class="flex items-start justify-between">
+                <span class="font-mono text-xs tracking-[0.32em] text-cream-50/50">{s.num}</span>
+                <span class="font-display italic text-cream-50/40">{s.en}</span>
+              </div>
+              <h3 class="mt-10 font-display text-4xl md:text-5xl tracking-hyper leading-[1.02]">
+                {s.title}
+              </h3>
+              <p class="mt-6 text-sm leading-8 text-cream-50/75 max-w-lg">{s.body}</p>
+              <ul class="mt-8 space-y-2">
+                {#each s.bullets as b}
+                  <li class="flex items-baseline gap-3 text-sm text-cream-50/80">
+                    <span class="inline-block w-1.5 h-1.5 rounded-full bg-sakura translate-y-[-2px]"></span>
+                    {b}
+                  </li>
+                {/each}
+              </ul>
+            </article>
+          </Reveal>
+        {/each}
+      </div>
+    </div>
+  </section>
+
+  <!-- PLANS -->
+  <section id="plans" class="relative py-28 md:py-40 scroll-mt-24 overflow-hidden">
+    <div class="max-w-[1400px] mx-auto px-6 md:px-10">
+      <Reveal>
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-16 md:mb-24">
+          <div>
+            <p class="font-mono text-xs tracking-[0.32em] uppercase text-ink/50">— 03 / Plans</p>
+            <h2 class="mt-6 font-display italic text-6xl md:text-8xl tracking-hyper leading-[0.9]">
+              三つの<br class="md:hidden"/>関わり方<span class="text-sakura">.</span>
+            </h2>
+          </div>
+          <p class="max-w-sm font-mincho text-base leading-8 text-ink/70">
+            事業フェーズと必要な関わり方に応じて、最適な形で伴走します。どのプランも、入口は「相談」からです。
+          </p>
+        </div>
+      </Reveal>
+
+      <div class="grid gap-8 lg:grid-cols-3">
+        {#each plans as plan, i}
+          <Reveal delay={i + 1}>
+            <article
+              class="relative soft-card p-8 md:p-10 h-full flex flex-col overflow-hidden hover-lift group"
+              data-cursor="hover"
+            >
+              <div
+                class="absolute top-0 left-0 h-1.5 w-1/3 rounded-br-xl transition-[width] duration-500 group-hover:w-full"
+                style="background: {plan.accent}"
+              ></div>
+              <div class="flex items-start justify-between">
+                <p class="font-mono text-[11px] tracking-[0.32em] uppercase text-ink/50">{plan.label}</p>
+                <span
+                  class="w-8 h-8 rounded-full flex items-center justify-center text-ink/60 border border-ink/15"
+                  style="background-color: {plan.accent}22"
+                >
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17l10-10M7 7h10v10"/></svg>
+                </span>
+              </div>
+              <h3 class="mt-6 font-display italic text-4xl tracking-hyper">{plan.title}</h3>
+              <p class="mt-4 text-sm leading-7 text-ink/70">{plan.description}</p>
+
+              <div class="mt-8 flex items-baseline gap-2">
+                <span class="font-display text-5xl md:text-6xl tracking-hyper">{plan.price}</span>
+                <span class="text-sm text-ink/50">{plan.unit}</span>
+              </div>
+
+              <div class="mt-8 space-y-6 pt-6 border-t border-ink/10">
+                {#each plan.sections as section}
+                  <div>
+                    <p class="font-mono text-[11px] tracking-[0.28em] uppercase text-ink/50">{section.title}</p>
+                    <ul class="mt-3 space-y-2 text-sm leading-7 text-ink/80">
+                      {#each section.items as item}
+                        <li class="flex items-baseline gap-3">
+                          <span class="mt-[5px] inline-block w-1 h-1 rounded-full" style="background: {plan.accent}"></span>
+                          <span>{item}</span>
+                        </li>
+                      {/each}
+                    </ul>
+                  </div>
+                {/each}
+
+                {#if plan.linkUrl}
+                  <a
+                    href={plan.linkUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    class="inline-flex text-sm font-medium underline underline-offset-4"
+                  >
+                    {plan.linkLabel}
+                  </a>
+                {/if}
+              </div>
+            </article>
+          </Reveal>
+        {/each}
+      </div>
+    </div>
+  </section>
+
+  <!-- REASONS -->
+  <section id="reasons" class="relative py-28 md:py-40 bg-cream-100 scroll-mt-24 overflow-hidden paper-grain">
+    <div class="max-w-[1400px] mx-auto px-6 md:px-10 relative">
+      <Reveal>
+        <div class="grid md:grid-cols-12 gap-10 mb-16 md:mb-24 items-end">
+          <div class="md:col-span-7">
+            <p class="font-mono text-xs tracking-[0.32em] uppercase text-ink/50">— 04 / Why bitboxx</p>
+            <h2 class="mt-6 font-display italic text-6xl md:text-8xl tracking-hyper leading-[0.9] text-balance">
+              進行設計、<br/>
+              技術判断、<br/>
+              <span class="underline-handwritten">実行まで。</span>
+            </h2>
+          </div>
+          <p class="md:col-span-5 font-mincho text-base leading-8 text-ink/70 max-w-md">
+            方針だけで終わらせない。判断と実装が同じチームで連続しているから、ぶれずに前へ進みます。
+          </p>
+        </div>
+      </Reveal>
+
+      <div class="grid md:grid-cols-3 gap-6 md:gap-10">
+        {#each reasons as r, i}
+          <Reveal delay={i + 1}>
+            <article class="relative pt-8 border-t-2 border-ink h-full" data-cursor="hover">
+              <span class="absolute -top-5 left-0 font-mono text-xs tracking-[0.32em] bg-cream-100 pr-3 text-ink/60">{r.num}</span>
+              <h3 class="font-display text-3xl md:text-4xl tracking-hyper leading-[1.1]">{r.title}</h3>
+              <p class="mt-6 text-sm leading-8 text-ink/75">{r.body}</p>
+            </article>
+          </Reveal>
+        {/each}
+      </div>
+    </div>
+  </section>
+
+  <!-- CASE STUDIES -->
+  <section id="case-studies" class="relative py-28 md:py-40 scroll-mt-24 overflow-hidden">
+    <div class="max-w-[1400px] mx-auto px-6 md:px-10">
+      <Reveal>
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-16 md:mb-24">
+          <div>
+            <p class="font-mono text-xs tracking-[0.32em] uppercase text-ink/50">— 05 / Works</p>
+            <h2 class="mt-6 font-display italic text-6xl md:text-8xl tracking-hyper leading-[0.9]">
+              支援の<span class="text-sakura">軌跡</span>.
+            </h2>
+          </div>
+          <p class="max-w-sm font-mincho text-base leading-8 text-ink/70">
+            どんな「関わり方」で事業に入り込んでいるのか、代表的な事例を。
+          </p>
+        </div>
+      </Reveal>
+
+      <div class="space-y-10 md:space-y-16">
+        {#each caseStudies as study, i}
+          <Reveal delay={(i % 3) + 1}>
+            <article
+              class="relative soft-card p-8 md:p-12 grid md:grid-cols-12 gap-8 md:gap-12 items-start"
+            >
+              <div class="md:col-span-4 flex md:flex-col items-start md:items-start gap-4 md:gap-6">
+                <div
+                  class="relative w-20 h-20 md:w-28 md:h-28 rounded-2xl flex items-center justify-center font-display italic text-4xl md:text-5xl"
+                  style="background: {study.accent}"
+                >
+                  {String(i + 1).padStart(2, '0')}
+                </div>
+                <div>
+                  <p class="font-mono text-[11px] tracking-[0.28em] uppercase text-ink/50">{study.label}</p>
+                  <p class="mt-2 font-display italic text-2xl tracking-hyper">{study.jp}</p>
+                </div>
+              </div>
+
+              <div class="md:col-span-8">
+                <h3 class="font-display text-3xl md:text-5xl tracking-hyper leading-[1.05]">
+                  {study.company}
+                </h3>
+                <p class="mt-6 text-sm md:text-base leading-8 text-ink/75 max-w-2xl">
+                  {study.body}
+                </p>
+                <ul class="mt-8 pt-8 border-t border-ink/10 grid sm:grid-cols-2 gap-x-6 gap-y-3 text-sm leading-7 text-ink/80">
+                  {#each study.items as item}
+                    <li class="flex items-baseline gap-3">
+                      <span class="inline-block w-1.5 h-1.5 rounded-full" style="background: {study.accent}"></span>
+                      <span>{item}</span>
+                    </li>
+                  {/each}
+                </ul>
+              </div>
+            </article>
+          </Reveal>
+        {/each}
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPANY -->
+  <section id="company" class="relative py-28 md:py-40 bg-cream-100 paper-grain scroll-mt-24">
+    <div class="max-w-[1400px] mx-auto px-6 md:px-10">
+      <div class="grid md:grid-cols-12 gap-10 md:gap-16">
+        <Reveal klass="md:col-span-5">
+          <p class="font-mono text-xs tracking-[0.32em] uppercase text-ink/50">— 06 / Company</p>
+          <h2 class="mt-6 font-display italic text-6xl md:text-8xl tracking-hyper leading-[0.88]">
+            会社<br/>概要<span class="text-sakura">.</span>
+          </h2>
+          <p class="mt-8 font-mincho text-base leading-8 text-ink/70 max-w-md">
+            東京・日本橋箱崎を拠点に、EKU思想のプロダクトづくりを行うエンジニアリング会社です。
+          </p>
+
+          <div class="mt-10 flex items-center gap-4">
+            <Mascot klass="w-20 h-20 animate-floaty" color="#9DE8C3"/>
+            <div class="font-mono text-[11px] tracking-[0.28em] uppercase text-ink/60 leading-7">
+              Hello!<br/>
+              We are<br/>
+              bitboxx.
+            </div>
+          </div>
+        </Reveal>
+
+        <Reveal delay={1} klass="md:col-span-7">
+          <dl class="divide-y divide-ink/15 border-y border-ink/15">
+            {#each [
+              ['会社名', 'Name', companyInfo.name],
+              ['所在地', 'Location', `${companyInfo.postcode}  ${companyInfo.address}`],
+              ['代表者', 'Founder', companyInfo.representative],
+              ['設立', 'Founded', `${companyInfo.established.substring(0, 4)}年${companyInfo.established.substring(5, 7)}月${companyInfo.established.substring(8, 10)}日`],
+              ['事業内容', 'Business', companyInfo.business]
+            ] as [label, en, value]}
+              <div class="grid grid-cols-12 gap-4 py-6">
+                <dt class="col-span-4">
+                  <p class="font-display italic text-lg tracking-hyper">{label}</p>
+                  <p class="font-mono text-[10px] tracking-[0.3em] uppercase text-ink/50">{en}</p>
+                </dt>
+                <dd class="col-span-8 text-sm md:text-base leading-7 text-ink/85">{value}</dd>
+              </div>
+            {/each}
+          </dl>
+        </Reveal>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact-form" class="relative py-28 md:py-40 bg-ink text-cream-50 scroll-mt-24 overflow-hidden">
+    <div class="pointer-events-none absolute inset-0 bg-noise opacity-20"></div>
+    <div
+      class="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[80rem] h-[80rem] rounded-full blur-3xl opacity-20"
+      style="background: radial-gradient(closest-side, #FF7A8A, transparent)"
+    ></div>
+
+    <div class="relative max-w-[1400px] mx-auto px-6 md:px-10">
+      <Reveal>
+        <p class="font-mono text-xs tracking-[0.32em] uppercase text-cream-50/50">— 07 / Contact</p>
+        <h2 class="mt-6 font-display italic text-6xl md:text-[10rem] tracking-hyper leading-[0.85] text-balance">
+          Let's make<br/>
+          something <span class="text-sakura not-italic">wonderful</span>.
+        </h2>
+        <p class="mt-8 font-mincho text-base md:text-lg leading-8 text-cream-50/75 max-w-xl">
+          次の「最高」をつくる相談を、お待ちしています。プロジェクトのご相談、協業のご提案、その他お気軽にどうぞ。
+        </p>
+      </Reveal>
+
+      <Reveal delay={1}>
+        <div class="mt-14 md:mt-20 grid md:grid-cols-12 gap-10 md:gap-16 items-start">
+          <div class="md:col-span-5 space-y-8">
+            <div>
+              <p class="font-mono text-[11px] tracking-[0.28em] uppercase text-cream-50/50">Email</p>
+              <a href="mailto:contact@bitboxx.co.jp" class="mt-2 inline-block font-display italic text-3xl md:text-4xl tracking-hyper hover:text-sakura transition-colors">
+                contact@bitboxx.co.jp
+              </a>
+            </div>
+            <div>
+              <p class="font-mono text-[11px] tracking-[0.28em] uppercase text-cream-50/50">Office</p>
+              <p class="mt-2 text-sm leading-7 text-cream-50/85">
+                {companyInfo.postcode}<br/>
+                {companyInfo.address}
+              </p>
+            </div>
+            <div>
+              <p class="font-mono text-[11px] tracking-[0.28em] uppercase text-cream-50/50">Hours</p>
+              <p class="mt-2 text-sm text-cream-50/85">平日 10:00 – 19:00 (JST)</p>
+            </div>
+          </div>
+
+          <div class="md:col-span-7">
+            <form on:submit|preventDefault={send} class="space-y-8 bg-cream-50/5 backdrop-blur rounded-3xl border border-cream-50/10 p-8 md:p-10">
+              <div class="grid md:grid-cols-2 gap-6">
+                <label class="block">
+                  <span class="font-mono text-[11px] tracking-[0.28em] uppercase text-cream-50/50">お名前</span>
+                  <input
+                    type="text"
+                    bind:value={yourname}
+                    class="mt-2 w-full bg-transparent border-b border-cream-50/25 focus:border-sakura outline-none py-3 text-lg placeholder-cream-50/30"
+                    placeholder="山田 太郎"
+                  />
+                </label>
+                <label class="block">
+                  <span class="font-mono text-[11px] tracking-[0.28em] uppercase text-cream-50/50">会社名</span>
+                  <input
+                    type="text"
+                    bind:value={company}
+                    class="mt-2 w-full bg-transparent border-b border-cream-50/25 focus:border-sakura outline-none py-3 text-lg placeholder-cream-50/30"
+                    placeholder="Your Company Inc."
+                  />
+                </label>
+                <label class="block">
+                  <span class="font-mono text-[11px] tracking-[0.28em] uppercase text-cream-50/50">メール</span>
+                  <input
+                    type="email"
+                    bind:value={email}
+                    class="mt-2 w-full bg-transparent border-b border-cream-50/25 focus:border-sakura outline-none py-3 text-lg placeholder-cream-50/30"
+                    placeholder="you@company.com"
+                  />
+                </label>
+                <label class="block">
+                  <span class="font-mono text-[11px] tracking-[0.28em] uppercase text-cream-50/50">電話</span>
+                  <input
+                    type="tel"
+                    bind:value={tel}
+                    class="mt-2 w-full bg-transparent border-b border-cream-50/25 focus:border-sakura outline-none py-3 text-lg placeholder-cream-50/30"
+                    placeholder="03-0000-0000"
+                  />
+                </label>
+              </div>
+
+              <label class="block">
+                <span class="font-mono text-[11px] tracking-[0.28em] uppercase text-cream-50/50">お問い合わせ内容</span>
+                <textarea
+                  bind:value={text}
+                  rows="5"
+                  class="mt-2 w-full bg-transparent border border-cream-50/20 focus:border-sakura outline-none rounded-2xl p-4 text-lg resize-none placeholder-cream-50/30"
+                  placeholder="ご相談内容を自由にどうぞ"
+                ></textarea>
+              </label>
+
+              <label class="flex items-center gap-3 text-sm text-cream-50/80">
+                <input
+                  type="checkbox"
+                  bind:checked={pr}
+                  class="w-4 h-4 accent-sakura"
+                />
+                <span>
+                  <button type="button" on:click={openPrivacyModal} class="underline underline-offset-4 hover:text-sakura">
+                    プライバシーポリシー
+                  </button>
+                  に同意する
+                </span>
+              </label>
+
+              <button
+                type="submit"
+                disabled={isDisabled(pr, yourname, company, email, tel, text)}
+                class={`group w-full flex items-center justify-between pl-7 pr-2 py-2 rounded-full transition-all duration-500
+                  ${isDisabled(pr, yourname, company, email, tel, text)
+                    ? 'bg-cream-50/10 text-cream-50/40 cursor-not-allowed'
+                    : 'bg-cream-50 text-ink hover:bg-sakura'}`}
+              >
+                <span class="font-display italic text-xl">送信する</span>
+                <span class="w-12 h-12 rounded-full bg-ink text-cream-50 flex items-center justify-center group-hover:rotate-45 transition-transform duration-500">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                </span>
+              </button>
+            </form>
+          </div>
+        </div>
+      </Reveal>
+    </div>
+  </section>
+
+  {#if showPrivacyModal}
+    <div
+      class="fixed inset-0 bg-ink/80 backdrop-blur-sm flex items-center justify-center z-[1000] px-4"
+      on:click={closePrivacyModal}
+      on:keydown
+      role="presentation"
+    >
+      <div
+        class="bg-cream-50 text-ink rounded-3xl shadow-2xl w-full max-w-3xl p-6 md:p-10 max-h-[90vh] flex flex-col"
+        on:click|stopPropagation
+        on:keydown
+        role="presentation"
+      >
+        <div class="flex justify-between items-center mb-4 pb-4 border-b border-ink/10">
+          <h2 class="font-display italic text-3xl tracking-hyper">プライバシーポリシー</h2>
+          <button class="text-ink/60 hover:text-ink text-3xl leading-none" on:click={closePrivacyModal} aria-label="閉じる">×</button>
+        </div>
+        <div class="overflow-y-auto pr-2 flex-1">
+          <PrivacyPolicy showTitle={false}/>
+        </div>
+      </div>
+    </div>
+  {/if}
 </main>
+
+<style>
+  :global(.text-cream-50\/8) { color: rgba(251,247,241,0.08); }
+</style>
