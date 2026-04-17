@@ -63,13 +63,8 @@
       ${scrolled ? 'bg-cream-50/80 backdrop-blur-md border-b border-ink/5' : 'bg-transparent'}`}
   >
     <div class="max-w-[1400px] mx-auto h-20 px-6 md:px-10 flex items-center justify-between">
-      <a href="{base}/" class="flex items-center gap-3 group" aria-label="bitboxx">
-        <span class="relative flex items-center justify-center w-9 h-9">
-          <span class="absolute inset-0 rounded-xl bg-ink group-hover:rotate-12 transition-transform duration-500"></span>
-          <span class="absolute inset-[3px] rounded-[10px] bg-sakura group-hover:-rotate-12 transition-transform duration-500"></span>
-          <span class="relative text-cream-50 font-display italic font-semibold text-lg">b</span>
-        </span>
-        <span class="font-display italic text-xl tracking-hyper">bitboxx</span>
+      <a href="{base}/" class="flex items-center" aria-label="bitboxx">
+        <img src="{base}/black.svg" alt="bitboxx" class="h-6 md:h-7 w-auto" />
       </a>
 
       <nav class="hidden lg:flex items-center gap-1 text-sm">

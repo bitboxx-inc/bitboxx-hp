@@ -181,28 +181,9 @@
       <HeroCanvas />
     </div>
 
-    <!-- Top meta row -->
-    <div class="pointer-events-none absolute top-28 left-0 right-0 z-20 px-6 md:px-10">
-      <div class="max-w-[1400px] mx-auto flex items-start justify-between">
-        <div class="pill pointer-events-auto">
-          <span class="chip-dot bg-sakura animate-floaty"></span>
-          Tokyo · Est. 2024
-        </div>
-        <div class="hidden md:flex flex-col items-end gap-2 font-mono text-[11px] tracking-[0.28em] uppercase text-ink/60">
-          <span>N 35.6854</span>
-          <span>E 139.7925</span>
-        </div>
-      </div>
-    </div>
-
     <!-- Main title -->
     <div class="relative z-10 w-full px-6 md:px-10 pb-4">
       <div class="max-w-[1400px] mx-auto">
-        <p class="font-mono text-[11px] md:text-xs tracking-[0.32em] uppercase text-ink/50 mb-6 md:mb-10">
-          <span class="inline-block w-8 h-px bg-ink/40 align-middle mr-3"></span>
-          bitboxx — engineering with craft
-        </p>
-
         <h1 class="font-display leading-[0.82] tracking-hyper break-words">
           <span class="block text-[14vw] md:text-[11vw] lg:text-[9.5rem] italic">
             <span class="underline-handwritten">Excellent.</span>
@@ -242,13 +223,6 @@
       </div>
     </div>
 
-    <!-- scroll indicator -->
-    <div class="pointer-events-none absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 text-ink/50">
-      <span class="font-mono text-[10px] tracking-[0.3em] uppercase">Scroll</span>
-      <span class="w-px h-10 bg-ink/30 relative overflow-hidden">
-        <span class="absolute top-0 left-0 w-full h-3 bg-ink animate-[floaty_2s_ease-in-out_infinite]"></span>
-      </span>
-    </div>
   </section>
 
   <!-- PHILOSOPHY -->
