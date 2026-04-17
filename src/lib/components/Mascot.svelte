@@ -1,7 +1,7 @@
 <script lang="ts">
   export let color: string = '#FFFFFF';
   export let eyeColor: string = '#111014';
-  export let cheekColor: string = '#FFB5B5';
+  export let cheekColor: string = '#FF8A92';
   export let klass: string = '';
 </script>
 

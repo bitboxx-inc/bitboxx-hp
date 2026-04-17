@@ -206,7 +206,7 @@
     color: #ffffff;
   }
   .nav-cta:hover {
-    background-color: #FF7A8A;
+    background-color: #FF2630;
   }
   .menu-btn {
     background-color: #111014;
@@ -214,6 +214,6 @@
     box-shadow: 0 10px 24px -12px rgba(17, 16, 20, 0.45);
   }
   .menu-btn:hover {
-    background-color: #FF7A8A;
+    background-color: #FF2630;
   }
 </style>

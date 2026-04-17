@@ -7,7 +7,7 @@
     --cream: #FFFFFF;
     --cream-soft: #F6F6F4;
     --ink: #111014;
-    --sakura: #FF7A8A;
+    --sakura: #FF2630;
     --sora: #7AA2FF;
     --mint: #9DE8C3;
   }
@@ -100,7 +100,7 @@
     color: #ffffff;
   }
   .btn-ink:hover {
-    background-color: #FF7A8A;
+    background-color: #FF2630;
   }
   .btn-ink svg { color: #ffffff; }
   .btn-ink:hover svg { color: #ffffff; }

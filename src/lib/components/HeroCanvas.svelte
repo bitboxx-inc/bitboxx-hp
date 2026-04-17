@@ -68,7 +68,7 @@
       new THREE.Color('#4B4752'),
       new THREE.Color('#E6E6E2'), // light gray
       new THREE.Color('#CFCFC9'),
-      new THREE.Color('#FF7A8A')  // single sakura accent
+      new THREE.Color('#FF2630')  // single sakura accent (birthdays 12/26 + 04/30)
     ];
 
     // bitboxx logo texture (!? mark) — rendered onto a generated canvas so

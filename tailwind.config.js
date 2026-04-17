@@ -19,8 +19,8 @@ export default {
           500: '#4B4752'
         },
         sakura: {
-          DEFAULT: '#FF7A8A',
-          soft: '#FFB5B5'
+          DEFAULT: '#FF2630',
+          soft: '#FF6B72'
         },
         sora: {
           DEFAULT: '#7AA2FF',
