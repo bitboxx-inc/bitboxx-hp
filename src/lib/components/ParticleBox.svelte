@@ -143,26 +143,51 @@
       }
     };
 
-    setup();
-    animate();
+    let isReady = false;
+    let startTimeout: ReturnType<typeof setTimeout> | null = null;
 
+    const start = () => {
+      if (!isReady) {
+        setup();
+        animate();
+        isReady = true;
+      }
+      if (animating) return;
+      // Re-scatter so every entry replays fresh.
+      for (const p of particles) {
+        p.sx = Math.random() * width;
+        p.sy = Math.random() * h;
+        p.x = p.sx;
+        p.y = p.sy;
+      }
+      hasAnimated = false;
+      if (startTimeout) clearTimeout(startTimeout);
+      // Small beat so the user sees the scattered state before it assembles.
+      startTimeout = setTimeout(() => {
+        animating = true;
+        started = performance.now();
+      }, 180);
+    };
+
+    // Fire only when the section is well into the viewport — the top 65 %.
+    // Prevents the animation from being already complete when the user arrives.
     observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (entry.isIntersecting && !animating && !hasAnimated) {
-            animating = true;
-            started = performance.now();
-          }
+          if (entry.isIntersecting) start();
         }
       },
-      { threshold: 0.25 }
+      { rootMargin: '0px 0px -35% 0px', threshold: 0 }
     );
     observer.observe(container);
 
-    resizeObserver = new ResizeObserver(() => setup());
+    resizeObserver = new ResizeObserver(() => {
+      if (isReady) setup();
+    });
     resizeObserver.observe(container);
 
     return () => {
+      if (startTimeout) clearTimeout(startTimeout);
       cancelAnimationFrame(raf);
       observer?.disconnect();
       resizeObserver?.disconnect();

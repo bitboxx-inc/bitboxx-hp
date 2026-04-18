@@ -93,7 +93,7 @@
     const group = new THREE.Group();
     scene.add(group);
 
-    const count = prefersReduced ? 8 : 16;
+    const count = prefersReduced ? 5 : 10;
     for (let i = 0; i < count; i++) {
       const size = 0.35 + Math.random() * 0.85;
       const geo = makeBox(size);

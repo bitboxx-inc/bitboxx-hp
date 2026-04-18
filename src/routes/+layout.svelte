@@ -46,11 +46,11 @@
   };
 
   const navItems: Array<[string, string, string]> = [
-    ['philosophy', sectionLinks.philosophy, 'Philosophy'],
-    ['business', sectionLinks.business, 'Services'],
-    ['plans', sectionLinks.plans, 'Plans'],
-    ['case-studies', sectionLinks.caseStudies, 'Works'],
-    ['company', sectionLinks.company, 'Company']
+    ['philosophy', sectionLinks.philosophy, '大切にしていること'],
+    ['business', sectionLinks.business, '事業領域'],
+    ['plans', sectionLinks.plans, '料金'],
+    ['case-studies', sectionLinks.caseStudies, '実績'],
+    ['company', sectionLinks.company, '会社概要']
   ];
 </script>
 
@@ -59,7 +59,7 @@
 
   <!-- Top nav -->
   <header
-    class={`fixed top-0 left-0 w-full z-50 transition-all duration-500
+    class={`fixed top-0 left-0 w-full z-[70] transition-all duration-500
       ${scrolled ? 'bg-cream-50/80 backdrop-blur-md border-b border-ink/5' : 'bg-transparent'}`}
   >
     <div class="max-w-[1400px] mx-auto h-20 px-6 md:px-10 flex items-center justify-between">
@@ -67,14 +67,10 @@
         <img src="{base}/black.svg" alt="bitboxx" class="h-6 md:h-7 w-auto" />
       </a>
 
-      <nav class="hidden lg:flex items-center gap-1 text-sm">
-        {#each navItems as [key, href, label]}
-          <a
-            {href}
-            class="relative px-4 py-2 rounded-full hover:bg-ink/5 transition-colors"
-          >
-            <span class="font-mono text-[11px] tracking-widest uppercase text-ink/50 mr-1.5">0{navItems.findIndex(i => i[0] === key) + 1}</span>
-            <span class="font-medium">{label}</span>
+      <nav class="hidden lg:flex items-center gap-6 text-sm">
+        {#each navItems as [, href, label]}
+          <a {href} class="font-mincho text-ink/80 hover:text-ink transition-colors">
+            {label}
           </a>
         {/each}
       </nav>
@@ -82,9 +78,9 @@
       <div class="flex items-center gap-3">
         <a
           href={sectionLinks.contact}
-          class="nav-cta hidden lg:inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full text-sm font-medium transition-colors duration-300 group"
+          class="nav-cta hidden lg:inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full text-sm font-mincho transition-colors duration-300 group"
         >
-          Contact
+          お問い合わせ
           <svg class="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
         </a>
 
@@ -119,26 +115,19 @@
     >
       <nav
         transition:slide={{ duration: 260, easing: quintOut }}
-        class="relative flex flex-col gap-6 font-display italic text-5xl tracking-hyper"
+        class="relative flex flex-col gap-5 font-mincho text-2xl"
         on:click|stopPropagation
         on:keydown
         role="presentation"
       >
-        {#each navItems as [, href, label], i}
-          <a {href} class="flex items-baseline gap-4 group" on:click={closeMenu}>
-            <span class="font-mono not-italic text-xs text-ink/50">0{i + 1}</span>
-            <span class="underline-handwritten">{label}</span>
+        {#each navItems as [, href, label]}
+          <a {href} class="text-ink/85 hover:text-ink transition-colors" on:click={closeMenu}>
+            {label}
           </a>
         {/each}
-        <div class="pt-10">
-          <a
-            href={sectionLinks.contact}
-            class="btn-ink inline-flex items-center gap-3 px-6 py-4 rounded-full text-base not-italic font-sans font-medium transition-colors duration-300"
-            on:click={closeMenu}
-          >
-            お問い合わせ →
-          </a>
-        </div>
+        <a href={sectionLinks.contact} class="text-ink/85 hover:text-ink transition-colors" on:click={closeMenu}>
+          お問い合わせ
+        </a>
       </nav>
     </div>
   {/if}
@@ -147,51 +136,40 @@
     <slot/>
   </main>
 
-  <footer class="relative overflow-hidden bg-ink text-cream-50 pt-24 pb-12 mt-24">
-    <div class="pointer-events-none absolute inset-0 bg-noise opacity-20"></div>
-
+  <footer class="relative py-14 md:py-16">
     <div class="relative max-w-[1400px] mx-auto px-6 md:px-10">
-      <div class="grid md:grid-cols-12 gap-10 md:gap-6">
-        <div class="md:col-span-6">
-          <p class="font-mono text-xs tracking-[0.3em] uppercase text-cream-50/60">bitboxx inc.</p>
-          <h3 class="mt-6 font-display italic text-6xl md:text-8xl leading-[0.95] tracking-hyper text-balance">
-            Let's build<br/>
-            something<br/>
-            <span class="text-sakura">kawaii</span> & <span class="italic">excellent</span>.
-          </h3>
-          <a
-            href={`${base}/#contact-form`}
-            class="mt-10 inline-flex items-center gap-4 group"
-          >
-            <span class="font-display italic text-xl">プロジェクトを相談する</span>
-            <span class="w-14 h-14 rounded-full bg-cream-50 text-ink flex items-center justify-center group-hover:bg-sakura transition-colors">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-            </span>
-          </a>
+      <div class="grid md:grid-cols-12 gap-10 md:gap-12">
+        <div class="md:col-span-4">
+          <img src="{base}/black.svg" alt="bitboxx" class="h-5 w-auto" />
+          <p class="mt-6 font-mincho text-[13px] leading-7 text-ink/75">
+            〒103-0015<br/>
+            東京都中央区日本橋箱崎町16-11<br/>
+            ルミネ日本橋601
+          </p>
         </div>
 
-        <div class="md:col-span-3">
-          <p class="font-mono text-xs tracking-[0.3em] uppercase text-cream-50/50">Sitemap</p>
-          <ul class="mt-5 space-y-2.5 text-sm">
+        <div class="md:col-span-4">
+          <p class="font-mincho text-[12px] tracking-[0.18em] text-ink/55">会社案内</p>
+          <ul class="mt-4 space-y-2 font-mincho text-[13px] text-ink/85">
             {#each navItems as [, href, label]}
               <li><a {href} class="hover:text-sakura transition-colors">{label}</a></li>
             {/each}
-            <li><a href={sectionLinks.contact} class="hover:text-sakura transition-colors">Contact</a></li>
+            <li><a href={sectionLinks.contact} class="hover:text-sakura transition-colors">お問い合わせ</a></li>
           </ul>
         </div>
 
-        <div class="md:col-span-3">
-          <p class="font-mono text-xs tracking-[0.3em] uppercase text-cream-50/50">Legal</p>
-          <ul class="mt-5 space-y-2.5 text-sm">
+        <div class="md:col-span-4">
+          <p class="font-mincho text-[12px] tracking-[0.18em] text-ink/55">規約</p>
+          <ul class="mt-4 space-y-2 font-mincho text-[13px] text-ink/85">
             <li><a href="{base}/terms_of_service" class="hover:text-sakura transition-colors">利用規約</a></li>
             <li><a href="{base}/privacy_policy" class="hover:text-sakura transition-colors">プライバシーポリシー</a></li>
           </ul>
         </div>
       </div>
 
-      <div class="mt-20 pt-8 border-t border-cream-50/15 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
-        <p class="font-display italic text-[18vw] md:text-[12vw] leading-[0.85] tracking-hyper text-cream-50/8 select-none">bitboxx</p>
-        <p class="font-mono text-xs text-cream-50/40">© {new Date().getFullYear()} bitboxx Inc. All rights reserved.</p>
+      <div class="mt-12 pt-6 border-t border-ink/10 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+        <p class="font-mincho text-[12px] text-ink/60">株式会社bitboxx</p>
+        <p class="font-mincho text-[12px] text-ink/50">© {new Date().getFullYear()} bitboxx Inc. All rights reserved.</p>
       </div>
     </div>
   </footer>
@@ -209,11 +187,13 @@
     background-color: #FF2630;
   }
   .menu-btn {
-    background-color: #111014;
-    color: #ffffff;
-    box-shadow: 0 10px 24px -12px rgba(17, 16, 20, 0.45);
+    background-color: #ffffff;
+    color: #111014;
+    border: 1px solid #111014;
   }
   .menu-btn:hover {
     background-color: #FF2630;
+    color: #ffffff;
+    border-color: #FF2630;
   }
 </style>
