@@ -39,22 +39,21 @@
     philosophy: `${base}/#philosophy`,
     business: `${base}/#business`,
     reasons: `${base}/#reasons`,
-    plans: `${base}/#plans`,
     caseStudies: `${base}/#case-studies`,
     company: `${base}/#company`,
     contact: `${base}/#contact-form`
   };
 
   const navItems: Array<[string, string, string]> = [
-    ['philosophy', sectionLinks.philosophy, '大切にしていること'],
-    ['business', sectionLinks.business, '事業領域'],
-    ['plans', sectionLinks.plans, '料金'],
+    ['philosophy', sectionLinks.philosophy, '三つのものさし'],
+    ['business', sectionLinks.business, '事業内容'],
+    ['reasons', sectionLinks.reasons, '選ばれる理由'],
     ['case-studies', sectionLinks.caseStudies, '実績'],
     ['company', sectionLinks.company, '会社概要']
   ];
 </script>
 
-<div class="relative min-h-screen bg-cream-50 text-ink font-sans flex flex-col overflow-x-hidden">
+<div class="relative min-h-screen bg-cream-50 text-ink font-sans flex flex-col overflow-x-clip">
   <Cursor />
 
   <!-- Top nav -->
@@ -169,7 +168,7 @@
 
       <div class="mt-12 pt-6 border-t border-ink/10 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
         <p class="font-mincho text-[12px] text-ink/60">株式会社bitboxx</p>
-        <p class="font-mincho text-[12px] text-ink/50">© {new Date().getFullYear()} bitboxx Inc. All rights reserved.</p>
+        <p class="font-mincho text-[12px] text-ink/50">© {new Date().getFullYear()} bitboxx Inc.</p>
       </div>
     </div>
   </footer>

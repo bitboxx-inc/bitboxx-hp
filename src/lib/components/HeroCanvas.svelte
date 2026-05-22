@@ -12,6 +12,9 @@
     const THREE: any = await import('three');
 
     const scene = new THREE.Scene();
+    // Atmospheric perspective — far objects fade to the page's cream so the
+    // scene reads as a real receding space rather than a flat cluster.
+    scene.fog = new THREE.FogExp2(0xfaf8f4, 0.052);
 
     const camera = new THREE.PerspectiveCamera(
       42,
@@ -116,13 +119,14 @@
       }
 
       const mesh = new THREE.Mesh(geo, material);
-      const radius = 2.8 + Math.random() * 2.4;
+      // Wider radial + Y spread, deeper Z offset so far cubes recede into fog.
+      const radius = 2.8 + Math.random() * 3.6;
       const theta = Math.random() * Math.PI * 2;
-      const y = (Math.random() - 0.5) * 3.2;
+      const y = (Math.random() - 0.5) * 3.6;
       mesh.position.set(
         Math.cos(theta) * radius,
         y,
-        Math.sin(theta) * radius - 1.0
+        Math.sin(theta) * radius - 2.5
       );
       mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
       group.add(mesh);
@@ -149,7 +153,16 @@
         ),
         floatSpeed: 0.4 + Math.random() * 0.6,
         floatAmp: 0.18 + Math.random() * 0.42,
-        phase: Math.random() * Math.PI * 2
+        phase: Math.random() * Math.PI * 2,
+        // Click-impulse physics — added to base position each frame and
+        // decayed back toward zero. Lets the scene "react" to clicks.
+        velocity: new THREE.Vector3(),
+        displacement: new THREE.Vector3(),
+        kickRot: new THREE.Vector3(),
+        // Game: sakura flash + extra spin when the cube is "defeated".
+        hitFlash: 0,
+        hitSpin: 0,
+        hitCooldown: 0
       });
     }
 
@@ -169,21 +182,23 @@
     mascot.position.set(1.2, -0.3, 1.4);
     group.add(mascot);
 
-    // Tiny particles
-    const particleCount = prefersReduced ? 60 : 180;
+    // Tiny particles — denser and spread deeper into Z to read as "space dust"
+    // receding through the fog.
+    const particleCount = prefersReduced ? 90 : 260;
     const pGeo = new THREE.BufferGeometry();
     const pPos = new Float32Array(particleCount * 3);
     for (let i = 0; i < particleCount; i++) {
-      pPos[i * 3]     = (Math.random() - 0.5) * 18;
-      pPos[i * 3 + 1] = (Math.random() - 0.5) * 10;
-      pPos[i * 3 + 2] = (Math.random() - 0.5) * 10 - 2;
+      pPos[i * 3]     = (Math.random() - 0.5) * 22;
+      pPos[i * 3 + 1] = (Math.random() - 0.5) * 12;
+      pPos[i * 3 + 2] = (Math.random() - 0.5) * 18 - 4;
     }
     pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
     const pMat = new THREE.PointsMaterial({
       color: '#111014',
-      size: 0.035,
+      size: 0.04,
       transparent: true,
-      opacity: 0.5
+      opacity: 0.55,
+      fog: true
     });
     const points = new THREE.Points(pGeo, pMat);
     scene.add(points);
@@ -201,12 +216,222 @@
     const onScroll = () => { scrollY = window.scrollY; };
     window.addEventListener('scroll', onScroll, { passive: true });
 
+    // ─── Click detonation ────────────────────────────────────────────
+    // Clicking anywhere on the hero scene projects the click to z=0 in
+    // world space, applies inverse-square impulses to every cube, and
+    // emits a sakura ring (DOM overlay) at the click point.
+    const mascotState = {
+      velocity: new THREE.Vector3(),
+      displacement: new THREE.Vector3(),
+      kickRot: new THREE.Vector3(),
+      hitFlash: 0,
+      hitSpin: 0,
+      hitCooldown: 0
+    };
+
+    // ─── Mini-game ───────────────────────────────────────────────────
+    // First direct-hit on a cube starts a 10-second window; subsequent
+    // direct-hits add to the score. The HUD appears only during play.
+    const game = {
+      state: 'idle' as 'idle' | 'playing' | 'gameover',
+      score: 0,
+      startTime: 0,
+      duration: 10000
+    };
+
+    const gameUi = document.createElement('div');
+    gameUi.style.cssText = [
+      'position:absolute',
+      'top:5.75rem',
+      'left:50%',
+      'transform:translateX(-50%)',
+      'z-index:6',
+      'pointer-events:none',
+      'display:flex',
+      'gap:2rem',
+      'font-family:"JetBrains Mono", ui-monospace, monospace',
+      'color:#111014',
+      'opacity:0',
+      'transition:opacity 280ms ease',
+      'text-align:center'
+    ].join(';');
+    gameUi.innerHTML = `
+      <div>
+        <div style="font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:rgba(17,16,20,0.5);">Time</div>
+        <div data-time style="font-size:22px;letter-spacing:0.02em;margin-top:4px;font-variant-numeric:tabular-nums;transition:color 200ms;">10.0</div>
+      </div>
+      <div style="width:1px;background:rgba(17,16,20,0.18);align-self:stretch;"></div>
+      <div>
+        <div style="font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:rgba(17,16,20,0.5);">Score</div>
+        <div data-score style="font-size:22px;letter-spacing:0.02em;margin-top:4px;font-variant-numeric:tabular-nums;display:inline-block;">00</div>
+      </div>
+    `;
+    container.appendChild(gameUi);
+    const timeEl = gameUi.querySelector('[data-time]') as HTMLElement;
+    const scoreEl = gameUi.querySelector('[data-score]') as HTMLElement;
+
+    const pulseScore = () => {
+      scoreEl.style.transition = 'transform 90ms ease-out';
+      scoreEl.style.transform = 'scale(1.22)';
+      setTimeout(() => {
+        scoreEl.style.transition = 'transform 260ms cubic-bezier(.2,.8,.2,1)';
+        scoreEl.style.transform = 'scale(1)';
+      }, 90);
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const setEmissive = (mat: any, r: number, g: number, b: number) => {
+      if (Array.isArray(mat)) {
+        for (const m of mat) m?.emissive?.setRGB(r, g, b);
+      } else {
+        mat?.emissive?.setRGB(r, g, b);
+      }
+    };
+
+    const raycaster = new THREE.Raycaster();
+    const ndc = new THREE.Vector2();
+    const detonatePlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+    const detonatePoint = new THREE.Vector3();
+
+    const ringLayer = document.createElement('div');
+    ringLayer.style.cssText =
+      'position:absolute;inset:0;pointer-events:none;z-index:5;overflow:hidden;';
+    container.appendChild(ringLayer);
+
+    const spawnRing = (x: number, y: number) => {
+      const ring = document.createElement('span');
+      ring.style.cssText = `
+        position:absolute;left:${x}px;top:${y}px;
+        width:8px;height:8px;margin:-4px 0 0 -4px;border-radius:9999px;
+        border:1.5px solid #FF2630;opacity:0.85;
+        transition:transform 700ms cubic-bezier(.2,.8,.2,1), opacity 700ms ease-out;
+        will-change:transform, opacity;
+      `;
+      ringLayer.appendChild(ring);
+      // Force layout, then animate.
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      ring.offsetWidth;
+      ring.style.transform = 'scale(48)';
+      ring.style.opacity = '0';
+      setTimeout(() => ring.remove(), 760);
+
+      // Inner core dot fades faster for an "impact" feel.
+      const core = document.createElement('span');
+      core.style.cssText = `
+        position:absolute;left:${x}px;top:${y}px;
+        width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:9999px;
+        background:#FF2630;opacity:0.95;
+        transition:transform 300ms ease-out, opacity 300ms ease-out;
+      `;
+      ringLayer.appendChild(core);
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      core.offsetWidth;
+      core.style.transform = 'scale(2.6)';
+      core.style.opacity = '0';
+      setTimeout(() => core.remove(), 340);
+    };
+
+    const detonate = (clientX: number, clientY: number) => {
+      const r = container.getBoundingClientRect();
+      const localX = clientX - r.left;
+      const localY = clientY - r.top;
+      ndc.x = (localX / r.width) * 2 - 1;
+      ndc.y = -(localY / r.height) * 2 + 1;
+
+      // World matrices must be current before raycasting against animated meshes.
+      scene.updateMatrixWorld(true);
+      raycaster.setFromCamera(ndc, camera);
+
+      // 1) Physics impulse — projected to a plane at z=0 in world space.
+      if (raycaster.ray.intersectPlane(detonatePlane, detonatePoint)) {
+        const localPoint = detonatePoint.clone();
+        group.worldToLocal(localPoint);
+
+        for (const c of cubes) {
+          const dir = c.mesh.position.clone().sub(localPoint);
+          const dist = Math.max(0.6, dir.length());
+          const strength = 14 / (dist * dist);
+          dir.normalize();
+          c.velocity.add(dir.multiplyScalar(strength));
+          c.kickRot.x += (Math.random() - 0.5) * 0.8;
+          c.kickRot.y += (Math.random() - 0.5) * 0.8;
+          c.kickRot.z += (Math.random() - 0.5) * 0.4;
+        }
+        const mdir = mascot.position.clone().sub(localPoint);
+        const mdist = Math.max(0.6, mdir.length());
+        mdir.normalize().multiplyScalar(20 / (mdist * mdist));
+        mascotState.velocity.add(mdir);
+        mascotState.kickRot.x += (Math.random() - 0.5) * 0.6;
+        mascotState.kickRot.y += (Math.random() - 0.5) * 1.0;
+
+        spawnRing(localX, localY);
+      }
+
+      // 2) Game hit — direct cube/mascot strike via raycast.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const hittables: any[] = cubes.map((c) => c.mesh).concat([mascot]);
+      const intersects = raycaster.intersectObjects(hittables, true);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let hitObject: any = null;
+      for (const it of intersects) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let obj: any = it.object;
+        while (obj && !hittables.includes(obj)) obj = obj.parent;
+        if (obj) { hitObject = obj; break; }
+      }
+      if (!hitObject) return;
+
+      const now = performance.now();
+      const cubeState = cubes.find((c) => c.mesh === hitObject);
+      const stateObj = cubeState || mascotState;
+      if (now < (stateObj.hitCooldown || 0)) return;
+
+      // Feedback: sakura flash + bonus spin.
+      stateObj.hitFlash = 1.0;
+      stateObj.hitSpin += 14;
+      if (stateObj.hitSpin > 30) stateObj.hitSpin = 30;
+      stateObj.hitCooldown = now + 260;
+
+      // Game: any direct hit (re)starts the round.
+      if (game.state !== 'playing') {
+        game.state = 'playing';
+        game.score = 0;
+        game.startTime = now;
+        gameUi.style.opacity = '1';
+        timeEl.style.color = '#111014';
+      }
+      game.score++;
+      pulseScore();
+    };
+
+    const onClick = (e: MouseEvent) => detonate(e.clientX, e.clientY);
+    const onTouch = (e: TouchEvent) => {
+      const t = e.changedTouches[0];
+      if (t) detonate(t.clientX, t.clientY);
+    };
+    container.addEventListener('click', onClick);
+    container.addEventListener('touchend', onTouch, { passive: true });
+
     const clock = new THREE.Clock();
     let frame = 0;
 
     const animate = () => {
       frame = requestAnimationFrame(animate);
       const t = clock.getElapsedTime();
+      const now = performance.now();
+
+      // Game timer
+      if (game.state === 'playing') {
+        const remaining = Math.max(0, game.duration - (now - game.startTime));
+        timeEl.textContent = (remaining / 1000).toFixed(1);
+        scoreEl.textContent = String(game.score).padStart(2, '0');
+        // Final 3 seconds: time text turns sakura.
+        timeEl.style.color = remaining <= 3000 ? '#FF2630' : '#111014';
+        if (remaining <= 0) {
+          game.state = 'gameover';
+          timeEl.textContent = '00.0';
+        }
+      }
 
       mouse.x += (mouse.tx - mouse.x) * 0.06;
       mouse.y += (mouse.ty - mouse.y) * 0.06;
@@ -216,16 +441,53 @@
       group.position.y = -scrollY * 0.0015;
 
       for (const c of cubes) {
-        c.mesh.rotation.x += c.rotSpeed.x * 0.01;
-        c.mesh.rotation.y += c.rotSpeed.y * 0.01;
-        c.mesh.rotation.z += c.rotSpeed.z * 0.01;
-        c.mesh.position.y = c.basePos.y + Math.sin(t * c.floatSpeed + c.phase) * c.floatAmp;
-        c.mesh.position.x = c.basePos.x + Math.cos(t * c.floatSpeed * 0.6 + c.phase) * c.floatAmp * 0.4;
+        // Decay physics. Velocity adds to displacement; displacement
+        // slowly pulls back toward the base position.
+        c.velocity.multiplyScalar(0.93);
+        c.displacement.add(c.velocity.clone().multiplyScalar(0.05));
+        c.displacement.multiplyScalar(0.985);
+        c.kickRot.multiplyScalar(0.9);
+        c.hitFlash *= 0.88;
+        c.hitSpin *= 0.88;
+
+        c.mesh.rotation.x += c.rotSpeed.x * 0.01 + c.kickRot.x * 0.04 + c.hitSpin * 0.04;
+        c.mesh.rotation.y += c.rotSpeed.y * 0.01 + c.kickRot.y * 0.04 + c.hitSpin * 0.05;
+        c.mesh.rotation.z += c.rotSpeed.z * 0.01 + c.kickRot.z * 0.04;
+        c.mesh.position.set(
+          c.basePos.x + Math.cos(t * c.floatSpeed * 0.6 + c.phase) * c.floatAmp * 0.4 + c.displacement.x,
+          c.basePos.y + Math.sin(t * c.floatSpeed + c.phase) * c.floatAmp + c.displacement.y,
+          c.basePos.z + c.displacement.z
+        );
+
+        // Sakura emissive flash during hit decay.
+        if (c.hitFlash > 0.02) {
+          setEmissive(c.mesh.material, c.hitFlash * 1.0, c.hitFlash * 0.15, c.hitFlash * 0.18);
+        } else if (c.lastFlash && c.lastFlash > 0.02) {
+          setEmissive(c.mesh.material, 0, 0, 0);
+        }
+        c.lastFlash = c.hitFlash;
       }
 
-      mascot.rotation.y = Math.sin(t * 0.6) * 0.5 + mouse.x * 0.6;
-      mascot.rotation.x = Math.sin(t * 0.4) * 0.12 + mouse.y * 0.2;
-      mascot.position.y = -0.3 + Math.sin(t * 0.9) * 0.18;
+      mascotState.velocity.multiplyScalar(0.92);
+      mascotState.displacement.add(mascotState.velocity.clone().multiplyScalar(0.05));
+      mascotState.displacement.multiplyScalar(0.985);
+      mascotState.kickRot.multiplyScalar(0.9);
+      mascotState.hitFlash *= 0.88;
+      mascotState.hitSpin *= 0.88;
+
+      mascot.rotation.y = Math.sin(t * 0.6) * 0.5 + mouse.x * 0.6 + mascotState.kickRot.y * 0.05 + mascotState.hitSpin * 0.05;
+      mascot.rotation.x = Math.sin(t * 0.4) * 0.12 + mouse.y * 0.2 + mascotState.kickRot.x * 0.05 + mascotState.hitSpin * 0.04;
+      mascot.position.set(
+        1.2 + mascotState.displacement.x,
+        -0.3 + Math.sin(t * 0.9) * 0.18 + mascotState.displacement.y,
+        1.4 + mascotState.displacement.z
+      );
+      if (mascotState.hitFlash > 0.02) {
+        setEmissive(mascot.material, mascotState.hitFlash * 1.0, mascotState.hitFlash * 0.15, mascotState.hitFlash * 0.18);
+      } else if ((mascotState as { lastFlash?: number }).lastFlash && (mascotState as { lastFlash?: number }).lastFlash! > 0.02) {
+        setEmissive(mascot.material, 0, 0, 0);
+      }
+      (mascotState as { lastFlash?: number }).lastFlash = mascotState.hitFlash;
 
       points.rotation.y = t * 0.02;
 
@@ -248,6 +510,10 @@
       window.removeEventListener('mousemove', onMove);
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onResize);
+      container.removeEventListener('click', onClick);
+      container.removeEventListener('touchend', onTouch);
+      if (ringLayer.parentNode) ringLayer.parentNode.removeChild(ringLayer);
+      if (gameUi.parentNode) gameUi.parentNode.removeChild(gameUi);
       renderer.dispose();
       cubes.forEach((c) => {
         c.mesh.geometry.dispose();

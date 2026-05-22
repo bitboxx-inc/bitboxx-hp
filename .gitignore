@@ -8,3 +8,8 @@ node_modules
 !.env.example
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+AILIKE.md
+# QA artifacts from the screenshot tour
+/screenshots
+/test-results
+/playwright-report

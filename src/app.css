@@ -223,18 +223,14 @@
     width: 40px; height: 40px;
     border: 1px solid rgba(17,16,20,0.55);
     border-radius: 9999px;
-    transition: transform .25s cubic-bezier(.2,.8,.2,1), width .25s, height .25s, border-color .25s, background-color .25s;
+    transition: width .22s cubic-bezier(.2,.8,.2,1), height .22s cubic-bezier(.2,.8,.2,1), margin .22s cubic-bezier(.2,.8,.2,1), border-width .22s;
     margin: -20px 0 0 -20px;
   }
+  /* Link hover — ring tightens around the dot (no color shift). */
   .cursor-ring.is-hover {
-    width: 68px; height: 68px;
-    margin: -34px 0 0 -34px;
-    background: var(--sakura);
-    border-color: transparent;
-    mix-blend-mode: multiply;
-  }
-  .cursor-dot.is-hover {
-    opacity: 0;
+    width: 14px; height: 14px;
+    margin: -7px 0 0 -7px;
+    border-width: 1.5px;
   }
 }
 
