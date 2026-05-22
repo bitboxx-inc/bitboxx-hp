@@ -10,6 +10,14 @@
   import Reveal from '$lib/components/Reveal.svelte';
   import ParticleBox from '$lib/components/ParticleBox.svelte';
   import EkuTriptych from '$lib/components/EkuTriptych.svelte';
+  import { heroGameState } from '$lib/stores/heroGame';
+
+  // Quiet the hero typography while the mini-game is engaged so the
+  // play field is clear. CTA stays visible as an "exit" path.
+  $: heroQuiet =
+    $heroGameState === 'ready' ||
+    $heroGameState === 'playing' ||
+    $heroGameState === 'gameover';
 
   // 主な事業内容 — what we do × どんな価値が生まれるか
   const services = [
@@ -140,9 +148,16 @@
       <HeroCanvas />
     </div>
 
-    <div class="relative z-10 w-full px-6 md:px-10 pb-4">
+    <!-- Whole hero area is click-through to the canvas behind so the
+         mini-game can pick up clicks anywhere. CTA pill re-enables
+         pointer-events as the explicit "exit" path. -->
+    <div class="relative z-10 w-full px-6 md:px-10 pb-4 pointer-events-none">
       <div class="max-w-[1400px] mx-auto">
-        <h1 class="font-display leading-[0.82] tracking-hyper break-words pointer-events-none">
+        <h1
+          class="font-display leading-[0.82] tracking-hyper break-words pointer-events-none transition-all duration-500 ease-[cubic-bezier(.2,.8,.2,1)]"
+          class:opacity-0={heroQuiet}
+          class:-translate-y-3={heroQuiet}
+        >
           <span class="block text-[14vw] md:text-[11vw] lg:text-[9.5rem] italic">
             <span class="underline-handwritten">Excellent.</span>
           </span>
@@ -155,7 +170,12 @@
         </h1>
 
         <div class="mt-14 md:mt-20 flex flex-col md:flex-row md:items-end md:justify-between gap-10">
-          <div class="max-w-2xl pointer-events-none">
+          <div
+            class="max-w-2xl pointer-events-none transition-all duration-500 ease-[cubic-bezier(.2,.8,.2,1)]"
+            class:opacity-0={heroQuiet}
+            class:translate-y-2={heroQuiet}
+            aria-hidden={heroQuiet}
+          >
             <p class="font-mincho font-light text-[26px] md:text-[44px] leading-[1.5] tracking-[0.04em] text-ink">
               まだ見ぬ<span class="relative inline-block">
                 <span class="relative z-10">最高</span>
@@ -171,7 +191,7 @@
           <div class="shrink-0">
             <a
               href="#contact-form"
-              class="btn-ink group inline-flex items-center gap-3 px-7 py-3.5 rounded-full text-base font-medium transition-colors duration-300"
+              class="btn-ink group inline-flex items-center gap-3 px-7 py-3.5 rounded-full text-base font-medium transition-colors duration-300 pointer-events-auto"
             >
               <span class="font-display italic text-lg whitespace-nowrap">プロジェクトを相談する</span>
               <svg class="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>

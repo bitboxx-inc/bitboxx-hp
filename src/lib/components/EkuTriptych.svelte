@@ -12,7 +12,7 @@
       accent: 'underline' as const,
       label: '卓越',
       mark: '01 — Standard',
-      body: '高い基準で、最後まで仕上げる。中途半端なものを引き渡さない。'
+      body: '妥協なく、細部まで仕上げ切ったもの。'
     },
     {
       word: 'Kawaii.',
@@ -20,7 +20,7 @@
       accent: 'fill' as const,
       label: '愛らしさ',
       mark: '02 — Affection',
-      body: '使う人が、ふと笑ってしまう一瞬を持つ。事業の道具に、温度を残す。'
+      body: '使うたびに、すこし好きになっていくもの。'
     },
     {
       word: 'Unique.',
@@ -28,7 +28,7 @@
       accent: 'period' as const,
       label: '唯一無二',
       mark: '03 — Singular',
-      body: '世にある選択肢を増やす。誰かがすでに作ったものは、私たちは作らない。'
+      body: 'ほかでは見たことのない、新しいかたち。'
     }
   ];
 
@@ -126,13 +126,24 @@
           mctx.fillStyle = '#ff00ff';
           mctx.fillText(w.word, W / 2, H / 2);
         } else if (w.accent === 'period') {
-          // Period only — paint a sakura dot over the trailing '.'.
-          // Approximate the dot center: just inside the right edge,
-          // sitting low.
-          const dot = fontPx * 0.13;
-          mctx.beginPath();
-          mctx.arc(right - dot * 1.0, baseline - dot * 0.3, dot * 0.9, 0, Math.PI * 2);
-          mctx.fill();
+          // Period only — paint the full word in sakura, then knock out
+          // the pre-period substring so what remains is exactly the
+          // trailing dot (matches the font's actual period glyph).
+          const baseWord = w.word.replace(/\.$/, '');
+          mctx.textAlign = 'left';
+          mctx.textBaseline = 'middle';
+          mctx.font = styleStr(fontPx);
+          // Re-measure with left alignment so both fills land at the same x.
+          const fullW = mctx.measureText(w.word).width;
+          const startX = W / 2 - fullW / 2;
+
+          mctx.fillStyle = '#ff00ff';
+          mctx.fillText(w.word, startX, H / 2);
+
+          mctx.globalCompositeOperation = 'destination-out';
+          mctx.fillStyle = '#000';
+          mctx.fillText(baseWord, startX, H / 2);
+          mctx.globalCompositeOperation = 'source-over';
         }
       }
 
@@ -352,10 +363,13 @@
     ></canvas>
 
     <div class="relative z-10 h-full max-w-[1400px] mx-auto px-6 md:px-10 pointer-events-none">
-      <!-- top-left section label -->
-      <p class="absolute top-24 md:top-28 left-6 md:left-10 font-mincho text-sm tracking-[0.2em] text-ink/55">
-        三つのものさし
-      </p>
+      <!-- top-left section label — establishes the unifying concept -->
+      <div class="absolute top-24 md:top-28 left-6 md:left-10 max-w-[22ch]">
+        <p class="font-mincho text-sm tracking-[0.2em] text-ink/55">三つのものさし</p>
+        <p class="mt-2 font-mincho text-[12px] md:text-[13px] leading-[1.8] text-ink/50">
+          このどれかに当てはまるもの、だけをつくります。
+        </p>
+      </div>
 
       <!-- top-right progress ticks -->
       <div class="absolute top-24 md:top-28 right-6 md:right-10 flex items-center gap-3">
