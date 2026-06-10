@@ -1,15 +1,15 @@
-<script>
+<script lang="ts">
   import companyInfo from '$lib/data/company_info.json';
 
   // 日付をYYYY年MM月DD日形式に整形する関数
-  function formatDate(dateString) {
+  function formatDate(dateString: string) {
     if (!dateString) return '';
     const [year, month, day] = dateString.split('-');
     return `${year}年${month}月${day}日`;
   }
 
   // 所在地から管轄裁判所として「〇〇区」の部分を抽出する関数
-  function extractWard(address) {
+  function extractWard(address: string) {
     if (!address) return '';
     const match = address.match(/東京都(.*?区)/);
     // 「中央区」の部分を返す（東京都中央区...の場合）

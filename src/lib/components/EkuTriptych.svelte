@@ -39,7 +39,6 @@
   let stickyEl: HTMLDivElement;
   let canvas: HTMLCanvasElement;
   let activeIdx = 0;
-  let phase = 0; // 0..1 within slide (1 = fully arrived)
 
   onMount(() => {
     if (typeof window === 'undefined') return;
@@ -106,7 +105,6 @@
         const metrics = mctx.measureText(w.word);
         const wordW = metrics.width;
         const left = W / 2 - wordW / 2;
-        const right = W / 2 + wordW / 2;
         const baseline = H / 2 + fontPx * 0.08;
 
         if (w.accent === 'underline') {
@@ -214,7 +212,6 @@
     setup();
     updateTargets(0);
 
-    let scrollProgress = 0;
     const onScroll = () => {
       const rect = container.getBoundingClientRect();
       const vh = window.innerHeight;
@@ -224,9 +221,7 @@
       // first 40%, then dwells for 60% — so the descriptor stays
       // readable even when the user scrolls quickly.
       const p = (passed / total) * slides.length;
-      scrollProgress = p;
       const idx = Math.min(slides.length - 1, Math.floor(p));
-      phase = Math.min(1, (p - idx) / 0.4); // 0..1 within slide arrival
       if (idx !== activeIdx) {
         activeIdx = idx;
         updateTargets(idx);
@@ -240,35 +235,6 @@
       updateTargets(activeIdx);
     });
     ro.observe(stickyEl);
-
-    // Snap-scope: while the section is on screen, set the document's
-    // scroll-snap type to `y proximity`. Each slide's "settled" row has
-    // `scroll-snap-align: start` + `scroll-snap-stop: always`, so the
-    // browser nudges the scroll into the right spot once the user pauses,
-    // without fighting active scroll gestures. Released the moment the
-    // section leaves the viewport so the rest of the page scrolls normally.
-    const html = document.documentElement;
-    const SNAP_ATTR = 'data-eku-snap';
-    const enableSnap = () => {
-      if (html.getAttribute(SNAP_ATTR) === '1') return;
-      html.style.scrollSnapType = 'y proximity';
-      html.setAttribute(SNAP_ATTR, '1');
-    };
-    const disableSnap = () => {
-      if (html.getAttribute(SNAP_ATTR) !== '1') return;
-      html.style.scrollSnapType = '';
-      html.removeAttribute(SNAP_ATTR);
-    };
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) {
-          if (e.isIntersecting) enableSnap();
-          else disableSnap();
-        }
-      },
-      { threshold: 0 }
-    );
-    io.observe(container);
 
     // Mouse: gentle repulsion field over the canvas.
     const mouse = { x: -9999, y: -9999, active: false };
@@ -337,8 +303,6 @@
       canvas.removeEventListener('mousemove', onMove);
       canvas.removeEventListener('mouseleave', onLeave);
       ro.disconnect();
-      io.disconnect();
-      disableSnap();
     };
   });
 
@@ -365,7 +329,7 @@
     <div class="relative z-10 h-full max-w-[1400px] mx-auto px-6 md:px-10 pointer-events-none">
       <!-- top-left section label — establishes the unifying concept -->
       <div class="absolute top-24 md:top-28 left-6 md:left-10 max-w-[22ch]">
-        <p class="font-mincho text-sm tracking-[0.2em] text-ink/55">三つのものさし</p>
+        <h2 class="font-mincho text-sm font-normal tracking-[0.2em] text-ink/55">三つのものさし</h2>
         <p class="mt-2 font-mincho text-[12px] md:text-[13px] leading-[1.8] text-ink/50">
           このどれかに当てはまるもの、だけをつくります。
         </p>
@@ -373,7 +337,7 @@
 
       <!-- top-right progress ticks -->
       <div class="absolute top-24 md:top-28 right-6 md:right-10 flex items-center gap-3">
-        {#each slides as s, i}
+        {#each slides as s, i (s.word)}
           <span
             class="font-mono text-[10px] tracking-[0.24em]"
             style="color: {i === activeIdx ? INK : 'rgba(17,16,20,0.35)'};"
@@ -408,29 +372,9 @@
     </div>
   </div>
 
-  <!--
-    Snap markers — invisible 1px rows positioned at each slide's "settled"
-    scroll-Y. Combined with scroll-snap-type set on <html> by the
-    IntersectionObserver while this section is on screen, the page rests
-    on each completed word and only releases when the user scrolls again.
-
-    Positions: pin range is (height − 100vh) = 60vh, divided into 3 slots.
-    Settled point per slot = slot_start + 0.7 × slot_size = 14vh, 34vh, 54vh
-    from the section top.
-  -->
-  <div class="eku-snap absolute left-0 right-0" style="top: 14vh; height: 1px;" aria-hidden="true"></div>
-  <div class="eku-snap absolute left-0 right-0" style="top: 34vh; height: 1px;" aria-hidden="true"></div>
-  <div class="eku-snap absolute left-0 right-0" style="top: 54vh; height: 1px;" aria-hidden="true"></div>
 </section>
 
 <style>
   /* Hard fallback so static SSR paint is at least readable. */
   canvas { background: transparent; }
-
-  /* Snap markers — each forces a scroll rest stop on its row. */
-  .eku-snap {
-    scroll-snap-align: start;
-    scroll-snap-stop: always;
-    pointer-events: none;
-  }
 </style>

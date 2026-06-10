@@ -1,8 +1,10 @@
 <svelte:head>
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
+    <!-- 使用ウェイトのみ読み込む: Fraunces 400/800 (roman+italic), Space Grotesk 400/500,
+         Noto Serif JP 300/400, JetBrains Mono 400/700。和文サンセリフはシステムフォールバック。 -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@300;400;600&family=JetBrains+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,800;1,400;1,800&family=Space+Grotesk:wght@400;500&family=Noto+Serif+JP:wght@300;400&family=JetBrains+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
 </svelte:head>
@@ -10,7 +12,6 @@
 <script lang="ts">
   import "../app.css";
   import { base } from "$app/paths";
-  import { page } from "$app/stores";
   import { onMount } from "svelte";
   import { quintOut } from "svelte/easing";
   import { fade, slide } from "svelte/transition";
@@ -33,8 +34,6 @@
     document.body.style.overflow = isMenuOpen ? 'hidden' : '';
   }
 
-  $: isHome = $page.url.pathname === `${base}/` || $page.url.pathname === '/' || $page.url.pathname === base;
-
   const sectionLinks = {
     philosophy: `${base}/#philosophy`,
     business: `${base}/#business`,
@@ -44,12 +43,12 @@
     contact: `${base}/#contact-form`
   };
 
-  const navItems: Array<[string, string, string]> = [
-    ['philosophy', sectionLinks.philosophy, '三つのものさし'],
-    ['business', sectionLinks.business, '事業内容'],
-    ['reasons', sectionLinks.reasons, '選ばれる理由'],
-    ['case-studies', sectionLinks.caseStudies, '実績'],
-    ['company', sectionLinks.company, '会社概要']
+  const navItems: Array<[string, string]> = [
+    [sectionLinks.philosophy, '三つのものさし'],
+    [sectionLinks.business, '事業内容'],
+    [sectionLinks.reasons, '選ばれる理由'],
+    [sectionLinks.caseStudies, '実績'],
+    [sectionLinks.company, '会社概要']
   ];
 </script>
 
@@ -67,7 +66,7 @@
       </a>
 
       <nav class="hidden lg:flex items-center gap-6 text-sm">
-        {#each navItems as [, href, label]}
+        {#each navItems as [href, label]}
           <a {href} class="font-mincho text-ink/80 hover:text-ink transition-colors">
             {label}
           </a>
@@ -119,7 +118,7 @@
         on:keydown
         role="presentation"
       >
-        {#each navItems as [, href, label]}
+        {#each navItems as [href, label]}
           <a {href} class="text-ink/85 hover:text-ink transition-colors" on:click={closeMenu}>
             {label}
           </a>
@@ -150,7 +149,7 @@
         <div class="md:col-span-4">
           <p class="font-mincho text-[12px] tracking-[0.18em] text-ink/55">会社案内</p>
           <ul class="mt-4 space-y-2 font-mincho text-[13px] text-ink/85">
-            {#each navItems as [, href, label]}
+            {#each navItems as [href, label]}
               <li><a {href} class="hover:text-sakura transition-colors">{label}</a></li>
             {/each}
             <li><a href={sectionLinks.contact} class="hover:text-sakura transition-colors">お問い合わせ</a></li>

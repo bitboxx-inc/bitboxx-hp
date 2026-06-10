@@ -1,9 +1,26 @@
 <svelte:head>
     <title>bitboxx | Excellent. Kawaii. Unique.</title>
     <meta name="description" content="bitboxx (ビットボックス) は、Excellent / Kawaii / Unique の三つのものさしで、事業の核となるプロダクトとシステムを設計・開発する東京のエンジニアリング会社です。"/>
+    <link rel="canonical" href={SITE_URL}/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:site_name" content="bitboxx"/>
+    <meta property="og:title" content="bitboxx | Excellent. Kawaii. Unique."/>
+    <meta property="og:description" content="Excellent / Kawaii / Unique の三つのものさしで、事業の核となるプロダクトとシステムを設計・開発する東京のエンジニアリング会社。"/>
+    <meta property="og:url" content={SITE_URL}/>
+    <meta property="og:image" content={`${SITE_URL}og.png`}/>
+    <meta property="og:image:width" content="1200"/>
+    <meta property="og:image:height" content="630"/>
+    <meta property="og:locale" content="ja_JP"/>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="bitboxx | Excellent. Kawaii. Unique."/>
+    <meta name="twitter:image" content={`${SITE_URL}og.png`}/>
+    <!-- 静的な会社情報の JSON.stringify のみを埋め込む (ユーザー入力は含まない) -->
+    <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+    {@html jsonLdTag}
 </svelte:head>
 
 <script lang="ts">
+  import { tick } from 'svelte';
   import companyInfo from '$lib/data/company_info.json';
   import PrivacyPolicy from '$lib/domains/PrivacyPolicy.svelte';
   import HeroCanvas from '$lib/components/HeroCanvas.svelte';
@@ -11,6 +28,32 @@
   import ParticleBox from '$lib/components/ParticleBox.svelte';
   import EkuTriptych from '$lib/components/EkuTriptych.svelte';
   import { heroGameState } from '$lib/stores/heroGame';
+
+  // 本番ドメイン (GitHub Pages + カスタムドメイン)
+  const SITE_URL = 'https://bitboxx.co.jp/';
+
+  const orgJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: companyInfo.name,
+    url: SITE_URL,
+    logo: `${SITE_URL}black.svg`,
+    email: 'contact@bitboxx.co.jp',
+    foundingDate: companyInfo.established,
+    address: {
+      '@type': 'PostalAddress',
+      postalCode: companyInfo.postcode,
+      addressRegion: '東京都',
+      addressLocality: '中央区',
+      streetAddress: '日本橋箱崎町16-11 ルミネ日本橋601',
+      addressCountry: 'JP'
+    }
+  };
+
+  // "<script" をソースに直書きすると Svelte / vitePreprocess のスクリプト抽出を
+  // 誤爆させるため、文字列連結でタグを組み立てる。
+  const jsonLdTag =
+    '<scr' + 'ipt type="application/ld+json">' + JSON.stringify(orgJsonLd) + '</scr' + 'ipt>';
 
   // Quiet the hero typography while the mini-game is engaged so the
   // play field is clear. CTA stays visible as an "exit" path.
@@ -75,7 +118,7 @@
   const reasons = [
     {
       num: 'Reason 01',
-      headline: '事業の意思決定そばで動く。',
+      headline: '「何をつくるか」から、並走する。',
       body: '「言われたものをつくる」ではなく、「何をつくるべきか」から並走します。技術と事業の両方の目を持って、経営判断の場に座ります。',
       contrast: '多くの開発会社は仕様の通りにつくる。私たちは、仕様が固まる前から関わる。'
     },
@@ -120,12 +163,51 @@
   let text = '';
   let pr = false;
   let showPrivacyModal = false;
+  let privacyDialogEl: HTMLDivElement | null = null;
+  let privacyCloseBtnEl: HTMLButtonElement | null = null;
+  let privacyTriggerEl: HTMLElement | null = null;
 
-  function openPrivacyModal(event: MouseEvent) {
+  async function openPrivacyModal(event: MouseEvent) {
     event.preventDefault();
+    privacyTriggerEl = event.currentTarget as HTMLElement;
     showPrivacyModal = true;
+    await tick();
+    privacyCloseBtnEl?.focus();
   }
-  function closePrivacyModal() { showPrivacyModal = false; }
+  function closePrivacyModal() {
+    showPrivacyModal = false;
+    privacyTriggerEl?.focus();
+  }
+
+  // モーダル表示中は背景スクロールを止め、Esc で閉じ、Tab をダイアログ内に閉じ込める。
+  $: if (typeof document !== 'undefined') {
+    document.body.style.overflow = showPrivacyModal ? 'hidden' : '';
+  }
+
+  function onPrivacyKeydown(e: KeyboardEvent) {
+    if (!showPrivacyModal) return;
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      closePrivacyModal();
+      return;
+    }
+    if (e.key === 'Tab' && privacyDialogEl) {
+      const focusables = privacyDialogEl.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input, textarea, select, [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      const active = document.activeElement as HTMLElement | null;
+      if (e.shiftKey && (active === first || !active || !privacyDialogEl.contains(active))) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  }
 
   function send() {
     if (isDisabled(pr, yourname, email, text)) return;
@@ -140,6 +222,8 @@
     return !pr || yourname === '' || email === '' || text === '';
   }
 </script>
+
+<svelte:window on:keydown={onPrivacyKeydown}/>
 
 <main class="relative">
   <!-- HERO — unchanged. Dynamic moment. -->
@@ -209,7 +293,7 @@
   <section class="relative py-20 md:py-28 paper-grain">
     <div class="max-w-[1400px] mx-auto px-6 md:px-10">
       <Reveal>
-        <p class="font-mincho text-sm tracking-[0.2em] text-ink/55">前提</p>
+        <h2 class="font-mincho text-sm tracking-[0.2em] text-ink/55">前提</h2>
         <p class="mt-8 md:mt-12 max-w-3xl font-mincho text-[18px] md:text-[22px] leading-[2.1] text-ink/85 tracking-[0.02em]">
           お客様のお手伝いをするときは、<br class="hidden md:block"/>
           <span class="underline-handwritten">お客様が本来の事業に集中する時間</span>を生み出すことを仕事としています。
@@ -226,7 +310,7 @@
     <div class="max-w-[1400px] mx-auto px-6 md:px-10">
       <Reveal>
         <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-          <p class="font-mincho text-sm tracking-[0.2em] text-ink/55">主な事業内容</p>
+          <h2 class="font-mincho text-sm tracking-[0.2em] text-ink/55">主な事業内容</h2>
           <p class="font-mincho text-[13px] md:text-sm text-ink/50">
             提供するもの<span class="mx-3 text-ink/30">／</span>そこから生まれる価値
           </p>
@@ -266,11 +350,11 @@
   <section id="reasons" class="relative py-20 md:py-28 scroll-mt-24 paper-grain bg-cream-100/40">
     <div class="max-w-[1400px] mx-auto px-6 md:px-10">
       <Reveal>
-        <p class="font-mincho text-sm tracking-[0.2em] text-ink/55">なぜ bitboxx か</p>
-        <h2 class="mt-6 md:mt-8 font-display text-[34px] md:text-[56px] leading-[1.1] tracking-hyper text-ink max-w-3xl">
+        <h2 class="font-mincho text-sm tracking-[0.2em] text-ink/55">なぜ bitboxx か</h2>
+        <p class="mt-6 md:mt-8 font-display text-[34px] md:text-[56px] leading-[1.1] tracking-hyper text-ink max-w-3xl">
           <span class="italic">技術と事業、</span><br/>
           両方の目を持つ<span class="text-sakura">.</span>
-        </h2>
+        </p>
       </Reveal>
 
       <div class="mt-12 md:mt-16">
@@ -302,14 +386,17 @@
   <section class="relative py-20 md:py-28 scroll-mt-24 paper-grain">
     <div class="max-w-[1400px] mx-auto px-6 md:px-10">
       <Reveal>
-        <p class="font-mincho text-sm tracking-[0.2em] text-ink/55">通ってきた現場</p>
+        <h2 class="font-mincho text-sm tracking-[0.2em] text-ink/55">通ってきた現場</h2>
       </Reveal>
-      <div class="mt-8 md:mt-12">
-        {#each capabilities as cap}
-          <Reveal>
-            <article class="relative grid md:grid-cols-12 gap-3 md:gap-10 py-8 md:py-10 border-t border-ink/15">
-              <p class="md:col-span-4 font-mincho text-base md:text-lg text-ink">{cap.tag}</p>
-              <p class="md:col-span-8 font-mincho text-[14px] md:text-[15px] leading-[2] text-ink/75 max-w-3xl">{cap.body}</p>
+      <!-- 罫線リストが続いた後の密度替え — 2×2 のヘアライングリッド -->
+      <div class="mt-8 md:mt-12 grid md:grid-cols-2">
+        {#each capabilities as cap, i}
+          <Reveal klass="h-full">
+            <article
+              class={`h-full py-8 md:py-12 border-t border-ink/15 ${i % 2 === 1 ? 'md:pl-12 md:border-l' : 'md:pr-12'}`}
+            >
+              <h3 class="font-mincho text-base md:text-lg text-ink">{cap.tag}</h3>
+              <p class="mt-4 font-mincho text-[14px] md:text-[15px] leading-[2] text-ink/75">{cap.body}</p>
             </article>
           </Reveal>
         {/each}
@@ -321,7 +408,7 @@
   <section id="case-studies" class="relative py-20 md:py-28 scroll-mt-24 paper-grain">
     <div class="max-w-[1400px] mx-auto px-6 md:px-10">
       <Reveal>
-        <p class="font-mincho text-sm tracking-[0.2em] text-ink/55">実績</p>
+        <h2 class="font-mincho text-sm tracking-[0.2em] text-ink/55">実績</h2>
       </Reveal>
       <div class="mt-8 md:mt-12">
         {#each works as w}
@@ -345,7 +432,7 @@
   <section id="company" class="relative py-20 md:py-28 scroll-mt-24 paper-grain">
     <div class="max-w-[1400px] mx-auto px-6 md:px-10">
       <Reveal>
-        <p class="font-mincho text-sm tracking-[0.2em] text-ink/55">会社概要</p>
+        <h2 class="font-mincho text-sm tracking-[0.2em] text-ink/55">会社概要</h2>
       </Reveal>
       <Reveal>
         <dl class="mt-8 md:mt-12">
@@ -364,14 +451,15 @@
   <section id="contact-form" class="relative py-20 md:py-32 scroll-mt-24 paper-grain">
     <div class="max-w-[1400px] mx-auto px-6 md:px-10">
       <Reveal>
-        <p class="font-mincho text-sm tracking-[0.2em] text-ink/55">お問い合わせ</p>
+        <h2 class="font-mincho text-sm tracking-[0.2em] text-ink/55">お問い合わせ</h2>
         <p class="mt-6 md:mt-8 max-w-2xl font-mincho text-[15px] md:text-[17px] leading-[2] text-ink/75">
           ご相談・お見積りなど、お気軽にどうぞ。
         </p>
       </Reveal>
 
       <Reveal>
-        <form on:submit|preventDefault={send} class="mt-12 md:mt-16 max-w-2xl space-y-10 md:space-y-12">
+        <div class="mt-12 md:mt-16 grid md:grid-cols-12 gap-14 md:gap-10">
+        <form on:submit|preventDefault={send} class="md:col-span-7 max-w-2xl space-y-10 md:space-y-12">
           <label class="block">
             <span class="block font-mono text-[10px] tracking-[0.3em] text-ink/45 uppercase">Name</span>
             <input
@@ -442,16 +530,27 @@
           </div>
         </form>
 
-        <!-- footer line — direct contact + hours, single row -->
-        <div class="mt-14 md:mt-20 pt-6 border-t border-ink/15 max-w-2xl flex flex-col md:flex-row md:items-center gap-3 md:gap-8 font-mincho text-[12px] tracking-[0.04em] text-ink/55">
-          <span>
-            直接メール:
-            <a href="mailto:contact@bitboxx.co.jp" class="ml-1 text-ink hover:text-sakura transition-colors">
+        <!-- 右カラム — フォームを使わない人のための直接連絡先 -->
+        <aside class="md:col-span-4 md:col-start-9 md:border-l md:border-ink/15 md:pl-10 space-y-10">
+          <div>
+            <p class="font-mono text-[10px] tracking-[0.3em] text-ink/45 uppercase">Direct</p>
+            <a
+              href="mailto:contact@bitboxx.co.jp"
+              class="mt-3 inline-block font-mincho text-[15px] md:text-base text-ink hover:text-sakura transition-colors"
+            >
               contact@bitboxx.co.jp
             </a>
-          </span>
-          <span class="hidden md:block w-px h-3 bg-ink/15" aria-hidden="true"></span>
-          <span>平日 10:00–19:00 (JST)</span>
+            <p class="mt-2 font-mincho text-[12px] leading-[1.9] text-ink/55">平日 10:00–19:00 (JST)</p>
+          </div>
+          <div>
+            <p class="font-mono text-[10px] tracking-[0.3em] text-ink/45 uppercase">Office</p>
+            <p class="mt-3 font-mincho text-[13px] leading-[2] text-ink/75">
+              〒103-0015<br/>
+              東京都中央区日本橋箱崎町16-11<br/>
+              ルミネ日本橋601
+            </p>
+          </div>
+        </aside>
         </div>
       </Reveal>
     </div>
@@ -460,19 +559,25 @@
   {#if showPrivacyModal}
     <div
       class="fixed inset-0 bg-ink/80 backdrop-blur-sm flex items-center justify-center z-[1000] px-4"
-      on:click={closePrivacyModal}
+      on:click={(e) => { if (e.target === e.currentTarget) closePrivacyModal(); }}
       on:keydown
       role="presentation"
     >
       <div
+        bind:this={privacyDialogEl}
         class="bg-cream-50 text-ink rounded-3xl shadow-2xl w-full max-w-3xl p-6 md:p-10 max-h-[90vh] flex flex-col"
-        on:click|stopPropagation
-        on:keydown
-        role="presentation"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="privacy-modal-title"
       >
         <div class="flex justify-between items-center mb-4 pb-4 border-b border-ink/10">
-          <h2 class="font-display italic text-2xl tracking-hyper">プライバシーポリシー</h2>
-          <button class="text-ink/60 hover:text-ink text-3xl leading-none" on:click={closePrivacyModal} aria-label="閉じる">×</button>
+          <h2 id="privacy-modal-title" class="font-display italic text-2xl tracking-hyper">プライバシーポリシー</h2>
+          <button
+            bind:this={privacyCloseBtnEl}
+            class="text-ink/60 hover:text-ink text-3xl leading-none"
+            on:click={closePrivacyModal}
+            aria-label="閉じる"
+          >×</button>
         </div>
         <div class="overflow-y-auto pr-2 flex-1">
           <PrivacyPolicy showTitle={false}/>

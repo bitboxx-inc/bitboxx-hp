@@ -20,9 +20,13 @@
     };
     const onOver = (e: MouseEvent) => {
       const t = e.target as HTMLElement;
-      const hover = !!t.closest('a, button, input, textarea, select, label, [data-cursor="hover"]');
+      const hover = !!t.closest('a, button, label, [data-cursor="hover"]');
+      // テキスト入力の上ではネイティブ I ビームに譲る
+      const overField = !!t.closest('input, textarea, select');
       ring?.classList.toggle('is-hover', hover);
       dot?.classList.toggle('is-hover', hover);
+      ring?.classList.toggle('is-hidden', overField);
+      dot?.classList.toggle('is-hidden', overField);
     };
     const onLeave = () => {
       target.x = -100;

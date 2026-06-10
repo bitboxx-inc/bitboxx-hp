@@ -4,9 +4,6 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: {
-          DEFAULT: '#D62649'
-        },
         cream: {
           50: '#FFFFFF',
           100: '#F6F6F4',
@@ -18,19 +15,10 @@ export default {
           700: '#2A272F',
           500: '#4B4752'
         },
+        // アクセントは #FF2630 のみ (FF + 26 + 30 — 役員誕生日由来)。差し替え不可。
         sakura: {
           DEFAULT: '#FF2630',
           soft: '#FF6B72'
-        },
-        sora: {
-          DEFAULT: '#7AA2FF',
-          deep: '#3D4AFF'
-        },
-        mint: {
-          DEFAULT: '#9DE8C3'
-        },
-        sun: {
-          DEFAULT: '#FFD166'
         }
       },
       fontFamily: {
@@ -62,30 +50,6 @@ export default {
       },
       letterSpacing: {
         hyper: '-0.04em'
-      },
-      keyframes: {
-        marquee: {
-          '0%': { transform: 'translateX(0)' },
-          '100%': { transform: 'translateX(-50%)' }
-        },
-        floaty: {
-          '0%,100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-8px)' }
-        },
-        blink: {
-          '0%,92%,100%': { transform: 'scaleY(1)' },
-          '95%': { transform: 'scaleY(0.05)' }
-        },
-        wobble: {
-          '0%,100%': { transform: 'rotate(-2deg)' },
-          '50%': { transform: 'rotate(2deg)' }
-        }
-      },
-      animation: {
-        marquee: 'marquee 38s linear infinite',
-        floaty: 'floaty 6s ease-in-out infinite',
-        blink: 'blink 5s infinite',
-        wobble: 'wobble 4s ease-in-out infinite'
       }
     },
   },

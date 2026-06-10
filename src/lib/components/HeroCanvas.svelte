@@ -5,9 +5,26 @@
 
   let container: HTMLDivElement;
   let cleanup: (() => void) | null = null;
+  let destroyed = false;
 
   onMount(async () => {
     if (typeof window === 'undefined') return;
+
+    // three.js + postprocessing は合わせて約 1MB あるので、window load 後の
+    // アイドル時間まで読み込みを遅らせる。タイポグラフィ (LCP) が先に塗られ、
+    // シーンはその直後に立ち上がる。
+    await new Promise<void>((resolve) => {
+      const whenIdle = () => {
+        if ('requestIdleCallback' in window) {
+          window.requestIdleCallback(() => resolve(), { timeout: 2000 });
+        } else {
+          setTimeout(resolve, 300);
+        }
+      };
+      if (document.readyState === 'complete') whenIdle();
+      else window.addEventListener('load', whenIdle, { once: true });
+    });
+    if (destroyed || !container) return;
 
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -319,7 +336,6 @@
     const POS_MAX_X = 6;
     const POS_MAX_Y = 3.6;
     const VEL_MAX = 13;
-    const VEL_ACCEL = 36;
     const VEL_DAMP = 0.90;
     const ACCEL_LERP = 0.28; // higher = snappier key response
     const pos = { x: 0, y: 0, vx: 0, vy: 0 };
@@ -357,14 +373,25 @@
       if (mascotTapTimer) { clearTimeout(mascotTapTimer); mascotTapTimer = null; }
     };
 
+    // ゲームは WASD/Space のキーボード操作前提なので、ファインポインタの
+    // 環境だけで起動する。タッチ端末では 3 タップ目もご褒美の色変化に留め、
+    // 操作不能な READY 画面に入れない。
+    const canPlayGame = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
     const handleMascotTap = () => {
       sfx.tap(mascotTaps);
       mascotTaps += 1;
       if (mascotTaps >= 3) {
         mascotTaps = 0;
         clearMascotResetTimer();
-        resetMascotTint();
-        enterReady();
+        if (canPlayGame) {
+          resetMascotTint();
+          enterReady();
+          return;
+        }
+        // タッチ端末 — 最終色まで染めてからゆっくり戻す。
+        tintMascot(MASCOT_TAP_COLORS[2]);
+        armMascotResetTimer();
         return;
       }
       tintMascot(MASCOT_TAP_COLORS[mascotTaps - 1]);
@@ -986,31 +1013,6 @@
     };
 
     // ─── Boss projectile system (Touhou-ish patterns) ────────────────
-    /** Fire one projectile aimed at the player with an optional angular
-     *  offset (rotation in the XY plane around the aim direction). */
-    const fireBossShot = (offsetAngle = 0, speed = 7.5) => {
-      const start = boss.pos.clone();
-      const target = new THREE.Vector3(pos.x, pos.y, 9);
-      const dir = target.sub(start).normalize();
-      if (offsetAngle !== 0) {
-        const cs = Math.cos(offsetAngle);
-        const sn = Math.sin(offsetAngle);
-        const nx = dir.x * cs - dir.y * sn;
-        const ny = dir.x * sn + dir.y * cs;
-        dir.x = nx;
-        dir.y = ny;
-        dir.normalize();
-      }
-      const proj = new THREE.Mesh(enemyProjGeo, enemyProjMat);
-      proj.position.copy(start);
-      scene.add(proj);
-      enemyProjs.push({
-        mesh: proj,
-        vel: dir.multiplyScalar(speed),
-        bornAt: performance.now()
-      });
-    };
-
     /** Cone shot — `rotAngle` is the rotation around the boss→player aim
      *  axis, `spreadAngle` is the cone's half-angle. With spread=0 the
      *  bullet hits the player dead-on; with spread > 0 the bullet flies
@@ -1661,6 +1663,7 @@
   });
 
   onDestroy(() => {
+    destroyed = true;
     if (cleanup) cleanup();
   });
 

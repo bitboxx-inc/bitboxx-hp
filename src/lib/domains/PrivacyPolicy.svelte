@@ -1,8 +1,8 @@
-<script>
+<script lang="ts">
   import companyInfo from '$lib/data/company_info.json';
 
   // 日付をYYYY年MM月DD日形式に整形する関数
-  function formatDate(dateString) {
+  function formatDate(dateString: string) {
     if (!dateString) return '';
     const [year, month, day] = dateString.split('-');
     return `${year}年${month}月${day}日`;
