@@ -7,6 +7,10 @@
   let cleanup: (() => void) | null = null;
   let destroyed = false;
 
+  // ダークバリアント — インク地のパネル内に置くとき true。
+  // シーン (フォグ・キューブ・エッジ) と UI オーバーレイの色が反転する。
+  export let dark = false;
+
   onMount(async () => {
     if (typeof window === 'undefined') return;
 
@@ -32,10 +36,14 @@
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const PP: any = await import('postprocessing');
 
+    // テーマ定数 — オーバーレイ/シーン双方がここを参照する。
+    const FG = dark ? '#F6F6F4' : '#111014';
+    const ink = (a: number) => (dark ? `rgba(246,246,244,${a})` : `rgba(17,16,20,${a})`);
+
     const scene = new THREE.Scene();
-    // Atmospheric perspective — far objects fade to the page's cream so the
-    // scene reads as a real receding space rather than a flat cluster.
-    scene.fog = new THREE.FogExp2(0xfaf8f4, 0.052);
+    // Atmospheric perspective — far objects fade to the panel's ground color
+    // so the scene reads as a real receding space rather than a flat cluster.
+    scene.fog = new THREE.FogExp2(dark ? 0x111014 : 0xfaf8f4, 0.052);
 
     const camera = new THREE.PerspectiveCamera(
       42,
@@ -56,6 +64,14 @@
     renderer.toneMappingExposure = 1.1;
     container.appendChild(renderer.domElement);
 
+    // 環境マップ — 物理マテリアル (クリアコート / ガラス) の反射が一段リッチになる
+    const { RoomEnvironment } = await import('three/examples/jsm/environments/RoomEnvironment.js');
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    const envTex = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    pmrem.dispose();
+    scene.environment = envTex;
+    scene.environmentIntensity = dark ? 0.4 : 0.6;
+
     // ─── Postprocessing — bloom for the neon laser / explosion feel ───
     // Threshold is tuned so dark cubes don't glow but the sun, sakura
     // accents (#FF2630), bursts, and lasers do.
@@ -63,12 +79,31 @@
     composer.addPass(new PP.RenderPass(scene, camera));
     const bloom = new PP.BloomEffect({
       intensity: 1.6,
-      luminanceThreshold: 0.32,
+      // ダークではクリーム色キューブの輝度が高いため、しきい値を上げて
+      // サクラ / レーザー / バーストだけが光るようにする。
+      luminanceThreshold: dark ? 0.78 : 0.32,
       luminanceSmoothing: 0.18,
       kernelSize: PP.KernelSize.MEDIUM,
       mipmapBlur: true
     });
-    composer.addPass(new PP.EffectPass(camera, bloom));
+
+    // 被写界深度 — デスクトップのみ。マスコット付近 (カメラから約 8) に焦点を置き、
+    // 奥のキューブ群をボケに沈める。コスト高なのでモバイルは外す。
+    const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const effects: any[] = [];
+    if (finePointer && !prefersReduced && window.innerWidth >= 1024) {
+      effects.push(
+        new PP.DepthOfFieldEffect(camera, {
+          worldFocusDistance: 8.2,
+          worldFocusRange: 8.5,
+          bokehScale: 2.0,
+          height: 480
+        })
+      );
+    }
+    effects.push(bloom);
+    composer.addPass(new PP.EffectPass(camera, ...effects));
 
     // Lights — pared back to warm/cool white for a more monochrome scene.
     scene.add(new THREE.AmbientLight(0xffffff, 0.7));
@@ -99,15 +134,26 @@
     };
 
     // Mostly monochrome — one sakura spark survives as the single accent.
-    const palette = [
-      new THREE.Color('#111014'), // ink
-      new THREE.Color('#1F1D24'), // near ink
-      new THREE.Color('#2A272F'),
-      new THREE.Color('#4B4752'),
-      new THREE.Color('#E6E6E2'), // light gray
-      new THREE.Color('#CFCFC9'),
-      new THREE.Color('#FF2630')  // single sakura accent (birthdays 12/26 + 04/30)
-    ];
+    // ダークでは明暗を反転 (明るいキューブがインク地に浮かぶ)。
+    const palette = dark
+      ? [
+          new THREE.Color('#F6F6F4'), // cream
+          new THREE.Color('#E6E6E2'),
+          new THREE.Color('#CFCFC9'),
+          new THREE.Color('#9B989F'),
+          new THREE.Color('#3A3741'), // near ink
+          new THREE.Color('#4B4752'),
+          new THREE.Color('#FF2630') // single sakura accent (birthdays 12/26 + 04/30)
+        ]
+      : [
+          new THREE.Color('#111014'), // ink
+          new THREE.Color('#1F1D24'), // near ink
+          new THREE.Color('#2A272F'),
+          new THREE.Color('#4B4752'),
+          new THREE.Color('#E6E6E2'), // light gray
+          new THREE.Color('#CFCFC9'),
+          new THREE.Color('#FF2630') // single sakura accent (birthdays 12/26 + 04/30)
+        ];
 
     // bitboxx logo texture (!? mark) — rendered onto a generated canvas so
     // the image is crisp and uses consistent padding around the mark.
@@ -147,6 +193,19 @@
         const mats = [body(), body(), body(), body(), face, body()];
         materialsToDispose.push(...mats);
         material = mats;
+      } else if (i % 4 === 2) {
+        // ガラスのキューブ — 環境マップと奥のシーンを屈折させる
+        const m = makeMat({
+          color: '#FFFFFF',
+          transmission: 1,
+          thickness: size * 0.9,
+          roughness: 0.08,
+          ior: 1.45,
+          clearcoat: 1,
+          clearcoatRoughness: 0.08
+        });
+        materialsToDispose.push(m);
+        material = m;
       } else {
         const color = palette[i % palette.length];
         const m = makeMat({ color });
@@ -169,7 +228,7 @@
       // reminiscent of a blueprint / CPU render.
       const edges = new THREE.EdgesGeometry(geo, 18);
       const edgeMat = new THREE.LineBasicMaterial({
-        color: '#111014',
+        color: '#111014', // 明るいキューブにインクの稜線 — ダークでも共通で効く
         transparent: true,
         opacity: isLogoCube ? 0.18 : 0.3
       });
@@ -279,7 +338,7 @@
     const pGeo = new THREE.BufferGeometry();
     pGeo.setAttribute('position', new THREE.BufferAttribute(linePos, 3));
     const pMat = new THREE.LineBasicMaterial({
-      color: '#111014',
+      color: FG,
       transparent: true,
       opacity: 0.5,
       fog: true
@@ -437,7 +496,7 @@
 
     // Enemy projectile pool — sakura spheres fired by the boss.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    type EnemyProj = { mesh: any; vel: any; bornAt: number };
+    type EnemyProj = { mesh: any; vel: any; bornAt: number; trail?: any };
     const enemyProjs: EnemyProj[] = [];
     const enemyProjGeo = new THREE.SphereGeometry(0.18, 10, 8);
     const enemyProjMat = new THREE.MeshBasicMaterial({
@@ -458,25 +517,25 @@
       'display:flex',
       'gap:2rem',
       'font-family:"JetBrains Mono", ui-monospace, monospace',
-      'color:#111014',
+      `color:${FG}`,
       'opacity:0',
       'transition:opacity 280ms ease',
       'text-align:center'
     ].join(';');
     gameUi.innerHTML = `
       <div>
-        <div style="font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:rgba(17,16,20,0.5);">HP</div>
+        <div style="font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:${ink(0.5)};">HP</div>
         <div data-hp style="font-size:18px;letter-spacing:0.18em;margin-top:6px;line-height:1;">● ● ●</div>
       </div>
-      <div style="width:1px;background:rgba(17,16,20,0.18);align-self:stretch;"></div>
+      <div style="width:1px;background:${ink(0.18)};align-self:stretch;"></div>
       <div>
-        <div style="font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:rgba(17,16,20,0.5);">Score</div>
+        <div style="font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:${ink(0.5)};">Score</div>
         <div data-score style="font-size:28px;letter-spacing:0.02em;margin-top:4px;font-variant-numeric:tabular-nums;display:inline-block;">000</div>
       </div>
-      <div style="width:1px;background:rgba(17,16,20,0.18);align-self:stretch;"></div>
+      <div style="width:1px;background:${ink(0.18)};align-self:stretch;"></div>
       <div>
-        <div style="font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:rgba(17,16,20,0.5);">Exit</div>
-        <div style="font-size:14px;letter-spacing:0.04em;margin-top:8px;color:rgba(17,16,20,0.65);">
+        <div style="font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:${ink(0.5)};">Exit</div>
+        <div style="font-size:14px;letter-spacing:0.04em;margin-top:8px;color:${ink(0.65)};">
           <span style="display:inline-block;padding:2px 8px;border:1px solid currentColor;border-radius:4px;font-family:inherit;">Esc</span>
         </div>
       </div>
@@ -501,7 +560,7 @@
     ].join(';');
     bossHpEl.innerHTML = `
       <div style="font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:#FF2630;text-align:center;margin-bottom:6px;">Boss</div>
-      <div style="height:3px;background:rgba(17,16,20,0.15);border-radius:2px;overflow:hidden;">
+      <div style="height:3px;background:${ink(0.15)};border-radius:2px;overflow:hidden;">
         <div data-bosshp style="height:100%;background:#FF2630;transform-origin:left center;transform:scaleX(1);transition:transform 200ms ease-out;"></div>
       </div>
     `;
@@ -520,14 +579,14 @@
       'text-align:center',
       'opacity:0',
       'transition:opacity 280ms ease',
-      'color:#111014'
+      `color:${FG}`
     ].join(';');
     gameOverEl.innerHTML = `
-      <p data-label style="font-family:'JetBrains Mono', ui-monospace, monospace;font-size:10px;letter-spacing:0.4em;text-transform:uppercase;color:rgba(17,16,20,0.55);margin:0;">Game over</p>
+      <p data-label style="font-family:'JetBrains Mono', ui-monospace, monospace;font-size:10px;letter-spacing:0.4em;text-transform:uppercase;color:${ink(0.55)};margin:0;">Game over</p>
       <p data-title style="margin:14px 0 0;font-family:'Fraunces', ui-serif, serif;font-style:italic;font-weight:800;font-size:72px;letter-spacing:-0.04em;line-height:1;">Down<span style="color:#FF2630">.</span></p>
-      <p style="margin:18px 0 0;font-family:'JetBrains Mono', ui-monospace, monospace;font-size:11px;letter-spacing:0.3em;text-transform:uppercase;color:rgba(17,16,20,0.55);">
+      <p style="margin:18px 0 0;font-family:'JetBrains Mono', ui-monospace, monospace;font-size:11px;letter-spacing:0.3em;text-transform:uppercase;color:${ink(0.55)};">
         Final score
-        <span data-final style="display:inline-block;margin-left:12px;font-size:18px;color:#111014;font-variant-numeric:tabular-nums;">000</span>
+        <span data-final style="display:inline-block;margin-left:12px;font-size:18px;color:${FG};font-variant-numeric:tabular-nums;">000</span>
       </p>
     `;
     container.appendChild(gameOverEl);
@@ -590,13 +649,13 @@
       'text-align:center',
       'opacity:0',
       'transition:opacity 260ms ease',
-      'color:#111014',
+      `color:${FG}`,
       'user-select:none'
     ].join(';');
     readyOverlay.innerHTML = `
-      <p style="font-family:'JetBrains Mono', ui-monospace, monospace;font-size:10px;letter-spacing:0.4em;text-transform:uppercase;color:rgba(17,16,20,0.5);margin:0;">System</p>
+      <p style="font-family:'JetBrains Mono', ui-monospace, monospace;font-size:10px;letter-spacing:0.4em;text-transform:uppercase;color:${ink(0.5)};margin:0;">System</p>
       <p style="margin:14px 0 0;font-family:'Fraunces', ui-serif, serif;font-style:italic;font-weight:800;font-size:88px;letter-spacing:-0.04em;line-height:1;">READY<span style="color:#FF2630">.</span></p>
-      <p style="margin:20px 0 0;font-family:'JetBrains Mono', ui-monospace, monospace;font-size:11px;letter-spacing:0.28em;text-transform:uppercase;color:rgba(17,16,20,0.65);line-height:2;">
+      <p style="margin:20px 0 0;font-family:'JetBrains Mono', ui-monospace, monospace;font-size:11px;letter-spacing:0.28em;text-transform:uppercase;color:${ink(0.65)};line-height:2;">
         <span style="display:inline-block;padding:2px 8px;border:1px solid currentColor;border-radius:4px;">↑ ← ↓ →</span>
         or
         <span style="display:inline-block;padding:2px 8px;border:1px solid currentColor;border-radius:4px;">W A S D</span>
@@ -609,17 +668,23 @@
       </p>
       <button data-start style="
         margin-top:28px;padding:12px 30px;border-radius:9999px;
-        background:#111014;color:#fff;
+        background:${dark ? '#F6F6F4' : '#111014'};color:${dark ? '#111014' : '#fff'};
         font-family:'Noto Serif JP', serif;font-size:14px;
         cursor:pointer;border:none;
-        transition:background 200ms;pointer-events:auto;">
+        transition:background 200ms, color 200ms;pointer-events:auto;">
         START &nbsp;→
       </button>
     `;
     container.appendChild(readyOverlay);
     const startBtn = readyOverlay.querySelector('[data-start]') as HTMLButtonElement;
-    startBtn.addEventListener('mouseenter', () => { startBtn.style.background = '#FF2630'; });
-    startBtn.addEventListener('mouseleave', () => { startBtn.style.background = '#111014'; });
+    startBtn.addEventListener('mouseenter', () => {
+      startBtn.style.background = '#FF2630';
+      startBtn.style.color = '#fff';
+    });
+    startBtn.addEventListener('mouseleave', () => {
+      startBtn.style.background = dark ? '#F6F6F4' : '#111014';
+      startBtn.style.color = dark ? '#111014' : '#fff';
+    });
 
     // Crosshair — Star-Fox-style 4-corner reticle + center dot.
     // Color flips to sakura when the reticle is on a cube.
@@ -637,7 +702,7 @@
       'pointer-events:none',
       'opacity:0',
       'transition:opacity 200ms ease, color 120ms ease',
-      'color:#111014'
+      `color:${FG}`
     ].join(';');
     crosshair.innerHTML = `
       <path d="M4 14 L4 4 L14 4"   fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
@@ -677,7 +742,7 @@
         slots.push(
           i < game.hp
             ? '<span style="color:#FF2630">●</span>'
-            : '<span style="color:rgba(17,16,20,0.18)">●</span>'
+            : '<span style="color:${ink(0.18)}">●</span>'
         );
       }
       hpEl.innerHTML = slots.join(' ');
@@ -775,6 +840,7 @@
       game.invulnerableUntil = now + 700;
       updateHpDisplay();
       flashScreen();
+      kickShake(0.12);
       sfx.damage();
       if (game.hp <= 0) endGame();
     };
@@ -989,6 +1055,8 @@
           spawnBurst(hitPoint);
           spawnBurst(hitPoint);
           spawnBurst(hitPoint);
+          spawnSparks(hitPoint, 90, 0.6); // フィナーレの大花火
+          kickShake(0.16);
           game.score += 25;
           spawnScorePop(hitPoint, '+25');
           scoreEl.textContent = String(game.score).padStart(3, '0');
@@ -1207,6 +1275,106 @@
     const BURST_TTL_MS = 420;
     const burstGeoProto = new THREE.SphereGeometry(0.22, 10, 8);
 
+    // ─── 火花 — 寿命つきパーティクルのプール (1 ドローコール) ─────────
+    const SPARK_MAX = 360;
+    const sparkPos = new Float32Array(SPARK_MAX * 3);
+    const sparkVel = new Float32Array(SPARK_MAX * 3);
+    const sparkLife = new Float32Array(SPARK_MAX); // 残り (s)
+    const sparkLife0 = new Float32Array(SPARK_MAX);
+    const sparkCol = new Float32Array(SPARK_MAX * 3);
+    const sparkRatio = new Float32Array(SPARK_MAX); // 0..1 (シェーダ側のフェード)
+    const sparkGeo = new THREE.BufferGeometry();
+    sparkGeo.setAttribute('position', new THREE.BufferAttribute(sparkPos, 3));
+    sparkGeo.setAttribute('aColor', new THREE.BufferAttribute(sparkCol, 3));
+    sparkGeo.setAttribute('aRatio', new THREE.BufferAttribute(sparkRatio, 1));
+    const sparkMat = new THREE.ShaderMaterial({
+      transparent: true,
+      depthWrite: false,
+      vertexShader: `
+        attribute vec3 aColor;
+        attribute float aRatio;
+        varying vec3 vColor;
+        varying float vRatio;
+        void main () {
+          vColor = aColor;
+          vRatio = aRatio;
+          vec4 mv = modelViewMatrix * vec4(position, 1.0);
+          gl_PointSize = (120.0 * (0.35 + 0.65 * aRatio)) / max(1.0, -mv.z);
+          gl_Position = projectionMatrix * mv;
+        }`,
+      fragmentShader: `
+        varying vec3 vColor;
+        varying float vRatio;
+        void main () {
+          vec2 d = gl_PointCoord - 0.5;
+          float m = smoothstep(0.5, 0.1, length(d));
+          if (vRatio <= 0.001) discard;
+          gl_FragColor = vec4(vColor, m * vRatio);
+        }`
+    });
+    const sparkPoints = new THREE.Points(sparkGeo, sparkMat);
+    sparkPoints.frustumCulled = false;
+    scene.add(sparkPoints);
+    let sparkCursor = 0;
+
+    const SPARK_INK = dark ? [0.96, 0.96, 0.95] : [0.13, 0.12, 0.15];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const spawnSparks = (at: any, count = 22, sakuraRatio = 0.45) => {
+      for (let n = 0; n < count; n++) {
+        const i = sparkCursor;
+        sparkCursor = (sparkCursor + 1) % SPARK_MAX;
+        const o = i * 3;
+        sparkPos[o] = at.x;
+        sparkPos[o + 1] = at.y;
+        sparkPos[o + 2] = at.z;
+        // ランダム球殻方向 + 少し前方 (カメラ側) へ
+        const th = Math.random() * Math.PI * 2;
+        const ph = Math.acos(2 * Math.random() - 1);
+        const sp = 2.2 + Math.random() * 5.5;
+        sparkVel[o] = Math.sin(ph) * Math.cos(th) * sp;
+        sparkVel[o + 1] = Math.sin(ph) * Math.sin(th) * sp;
+        sparkVel[o + 2] = Math.cos(ph) * sp * 0.7 + 1.2;
+        const life = 0.45 + Math.random() * 0.5;
+        sparkLife[i] = life;
+        sparkLife0[i] = life;
+        const sakura = Math.random() < sakuraRatio;
+        sparkCol[o] = sakura ? 1.0 : SPARK_INK[0];
+        sparkCol[o + 1] = sakura ? 0.149 : SPARK_INK[1];
+        sparkCol[o + 2] = sakura ? 0.188 : SPARK_INK[2];
+        sparkRatio[i] = 1;
+      }
+      sparkGeo.attributes.position.needsUpdate = true;
+      sparkGeo.attributes.aColor.needsUpdate = true;
+      sparkGeo.attributes.aRatio.needsUpdate = true;
+    };
+
+    const updateSparks = (dt: number) => {
+      let any = false;
+      for (let i = 0; i < SPARK_MAX; i++) {
+        if (sparkLife[i] <= 0) continue;
+        any = true;
+        sparkLife[i] -= dt;
+        const o = i * 3;
+        sparkVel[o] *= 0.965;
+        sparkVel[o + 1] = sparkVel[o + 1] * 0.965 - 2.2 * dt; // わずかな重力
+        sparkVel[o + 2] *= 0.965;
+        sparkPos[o] += sparkVel[o] * dt;
+        sparkPos[o + 1] += sparkVel[o + 1] * dt;
+        sparkPos[o + 2] += sparkVel[o + 2] * dt;
+        sparkRatio[i] = Math.max(0, sparkLife[i] / sparkLife0[i]);
+      }
+      if (any) {
+        sparkGeo.attributes.position.needsUpdate = true;
+        sparkGeo.attributes.aRatio.needsUpdate = true;
+      }
+    };
+
+    // ─── 画面シェイク — 着弾の手応え。減衰するランダムオフセット ───────
+    let shakeAmp = 0;
+    const kickShake = (amount: number) => {
+      shakeAmp = Math.min(0.16, shakeAmp + amount);
+    };
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const spawnBurst = (at: any) => {
       const mat = new THREE.MeshBasicMaterial({
@@ -1219,6 +1387,8 @@
       mesh.position.copy(at);
       scene.add(mesh);
       bursts.push({ mesh, mat, geom: burstGeoProto, bornAt: performance.now() });
+      spawnSparks(at);
+      kickShake(0.055);
     };
 
     // ─── Fire (Space / center-screen raycast) ───────────────────────
@@ -1381,6 +1551,16 @@
         group.rotation.x = -mouse.y * 0.35;
         group.rotation.z = 0;
       }
+
+      // シェイク — カメラ位置決定の後に重ねて、減衰させる
+      if (shakeAmp > 0.001) {
+        camera.position.x += (Math.random() - 0.5) * 2 * shakeAmp;
+        camera.position.y += (Math.random() - 0.5) * 2 * shakeAmp;
+        shakeAmp *= Math.max(0, 1 - dt * 7);
+      } else {
+        shakeAmp = 0;
+      }
+
       group.position.y = -scrollY * 0.0015;
 
 
@@ -1394,7 +1574,7 @@
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const hittables: any[] = cubes.map((c) => c.mesh).concat([mascot]);
         const intersects = raycaster.intersectObjects(hittables, true);
-        crosshair.style.color = intersects.length > 0 ? '#FF2630' : '#111014';
+        crosshair.style.color = intersects.length > 0 ? '#FF2630' : FG;
       }
 
       // Laser lifecycle — fade and remove.
@@ -1426,6 +1606,8 @@
         }
       }
 
+      updateSparks(dt);
+
       // Enemy projectiles — fly forward toward the player. If they reach
       // the player's small hit-box, damage; otherwise they live until
       // they pass the camera or time out.
@@ -1434,17 +1616,47 @@
         p.mesh.position.x += p.vel.x * dt;
         p.mesh.position.y += p.vel.y * dt;
         p.mesh.position.z += p.vel.z * dt;
+
+        // トレイル — 弾の後方に伸びる残光。初回アクセスで遅延生成する
+        if (!p.trail) {
+          const tg = new THREE.BufferGeometry();
+          tg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3));
+          const tm = new THREE.LineBasicMaterial({
+            color: '#FF2630',
+            transparent: true,
+            opacity: 0.42,
+            fog: false
+          });
+          p.trail = new THREE.Line(tg, tm);
+          p.trail.frustumCulled = false;
+          scene.add(p.trail);
+        }
+        {
+          const tp = p.trail.geometry.attributes.position.array as Float32Array;
+          const vlen = Math.max(0.001, Math.hypot(p.vel.x, p.vel.y, p.vel.z));
+          const k = 0.85 / vlen;
+          tp[0] = p.mesh.position.x;
+          tp[1] = p.mesh.position.y;
+          tp[2] = p.mesh.position.z;
+          tp[3] = p.mesh.position.x - p.vel.x * k;
+          tp[4] = p.mesh.position.y - p.vel.y * k;
+          tp[5] = p.mesh.position.z - p.vel.z * k;
+          p.trail.geometry.attributes.position.needsUpdate = true;
+        }
+
         const dx = p.mesh.position.x - pos.x;
         const dy = p.mesh.position.y - pos.y;
         const dz = p.mesh.position.z - 9;
         const close = Math.abs(dz) < 0.7 && Math.abs(dx) < 0.65 && Math.abs(dy) < 0.65;
         const expired = p.mesh.position.z > 12 || now - p.bornAt > 6500;
-        if (close) {
-          damagePlayer();
+        if (close || expired) {
+          if (close) damagePlayer();
           scene.remove(p.mesh);
-          enemyProjs.splice(i, 1);
-        } else if (expired) {
-          scene.remove(p.mesh);
+          if (p.trail) {
+            scene.remove(p.trail);
+            p.trail.geometry.dispose();
+            p.trail.material.dispose();
+          }
           enemyProjs.splice(i, 1);
         }
       }
@@ -1626,6 +1838,17 @@
         l.line.geometry.dispose();
         l.mat.dispose();
       }
+      scene.remove(sparkPoints);
+      sparkGeo.dispose();
+      sparkMat.dispose();
+      for (const p of enemyProjs) {
+        if (p.trail) {
+          scene.remove(p.trail);
+          p.trail.geometry.dispose();
+          p.trail.material.dispose();
+        }
+      }
+      envTex.dispose();
       for (const b of bursts) {
         scene.remove(b.mesh);
         b.mat.dispose();

@@ -24,10 +24,17 @@
   import companyInfo from '$lib/data/company_info.json';
   import PrivacyPolicy from '$lib/domains/PrivacyPolicy.svelte';
   import HeroCanvas from '$lib/components/HeroCanvas.svelte';
+  import FluidInk from '$lib/components/FluidInk.svelte';
   import Reveal from '$lib/components/Reveal.svelte';
-  import ParticleBox from '$lib/components/ParticleBox.svelte';
+  import DitherScape from '$lib/components/DitherScape.svelte';
   import EkuTriptych from '$lib/components/EkuTriptych.svelte';
   import { heroGameState } from '$lib/stores/heroGame';
+
+  // ゲーム中はヒーローのタイポグラフィを引っ込めて遊び場を空ける
+  $: heroQuiet =
+    $heroGameState === 'ready' ||
+    $heroGameState === 'playing' ||
+    $heroGameState === 'gameover';
 
   // 本番ドメイン (GitHub Pages + カスタムドメイン)
   const SITE_URL = 'https://bitboxx.co.jp/';
@@ -54,13 +61,6 @@
   // 誤爆させるため、文字列連結でタグを組み立てる。
   const jsonLdTag =
     '<scr' + 'ipt type="application/ld+json">' + JSON.stringify(orgJsonLd) + '</scr' + 'ipt>';
-
-  // Quiet the hero typography while the mini-game is engaged so the
-  // play field is clear. CTA stays visible as an "exit" path.
-  $: heroQuiet =
-    $heroGameState === 'ready' ||
-    $heroGameState === 'playing' ||
-    $heroGameState === 'gameover';
 
   // 主な事業内容 — what we do × どんな価値が生まれるか
   const services = [
@@ -226,15 +226,18 @@
 <svelte:window on:keydown={onPrivacyKeydown}/>
 
 <main class="relative">
-  <!-- HERO — unchanged. Dynamic moment. -->
+  <!-- HERO — 一枚絵。墨流しの流体の上にキューブの場、その上にタイポグラフィ。 -->
   <section class="relative min-h-screen min-h-[100svh] flex items-end pt-24 pb-20 overflow-hidden paper-grain">
-    <div class="absolute inset-0 z-0 mask-fade-y">
+    <!-- 流体レイヤ (最背面) — ポインタは親セクションで拾う -->
+    <div class="absolute inset-0 z-0">
+      <FluidInk />
+    </div>
+
+    <!-- three.js の場 — ゲームのホーム。透明背景で流体に重なる -->
+    <div class="absolute inset-0 z-[1] mask-fade-y">
       <HeroCanvas />
     </div>
 
-    <!-- Whole hero area is click-through to the canvas behind so the
-         mini-game can pick up clicks anywhere. CTA pill re-enables
-         pointer-events as the explicit "exit" path. -->
     <div class="relative z-10 w-full px-6 md:px-10 pb-4 pointer-events-none">
       <div class="max-w-[1400px] mx-auto">
         <h1
@@ -268,8 +271,8 @@
               確かな品質で。
             </p>
             <p class="mt-7 md:mt-10 font-mincho text-[15px] md:text-[17px] leading-[2.1] text-ink/60 max-w-lg tracking-[0.06em]">
-              唯一無二のアイデアを卓越した技術で実現し、<br class="hidden md:block"/>
-              愛着あるプロダクトとして世界に届ける。
+              唯一無二のアイデアを、卓越した技術でかたちにする。<br class="hidden md:block"/>
+              手放したくなくなるプロダクトを、世界に。
             </p>
           </div>
           <div class="shrink-0">
@@ -295,11 +298,11 @@
       <Reveal>
         <h2 class="font-mincho text-sm tracking-[0.2em] text-ink/55">前提</h2>
         <p class="mt-8 md:mt-12 max-w-3xl font-mincho text-[18px] md:text-[22px] leading-[2.1] text-ink/85 tracking-[0.02em]">
-          お客様のお手伝いをするときは、<br class="hidden md:block"/>
-          <span class="underline-handwritten">お客様が本来の事業に集中する時間</span>を生み出すことを仕事としています。
+          私たちの仕事は、<br class="hidden md:block"/>
+          お客様が<span class="underline-handwritten">本来の事業に集中できる時間</span>をつくることです。
         </p>
         <p class="mt-6 md:mt-8 max-w-2xl font-mincho text-[14px] md:text-[15px] leading-[2.1] text-ink/60">
-          システム開発そのものは、そのための手段です。
+          システム開発は、そのための手段です。
         </p>
       </Reveal>
     </div>
@@ -586,10 +589,21 @@
     </div>
   {/if}
 
-  <!-- IDENTITY / 粒子がロゴを形成する。フッタと同じ白地で視覚連続。 -->
-  <section class="relative pt-20 md:pt-28">
-    <div class="max-w-[1400px] mx-auto px-6 md:px-10 relative">
-      <ParticleBox height={300} />
+  <!-- CLOSING — 1-bit ディザの山稜。「bit」をそのまま絵にして締める。 -->
+  <section class="relative mt-20 md:mt-28 h-[68vh] min-h-[460px]" aria-label="クロージング">
+    <DitherScape />
+    <div class="absolute top-8 md:top-12 right-6 md:right-10 z-10 text-right">
+      <p class="font-mincho text-[16px] md:text-xl leading-[2] text-ink">
+        まだ世界にないものを、<br/>
+        一緒につくりませんか。
+      </p>
+      <a
+        href="#contact-form"
+        class="btn-ink group mt-5 inline-flex items-center gap-3 px-6 py-3 rounded-full text-sm transition-colors duration-300"
+      >
+        <span class="font-mincho whitespace-nowrap">プロジェクトを相談する</span>
+        <svg class="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </a>
     </div>
   </section>
 </main>

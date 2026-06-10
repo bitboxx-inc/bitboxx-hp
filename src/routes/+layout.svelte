@@ -16,6 +16,8 @@
   import { quintOut } from "svelte/easing";
   import { fade, slide } from "svelte/transition";
   import Cursor from "$lib/components/Cursor.svelte";
+  import PillNav from "$lib/components/PillNav.svelte";
+  import Clock from "$lib/components/Clock.svelte";
 
   let isMenuOpen = false;
   let scrolled = false;
@@ -55,52 +57,25 @@
 <div class="relative min-h-screen bg-cream-50 text-ink font-sans flex flex-col overflow-x-clip">
   <Cursor />
 
-  <!-- Top nav -->
+  <!-- 最小ヘッダー — ロゴと東京時刻のみ。ナビは下のピルに集約。 -->
   <header
     class={`fixed top-0 left-0 w-full z-[70] transition-all duration-500
       ${scrolled ? 'bg-cream-50/80 backdrop-blur-md border-b border-ink/5' : 'bg-transparent'}`}
   >
-    <div class="max-w-[1400px] mx-auto h-20 px-6 md:px-10 flex items-center justify-between">
+    <div class="max-w-[1500px] mx-auto h-16 px-6 md:px-10 flex items-center justify-between">
       <a href="{base}/" class="flex items-center" aria-label="bitboxx">
-        <img src="{base}/black.svg" alt="bitboxx" class="h-6 md:h-7 w-auto" />
+        <img src="{base}/black.svg" alt="bitboxx" class="h-5 md:h-6 w-auto" />
       </a>
-
-      <nav class="hidden lg:flex items-center gap-6 text-sm">
-        {#each navItems as [href, label]}
-          <a {href} class="font-mincho text-ink/80 hover:text-ink transition-colors">
-            {label}
-          </a>
-        {/each}
-      </nav>
-
-      <div class="flex items-center gap-3">
-        <a
-          href={sectionLinks.contact}
-          class="nav-cta hidden lg:inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full text-sm font-mincho transition-colors duration-300 group"
-        >
-          お問い合わせ
-          <svg class="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-        </a>
-
-        <button
-          class="menu-btn lg:hidden relative z-[61] w-12 h-12 flex items-center justify-center rounded-2xl transition-colors duration-300"
-          on:click={toggleMenu}
-          aria-label={isMenuOpen ? 'メニューを閉じる' : 'メニューを開く'}
-          aria-expanded={isMenuOpen}
-        >
-          {#if isMenuOpen}
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-              <path d="M6 6l12 12M18 6L6 18"/>
-            </svg>
-          {:else}
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-              <path d="M4 8h16M4 16h16"/>
-            </svg>
-          {/if}
-        </button>
-      </div>
+      <Clock klass="text-[10px] text-ink/50" />
     </div>
   </header>
+
+  <PillNav
+    links={navItems}
+    contactHref={sectionLinks.contact}
+    homeHref="{base}/"
+    on:menu={toggleMenu}
+  />
 
   <!-- Mobile menu -->
   {#if isMenuOpen}
@@ -134,7 +109,8 @@
     <slot/>
   </main>
 
-  <footer class="relative py-14 md:py-16">
+  <!-- 下端はピルナビが浮くぶん余白を足す -->
+  <footer class="relative pt-14 md:pt-16 pb-28 md:pb-32">
     <div class="relative max-w-[1400px] mx-auto px-6 md:px-10">
       <div class="grid md:grid-cols-12 gap-10 md:gap-12">
         <div class="md:col-span-4">

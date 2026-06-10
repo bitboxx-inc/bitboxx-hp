@@ -3,14 +3,14 @@
 // Run: node scripts/verify-shots.mjs (expects `vite preview` on :4173)
 import { chromium } from '@playwright/test';
 
-const browser = await chromium.launch();
+const browser = await chromium.launch({ args: ['--enable-unsafe-swiftshader'] });
 const targets = [
   { name: 'desktop', viewport: { width: 1440, height: 900 } },
   { name: 'mobile', viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }
 ];
 for (const t of targets) {
   const page = await browser.newPage({ viewport: t.viewport, isMobile: t.isMobile, hasTouch: t.hasTouch });
-  await page.goto('http://localhost:4173/', { waitUntil: 'networkidle' });
+  await page.goto('http://localhost:4173/', { waitUntil: 'load', timeout: 90000 });
   await page.waitForTimeout(2500); // deferred hero canvas + fonts
 
   const total = await page.evaluate(() => document.body.scrollHeight);
