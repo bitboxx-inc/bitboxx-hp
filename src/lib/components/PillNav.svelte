@@ -11,7 +11,7 @@
 
 <nav
   aria-label="メイン"
-  class="fixed bottom-5 left-1/2 -translate-x-1/2 z-[80] flex items-center gap-1 rounded-full bg-ink/90 backdrop-blur-md px-2 py-2 shadow-[0_18px_40px_-18px_rgba(17,16,20,0.55)]"
+  class="fixed bottom-5 left-1/2 -translate-x-1/2 z-[80] flex items-center gap-1 rounded-full bg-ink/90 backdrop-blur-md border border-white/10 px-2 py-2 shadow-[0_18px_40px_-18px_rgba(17,16,20,0.55)]"
 >
   <button
     type="button"

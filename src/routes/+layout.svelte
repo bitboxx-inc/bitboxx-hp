@@ -33,6 +33,9 @@
   $: isHome =
     $page.url.pathname === `${base}/` || $page.url.pathname === '/' || $page.url.pathname === base;
 
+  // 一枚絵 (ダーク) の上にいるとき、ヘッダーのロゴと時計を反転して見えるようにする
+  $: overDark = isHome && !$activePanel;
+
   const navItems: Array<{ id: PanelId; label: string }> = [
     { id: 'philosophy', label: '三つのものさし' },
     { id: 'business', label: '事業内容' },
@@ -61,9 +64,13 @@
   <header class="fixed top-0 left-0 w-full z-[78]">
     <div class="max-w-[1500px] mx-auto h-16 px-6 md:px-10 flex items-center justify-between">
       <button type="button" class="flex items-center" aria-label="bitboxx — 一枚絵に戻る" on:click={goHome}>
-        <img src="{base}/black.svg" alt="bitboxx" class="h-5 md:h-6 w-auto" />
+        <img
+          src="{base}/black.svg"
+          alt="bitboxx"
+          class={`h-5 md:h-6 w-auto transition-[filter] duration-300 ${overDark ? 'invert' : ''}`}
+        />
       </button>
-      <Clock klass="text-[10px] text-ink/50" />
+      <Clock klass={`text-[10px] transition-colors duration-300 ${overDark ? 'text-cream-50/60' : 'text-ink/50'}`} />
     </div>
   </header>
 

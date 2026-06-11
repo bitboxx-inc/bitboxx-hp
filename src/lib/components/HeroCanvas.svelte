@@ -78,10 +78,10 @@
     const composer = new PP.EffectComposer(renderer);
     composer.addPass(new PP.RenderPass(scene, camera));
     const bloom = new PP.BloomEffect({
-      intensity: 1.6,
+      intensity: dark ? 1.15 : 1.6,
       // ダークではクリーム色キューブの輝度が高いため、しきい値を上げて
       // サクラ / レーザー / バーストだけが光るようにする。
-      luminanceThreshold: dark ? 0.78 : 0.32,
+      luminanceThreshold: dark ? 0.93 : 0.32,
       luminanceSmoothing: 0.18,
       kernelSize: PP.KernelSize.MEDIUM,
       mipmapBlur: true
@@ -103,7 +103,7 @@
       );
     }
 
-    // 質感 — 色収差 + フィルムグレイン + ビネット。
+    // 質感 — 色収差 + ビネット。グレインは「チカチカ」の原因になるので使わない。
     // 被弾・爆発の瞬間は色収差がスパイクして「画面が歪む」手応えになる。
     const caEffect = new PP.ChromaticAberrationEffect({
       offset: new THREE.Vector2(0.0006, 0.0006),
@@ -111,11 +111,9 @@
       modulationOffset: 0.25
     });
     let caBoost = 0;
-    const noiseEffect = new PP.NoiseEffect({ premultiply: true });
-    noiseEffect.blendMode.opacity.value = 0.3;
-    const vignetteEffect = new PP.VignetteEffect({ offset: 0.26, darkness: dark ? 0.55 : 0.36 });
+    const vignetteEffect = new PP.VignetteEffect({ offset: 0.26, darkness: dark ? 0.5 : 0.36 });
 
-    effects.push(bloom, caEffect, noiseEffect, vignetteEffect);
+    effects.push(bloom, caEffect, vignetteEffect);
     composer.addPass(new PP.EffectPass(camera, ...effects));
 
     // Lights — pared back to warm/cool white for a more monochrome scene.
@@ -130,12 +128,13 @@
     rim.position.set(-3, 2, -4);
     scene.add(rim);
 
-    // 無限グリッド — 床と天井。シェーダーで線を引く (スクリーンスペース AA +
-    // 距離フェード) ので、トーンマッピングや DOF に潰されず視認性を制御できる。
-    // uScroll で前方へ流れ続け、セルぶん進んだら巻き戻して無限に走る。
-    const GRID_CELL = 2.5;
+    // 無限グリッド — 床と天井の「方眼紙」。シェーダーで線を引く (スクリーンスペース
+    // AA + 距離フェード) ので、トーンマッピングや DOF に潰されず視認性を制御できる。
+    // 細線 + 5 マスごとの主線の二層。ダークではフォスファーグリーンに灯る。
+    // uScroll で前方へ流れ続け、主線の周期ぶん進んだら巻き戻して無限に走る。
+    const GRID_CELL = 1.6;
     const gridScroll = { value: 0 };
-    const gridInk = new THREE.Color(dark ? '#F6F6F4' : '#111014');
+    const gridInk = new THREE.Color(dark ? '#2EE584' : '#111014');
     const makeGridPlane = (y: number, opacity: number) => {
       const mat = new THREE.ShaderMaterial({
         transparent: true,
@@ -163,10 +162,15 @@
           uniform vec3 uColor;
           void main () {
             vec2 coord = vec2(vWorld.x, vWorld.z + uScroll) / ${GRID_CELL.toFixed(2)};
-            vec2 g = abs(fract(coord - 0.5) - 0.5) / fwidth(coord);
-            float line = 1.0 - min(min(g.x, g.y), 1.0);
+            // 細線 (1 マス) と主線 (5 マス) の二層 — 方眼紙
+            vec2 g1 = abs(fract(coord - 0.5) - 0.5) / fwidth(coord);
+            float minor = 1.0 - min(min(g1.x, g1.y), 1.0);
+            vec2 c5 = coord / 5.0;
+            vec2 g5 = abs(fract(c5 - 0.5) - 0.5) / fwidth(c5);
+            float major = 1.0 - min(min(g5.x, g5.y), 1.0);
+            float line = max(minor * 0.38, major);
             if (line <= 0.0) discard;
-            float fade = exp(-pow(vDist * 0.033, 2.0));
+            float fade = exp(-pow(vDist * 0.03, 2.0));
             gl_FragColor = vec4(uColor, line * uOpacity * fade);
           }`
       });
@@ -1635,8 +1639,8 @@
         caEffect.offset.set(0.0006, 0.0006);
       }
 
-      // グリッドの前進 — セルぶん進んだら巻き戻して無限に流す
-      gridScroll.value = (now * 0.0011) % GRID_CELL;
+      // グリッドの前進 — 主線の周期 (5 マス) ぶん進んだら巻き戻して無限に流す
+      gridScroll.value = (now * 0.0008) % (GRID_CELL * 5);
 
       group.position.y = -scrollY * 0.0015;
 

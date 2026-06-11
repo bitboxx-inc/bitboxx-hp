@@ -303,11 +303,12 @@
 <svelte:window on:keydown={onPrivacyKeydown}/>
 
 <main class="relative">
-  <!-- 一枚絵 — このビューポートがサイトの全て。コンテンツはパネルでせり上がる。 -->
-  <section class="relative h-screen h-[100svh] flex items-end pt-24 pb-20 overflow-hidden paper-grain">
+  <!-- 一枚絵 — このビューポートがサイトの全て。コンテンツはパネルでせり上がる。
+       インクの闇に緑の方眼紙が流れ、クリームのキューブが浮かぶ。 -->
+  <section class="relative h-screen h-[100svh] flex items-end pt-24 pb-20 overflow-hidden bg-ink text-cream-50">
     <!-- three.js の場 — ゲームのホーム -->
-    <div class="absolute inset-0 z-0 mask-fade-y">
-      <HeroCanvas />
+    <div class="absolute inset-0 z-0">
+      <HeroCanvas dark />
     </div>
 
     <div class="relative z-10 w-full px-6 md:px-10 pb-4 pointer-events-none">
@@ -347,14 +348,14 @@
             class:translate-y-2={heroQuiet}
             aria-hidden={heroQuiet}
           >
-            <p class="hero-fade font-mincho font-light text-[26px] md:text-[44px] leading-[1.5] tracking-[0.04em] text-ink" style="--d:880ms">
+            <p class="hero-fade font-mincho font-light text-[26px] md:text-[44px] leading-[1.5] tracking-[0.04em] text-cream-50" style="--d:880ms">
               まだ見ぬ<span class="relative inline-block">
                 <span class="relative z-10">最高</span>
-                <span class="absolute inset-x-0 bottom-[0.12em] h-[0.28em] bg-sakura/60 -z-0" aria-hidden="true"></span>
+                <span class="absolute inset-x-0 bottom-[0.12em] h-[0.28em] bg-sakura/70 -z-0" aria-hidden="true"></span>
               </span>を、<br class="hidden sm:block"/>
               確かな品質で。
             </p>
-            <p class="hero-fade mt-7 md:mt-10 font-mincho text-[15px] md:text-[17px] leading-[2.1] text-ink/60 max-w-lg tracking-[0.06em]" style="--d:1020ms">
+            <p class="hero-fade mt-7 md:mt-10 font-mincho text-[15px] md:text-[17px] leading-[2.1] text-cream-50/65 max-w-lg tracking-[0.06em]" style="--d:1020ms">
               唯一無二のアイデアを、卓越した技術でかたちにする。<br class="hidden md:block"/>
               手放したくなくなるプロダクトを、世界に。
             </p>
@@ -363,7 +364,7 @@
             <button
               type="button"
               on:click={() => activePanel.set('contact')}
-              class="hero-fade btn-ink group inline-flex items-center gap-3 px-7 py-3.5 rounded-full text-base font-medium transition-colors duration-300 pointer-events-auto"
+              class="hero-fade group inline-flex items-center gap-3 px-7 py-3.5 rounded-full text-base font-medium bg-cream-50 text-ink hover:bg-sakura hover:text-white transition-colors duration-300 pointer-events-auto"
               style="--d:1160ms"
             >
               <span class="font-display italic text-lg whitespace-nowrap">プロジェクトを相談する</span>
