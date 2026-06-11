@@ -134,8 +134,8 @@
     // uScroll で前方へ流れ続け、主線の周期ぶん進んだら巻き戻して無限に走る。
     const GRID_CELL = 1.6;
     const gridScroll = { value: 0 };
-    // ダークでは沈んだ苔緑 — 背景に退いて、サクラだけが危険色として立つ
-    const gridInk = new THREE.Color(dark ? '#1FA862' : '#111014');
+    // ダークでもモノクローム — クリームの罫線。色相はサクラだけに譲る
+    const gridInk = new THREE.Color(dark ? '#E6E6E2' : '#111014');
     const makeGridPlane = (y: number, opacity: number) => {
       const mat = new THREE.ShaderMaterial({
         transparent: true,
@@ -188,8 +188,8 @@
       scene.add(mesh);
       return mesh;
     };
-    const gridFloor = makeGridPlane(-3.4, 0.6);
-    const gridCeil = makeGridPlane(4.1, 0.22);
+    const gridFloor = makeGridPlane(-3.4, 0.42);
+    const gridCeil = makeGridPlane(4.1, 0.16);
 
     // Rounded box geometry (fallback: use BoxGeometry with high segs + bevel trick)
     const makeBox = (size: number) => {
