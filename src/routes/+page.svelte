@@ -20,21 +20,92 @@
 </svelte:head>
 
 <script lang="ts">
-  import { tick } from 'svelte';
+  import { tick, onMount } from 'svelte';
+  import { fly } from 'svelte/transition';
+  import { quintOut } from 'svelte/easing';
+  import { base } from '$app/paths';
   import companyInfo from '$lib/data/company_info.json';
   import PrivacyPolicy from '$lib/domains/PrivacyPolicy.svelte';
   import HeroCanvas from '$lib/components/HeroCanvas.svelte';
-  import FluidInk from '$lib/components/FluidInk.svelte';
   import Reveal from '$lib/components/Reveal.svelte';
-  import DitherScape from '$lib/components/DitherScape.svelte';
-  import EkuTriptych from '$lib/components/EkuTriptych.svelte';
   import { heroGameState } from '$lib/stores/heroGame';
+  import { activePanel, type PanelId } from '$lib/stores/panel';
 
   // ゲーム中はヒーローのタイポグラフィを引っ込めて遊び場を空ける
   $: heroQuiet =
     $heroGameState === 'ready' ||
     $heroGameState === 'playing' ||
     $heroGameState === 'gameover';
+
+  // ── コンテンツパネル — 一枚絵の上にせり上がる紙 ─────────────────
+  const panelTitles: Record<PanelId, string> = {
+    philosophy: '三つのものさし',
+    business: '事業内容',
+    reasons: '選ばれる理由',
+    works: '実績',
+    company: '会社概要',
+    contact: 'お問い合わせ'
+  };
+
+  let panelCloseBtn: HTMLButtonElement | null = null;
+  let panelBodyEl: HTMLDivElement | null = null;
+  let lastPanel: PanelId | null = null;
+
+  function closePanel() {
+    activePanel.set(null);
+  }
+
+  // パネルが開いた / 切り替わったら先頭へ戻してフォーカスを移す
+  $: if ($activePanel !== lastPanel) {
+    lastPanel = $activePanel;
+    if ($activePanel) {
+      tick().then(() => {
+        panelBodyEl?.scrollTo({ top: 0 });
+        panelCloseBtn?.focus();
+      });
+    }
+  }
+
+  // 旧アンカー URL からの深いリンクを受ける (#contact-form など)
+  onMount(() => {
+    const hash = window.location.hash.replace('#', '');
+    const map: Record<string, PanelId> = {
+      'contact-form': 'contact',
+      contact: 'contact',
+      philosophy: 'philosophy',
+      business: 'business',
+      reasons: 'reasons',
+      'case-studies': 'works',
+      works: 'works',
+      company: 'company'
+    };
+    if (hash && map[hash]) activePanel.set(map[hash]);
+  });
+
+  // 三つのものさし — ヒーローの 3 流儀をそのまま静的に組む
+  const ekuSlides = [
+    {
+      word: 'Excellent.',
+      accent: 'underline' as const,
+      label: '卓越',
+      mark: '01 — Standard',
+      body: '妥協なく、細部まで仕上げ切ったもの。'
+    },
+    {
+      word: 'Kawaii.',
+      accent: 'fill' as const,
+      label: '愛らしさ',
+      mark: '02 — Affection',
+      body: '使うたびに、すこし好きになっていくもの。'
+    },
+    {
+      word: 'Unique.',
+      accent: 'period' as const,
+      label: '唯一無二',
+      mark: '03 — Singular',
+      body: 'ほかでは見たことのない、新しいかたち。'
+    }
+  ];
 
   // 本番ドメイン (GitHub Pages + カスタムドメイン)
   const SITE_URL = 'https://bitboxx.co.jp/';
@@ -185,6 +256,12 @@
   }
 
   function onPrivacyKeydown(e: KeyboardEvent) {
+    // Esc はモーダル → パネルの順に閉じる
+    if (e.key === 'Escape' && !showPrivacyModal && $activePanel) {
+      e.preventDefault();
+      closePanel();
+      return;
+    }
     if (!showPrivacyModal) return;
     if (e.key === 'Escape') {
       e.preventDefault();
@@ -226,15 +303,10 @@
 <svelte:window on:keydown={onPrivacyKeydown}/>
 
 <main class="relative">
-  <!-- HERO — 一枚絵。墨流しの流体の上にキューブの場、その上にタイポグラフィ。 -->
-  <section class="relative min-h-screen min-h-[100svh] flex items-end pt-24 pb-20 overflow-hidden paper-grain">
-    <!-- 流体レイヤ (最背面) — ポインタは親セクションで拾う -->
-    <div class="absolute inset-0 z-0">
-      <FluidInk />
-    </div>
-
-    <!-- three.js の場 — ゲームのホーム。透明背景で流体に重なる -->
-    <div class="absolute inset-0 z-[1] mask-fade-y">
+  <!-- 一枚絵 — このビューポートがサイトの全て。コンテンツはパネルでせり上がる。 -->
+  <section class="relative h-screen h-[100svh] flex items-end pt-24 pb-20 overflow-hidden paper-grain">
+    <!-- three.js の場 — ゲームのホーム -->
+    <div class="absolute inset-0 z-0 mask-fade-y">
       <HeroCanvas />
     </div>
 
@@ -276,51 +348,86 @@
             </p>
           </div>
           <div class="shrink-0">
-            <a
-              href="#contact-form"
+            <button
+              type="button"
+              on:click={() => activePanel.set('contact')}
               class="btn-ink group inline-flex items-center gap-3 px-7 py-3.5 rounded-full text-base font-medium transition-colors duration-300 pointer-events-auto"
             >
               <span class="font-display italic text-lg whitespace-nowrap">プロジェクトを相談する</span>
               <svg class="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-            </a>
+            </button>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- PHILOSOPHY / 三つのものさし — canvas-driven triptych -->
-  <EkuTriptych />
+  <!-- コンテンツパネル — 一枚絵の上にせり上がる紙。中だけがスクロールする。 -->
+  {#if $activePanel}
+    <div
+      class="fixed inset-0 z-[75]"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="panel-title"
+      transition:fly={{ y: 36, duration: 340, easing: quintOut }}
+    >
+      <div class="absolute inset-0 bg-cream-50 paper-grain" aria-hidden="true"></div>
+      <div bind:this={panelBodyEl} class="relative h-full overflow-y-auto overscroll-contain">
+        <div class="max-w-[1100px] mx-auto px-6 md:px-10 pt-24 md:pt-28 pb-44">
+          <div class="flex items-center justify-between gap-6">
+            <h2 id="panel-title" class="font-mincho text-sm tracking-[0.2em] text-ink/55">
+              {panelTitles[$activePanel]}
+            </h2>
+            <button
+              bind:this={panelCloseBtn}
+              type="button"
+              on:click={closePanel}
+              aria-label="閉じる"
+              class="grid place-items-center w-10 h-10 rounded-full border border-ink/15 text-ink/60 text-xl leading-none hover:text-white hover:bg-ink hover:border-ink transition-colors"
+            >×</button>
+          </div>
 
-  <!-- 前提 — お客様の時間をつくる -->
-  <section class="relative py-20 md:py-28 paper-grain">
-    <div class="max-w-[1400px] mx-auto px-6 md:px-10">
-      <Reveal>
-        <h2 class="font-mincho text-sm tracking-[0.2em] text-ink/55">前提</h2>
-        <p class="mt-8 md:mt-12 max-w-3xl font-mincho text-[18px] md:text-[22px] leading-[2.1] text-ink/85 tracking-[0.02em]">
-          私たちの仕事は、<br class="hidden md:block"/>
-          お客様が<span class="underline-handwritten">本来の事業に集中できる時間</span>をつくることです。
-        </p>
-        <p class="mt-6 md:mt-8 max-w-2xl font-mincho text-[14px] md:text-[15px] leading-[2.1] text-ink/60">
-          システム開発は、そのための手段です。
-        </p>
-      </Reveal>
-    </div>
-  </section>
+          {#if $activePanel === 'philosophy'}
+            <Reveal>
+              <p class="mt-10 md:mt-14 max-w-3xl font-mincho text-[18px] md:text-[22px] leading-[2.1] text-ink/85 tracking-[0.02em]">
+                私たちの仕事は、お客様が<span class="underline-handwritten">本来の事業に集中できる時間</span>をつくることです。
+              </p>
+              <p class="mt-5 md:mt-6 max-w-2xl font-mincho text-[14px] md:text-[15px] leading-[2.1] text-ink/60">
+                システム開発は、そのための手段。そして、次の三つのどれかに当てはまるものだけをつくります。
+              </p>
+            </Reveal>
+            <div class="mt-10 md:mt-14">
+              {#each ekuSlides as s (s.word)}
+                <Reveal>
+                  <article class="grid md:grid-cols-12 gap-4 md:gap-10 py-10 md:py-14 border-t border-ink/15">
+                    <div class="md:col-span-2">
+                      <p class="font-mono text-[10px] tracking-[0.3em] text-ink/45">{s.mark}</p>
+                    </div>
+                    <div class="md:col-span-5">
+                      <p class="font-display text-[42px] md:text-[58px] leading-none tracking-hyper text-ink">
+                        {#if s.accent === 'underline'}<span class="italic underline-handwritten">{s.word}</span>
+                        {:else if s.accent === 'fill'}<span class="italic text-sakura">{s.word}</span>
+                        {:else}Unique<span class="text-sakura">.</span>{/if}
+                      </p>
+                    </div>
+                    <div class="md:col-span-5">
+                      <h3 class="font-display italic text-xl md:text-2xl tracking-hyper text-ink">
+                        {s.label}<span class="text-sakura">.</span>
+                      </h3>
+                      <p class="mt-4 font-mincho text-[14px] md:text-[15px] leading-[2.1] text-ink/75">{s.body}</p>
+                    </div>
+                  </article>
+                </Reveal>
+              {/each}
+            </div>
 
-  <!-- SERVICES / 主な事業内容 — what we deliver × what value emerges -->
-  <section id="business" class="relative py-20 md:py-28 scroll-mt-24 paper-grain">
-    <div class="max-w-[1400px] mx-auto px-6 md:px-10">
-      <Reveal>
-        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-          <h2 class="font-mincho text-sm tracking-[0.2em] text-ink/55">主な事業内容</h2>
-          <p class="font-mincho text-[13px] md:text-sm text-ink/50">
-            提供するもの<span class="mx-3 text-ink/30">／</span>そこから生まれる価値
-          </p>
-        </div>
-      </Reveal>
-
-      <div class="mt-8 md:mt-12">
+          {:else if $activePanel === 'business'}
+            <Reveal>
+              <p class="mt-8 font-mincho text-[13px] md:text-sm text-ink/50">
+                提供するもの<span class="mx-3 text-ink/30">／</span>そこから生まれる価値
+              </p>
+            </Reveal>
+            <div class="mt-4 md:mt-6">
         {#each services as s}
           <Reveal>
             <article class="relative grid md:grid-cols-12 gap-4 md:gap-10 py-10 md:py-12 border-t border-ink/15">
@@ -346,21 +453,30 @@
           </Reveal>
         {/each}
       </div>
-    </div>
-  </section>
 
-  <!-- WHY bitboxx / 選ばれる理由 -->
-  <section id="reasons" class="relative py-20 md:py-28 scroll-mt-24 paper-grain bg-cream-100/40">
-    <div class="max-w-[1400px] mx-auto px-6 md:px-10">
-      <Reveal>
-        <h2 class="font-mincho text-sm tracking-[0.2em] text-ink/55">なぜ bitboxx か</h2>
-        <p class="mt-6 md:mt-8 font-display text-[34px] md:text-[56px] leading-[1.1] tracking-hyper text-ink max-w-3xl">
-          <span class="italic">技術と事業、</span><br/>
-          両方の目を持つ<span class="text-sakura">.</span>
-        </p>
-      </Reveal>
+            <h3 class="mt-16 md:mt-20 font-mincho text-sm tracking-[0.2em] text-ink/55">通ってきた現場</h3>
+            <div class="mt-6 md:mt-8 grid md:grid-cols-2">
+              {#each capabilities as cap, i (cap.tag)}
+                <Reveal klass="h-full">
+                  <article
+                    class={`h-full py-8 md:py-10 border-t border-ink/15 ${i % 2 === 1 ? 'md:pl-12 md:border-l' : 'md:pr-12'}`}
+                  >
+                    <h4 class="font-mincho text-base md:text-lg text-ink">{cap.tag}</h4>
+                    <p class="mt-4 font-mincho text-[14px] md:text-[15px] leading-[2] text-ink/75">{cap.body}</p>
+                  </article>
+                </Reveal>
+              {/each}
+            </div>
 
-      <div class="mt-12 md:mt-16">
+          {:else if $activePanel === 'reasons'}
+            <Reveal>
+              <p class="mt-8 md:mt-10 font-display text-[34px] md:text-[52px] leading-[1.1] tracking-hyper text-ink max-w-3xl">
+                <span class="italic">技術と事業、</span><br/>
+                両方の目を持つ<span class="text-sakura">.</span>
+              </p>
+            </Reveal>
+
+            <div class="mt-10 md:mt-14">
         {#each reasons as r}
           <Reveal>
             <article class="relative grid md:grid-cols-12 gap-4 md:gap-10 py-10 md:py-14 border-t border-ink/15">
@@ -382,38 +498,9 @@
           </Reveal>
         {/each}
       </div>
-    </div>
-  </section>
 
-  <!-- CAPABILITIES / 通ってきた現場 -->
-  <section class="relative py-20 md:py-28 scroll-mt-24 paper-grain">
-    <div class="max-w-[1400px] mx-auto px-6 md:px-10">
-      <Reveal>
-        <h2 class="font-mincho text-sm tracking-[0.2em] text-ink/55">通ってきた現場</h2>
-      </Reveal>
-      <!-- 罫線リストが続いた後の密度替え — 2×2 のヘアライングリッド -->
-      <div class="mt-8 md:mt-12 grid md:grid-cols-2">
-        {#each capabilities as cap, i}
-          <Reveal klass="h-full">
-            <article
-              class={`h-full py-8 md:py-12 border-t border-ink/15 ${i % 2 === 1 ? 'md:pl-12 md:border-l' : 'md:pr-12'}`}
-            >
-              <h3 class="font-mincho text-base md:text-lg text-ink">{cap.tag}</h3>
-              <p class="mt-4 font-mincho text-[14px] md:text-[15px] leading-[2] text-ink/75">{cap.body}</p>
-            </article>
-          </Reveal>
-        {/each}
-      </div>
-    </div>
-  </section>
-
-  <!-- WORKS / 実績 -->
-  <section id="case-studies" class="relative py-20 md:py-28 scroll-mt-24 paper-grain">
-    <div class="max-w-[1400px] mx-auto px-6 md:px-10">
-      <Reveal>
-        <h2 class="font-mincho text-sm tracking-[0.2em] text-ink/55">実績</h2>
-      </Reveal>
-      <div class="mt-8 md:mt-12">
+          {:else if $activePanel === 'works'}
+            <div class="mt-6 md:mt-10">
         {#each works as w}
           <Reveal>
             <article class="relative grid md:grid-cols-12 gap-3 md:gap-10 py-10 md:py-12 border-t border-ink/15">
@@ -428,17 +515,10 @@
           </Reveal>
         {/each}
       </div>
-    </div>
-  </section>
 
-  <!-- COMPANY / 会社概要 -->
-  <section id="company" class="relative py-20 md:py-28 scroll-mt-24 paper-grain">
-    <div class="max-w-[1400px] mx-auto px-6 md:px-10">
-      <Reveal>
-        <h2 class="font-mincho text-sm tracking-[0.2em] text-ink/55">会社概要</h2>
-      </Reveal>
-      <Reveal>
-        <dl class="mt-8 md:mt-12">
+          {:else if $activePanel === 'company'}
+            <Reveal>
+              <dl class="mt-6 md:mt-10">
           {#each companyFacts as [label, value]}
             <div class="grid grid-cols-12 gap-3 md:gap-10 py-6 md:py-7 border-t border-ink/15">
               <dt class="col-span-12 md:col-span-3 font-mincho text-sm md:text-base text-ink">{label}</dt>
@@ -446,22 +526,22 @@
             </div>
           {/each}
         </dl>
-      </Reveal>
-    </div>
-  </section>
+            </Reveal>
+            <div class="mt-10 pt-6 border-t border-ink/15 flex flex-wrap items-center gap-x-8 gap-y-2 font-mincho text-[13px] text-ink/70">
+              <a href="{base}/terms_of_service" class="hover:text-sakura transition-colors">利用規約</a>
+              <a href="{base}/privacy_policy" class="hover:text-sakura transition-colors">プライバシーポリシー</a>
+              <span class="md:ml-auto text-ink/45 text-[12px]">© {new Date().getFullYear()} bitboxx Inc.</span>
+            </div>
 
-  <!-- CONTACT / お問い合わせ — single column, breathable, only what's needed. -->
-  <section id="contact-form" class="relative py-20 md:py-32 scroll-mt-24 paper-grain">
-    <div class="max-w-[1400px] mx-auto px-6 md:px-10">
-      <Reveal>
-        <h2 class="font-mincho text-sm tracking-[0.2em] text-ink/55">お問い合わせ</h2>
-        <p class="mt-6 md:mt-8 max-w-2xl font-mincho text-[15px] md:text-[17px] leading-[2] text-ink/75">
-          ご相談・お見積りなど、お気軽にどうぞ。
-        </p>
-      </Reveal>
+          {:else if $activePanel === 'contact'}
+            <Reveal>
+              <p class="mt-8 max-w-2xl font-mincho text-[15px] md:text-[17px] leading-[2] text-ink/75">
+                ご相談・お見積りなど、お気軽にどうぞ。
+              </p>
+            </Reveal>
 
-      <Reveal>
-        <div class="mt-12 md:mt-16 grid md:grid-cols-12 gap-14 md:gap-10">
+            <Reveal>
+              <div class="mt-10 md:mt-12 grid md:grid-cols-12 gap-14 md:gap-10">
         <form on:submit|preventDefault={send} class="md:col-span-7 max-w-2xl space-y-10 md:space-y-12">
           <label class="block">
             <span class="block font-mono text-[10px] tracking-[0.3em] text-ink/45 uppercase">Name</span>
@@ -555,9 +635,12 @@
           </div>
         </aside>
         </div>
-      </Reveal>
+            </Reveal>
+          {/if}
+        </div>
+      </div>
     </div>
-  </section>
+  {/if}
 
   {#if showPrivacyModal}
     <div
@@ -589,21 +672,4 @@
     </div>
   {/if}
 
-  <!-- CLOSING — 1-bit ディザの山稜。「bit」をそのまま絵にして締める。 -->
-  <section class="relative mt-20 md:mt-28 h-[68vh] min-h-[460px]" aria-label="クロージング">
-    <DitherScape />
-    <div class="absolute top-8 md:top-12 right-6 md:right-10 z-10 text-right">
-      <p class="font-mincho text-[16px] md:text-xl leading-[2] text-ink">
-        まだ世界にないものを、<br/>
-        一緒につくりませんか。
-      </p>
-      <a
-        href="#contact-form"
-        class="btn-ink group mt-5 inline-flex items-center gap-3 px-6 py-3 rounded-full text-sm transition-colors duration-300"
-      >
-        <span class="font-mincho whitespace-nowrap">プロジェクトを相談する</span>
-        <svg class="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-      </a>
-    </div>
-  </section>
 </main>

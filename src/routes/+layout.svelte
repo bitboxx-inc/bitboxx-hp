@@ -12,68 +12,66 @@
 <script lang="ts">
   import "../app.css";
   import { base } from "$app/paths";
-  import { onMount } from "svelte";
+  import { page } from "$app/stores";
+  import { goto } from "$app/navigation";
   import { quintOut } from "svelte/easing";
   import { fade, slide } from "svelte/transition";
   import Cursor from "$lib/components/Cursor.svelte";
   import PillNav from "$lib/components/PillNav.svelte";
   import Clock from "$lib/components/Clock.svelte";
+  import { activePanel, type PanelId } from "$lib/stores/panel";
 
   let isMenuOpen = false;
-  let scrolled = false;
 
   function toggleMenu() { isMenuOpen = !isMenuOpen; }
   function closeMenu() { isMenuOpen = false; }
-
-  onMount(() => {
-    const onScroll = () => { scrolled = window.scrollY > 24; };
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  });
 
   $: if (typeof document !== 'undefined') {
     document.body.style.overflow = isMenuOpen ? 'hidden' : '';
   }
 
-  const sectionLinks = {
-    philosophy: `${base}/#philosophy`,
-    business: `${base}/#business`,
-    reasons: `${base}/#reasons`,
-    caseStudies: `${base}/#case-studies`,
-    company: `${base}/#company`,
-    contact: `${base}/#contact-form`
-  };
+  $: isHome =
+    $page.url.pathname === `${base}/` || $page.url.pathname === '/' || $page.url.pathname === base;
 
-  const navItems: Array<[string, string]> = [
-    [sectionLinks.philosophy, '三つのものさし'],
-    [sectionLinks.business, '事業内容'],
-    [sectionLinks.reasons, '選ばれる理由'],
-    [sectionLinks.caseStudies, '実績'],
-    [sectionLinks.company, '会社概要']
+  const navItems: Array<{ id: PanelId; label: string }> = [
+    { id: 'philosophy', label: '三つのものさし' },
+    { id: 'business', label: '事業内容' },
+    { id: 'reasons', label: '選ばれる理由' },
+    { id: 'works', label: '実績' },
+    { id: 'company', label: '会社概要' }
   ];
+
+  // パネルを開く — 規約ページにいたら先に一枚絵へ戻る
+  async function openPanel(id: string) {
+    closeMenu();
+    if (!isHome) await goto(`${base}/`);
+    activePanel.set(id as PanelId);
+  }
+  function goHome() {
+    closeMenu();
+    activePanel.set(null);
+    if (!isHome) goto(`${base}/`);
+  }
 </script>
 
 <div class="relative min-h-screen bg-cream-50 text-ink font-sans flex flex-col overflow-x-clip">
   <Cursor />
 
   <!-- 最小ヘッダー — ロゴと東京時刻のみ。ナビは下のピルに集約。 -->
-  <header
-    class={`fixed top-0 left-0 w-full z-[70] transition-all duration-500
-      ${scrolled ? 'bg-cream-50/80 backdrop-blur-md border-b border-ink/5' : 'bg-transparent'}`}
-  >
+  <header class="fixed top-0 left-0 w-full z-[78]">
     <div class="max-w-[1500px] mx-auto h-16 px-6 md:px-10 flex items-center justify-between">
-      <a href="{base}/" class="flex items-center" aria-label="bitboxx">
+      <button type="button" class="flex items-center" aria-label="bitboxx — 一枚絵に戻る" on:click={goHome}>
         <img src="{base}/black.svg" alt="bitboxx" class="h-5 md:h-6 w-auto" />
-      </a>
+      </button>
       <Clock klass="text-[10px] text-ink/50" />
     </div>
   </header>
 
   <PillNav
-    links={navItems}
-    contactHref={sectionLinks.contact}
-    homeHref="{base}/"
+    items={navItems}
+    active={$activePanel}
+    on:open={(e) => openPanel(e.detail)}
+    on:home={goHome}
     on:menu={toggleMenu}
   />
 
@@ -81,7 +79,7 @@
   {#if isMenuOpen}
     <div
       transition:fade={{ duration: 180 }}
-      class="fixed inset-0 z-[60] bg-white lg:hidden flex flex-col pt-28 px-8 overflow-y-auto"
+      class="fixed inset-0 z-[79] bg-white lg:hidden flex flex-col pt-28 px-8 overflow-y-auto"
       on:click={closeMenu}
       on:keydown
       role="presentation"
@@ -93,14 +91,14 @@
         on:keydown
         role="presentation"
       >
-        {#each navItems as [href, label]}
-          <a {href} class="text-ink/85 hover:text-ink transition-colors" on:click={closeMenu}>
-            {label}
-          </a>
+        {#each navItems as item (item.id)}
+          <button type="button" class="text-left text-ink/85 hover:text-ink transition-colors" on:click={() => openPanel(item.id)}>
+            {item.label}
+          </button>
         {/each}
-        <a href={sectionLinks.contact} class="text-ink/85 hover:text-ink transition-colors" on:click={closeMenu}>
+        <button type="button" class="text-left text-ink/85 hover:text-ink transition-colors" on:click={() => openPanel('contact')}>
           お問い合わせ
-        </a>
+        </button>
       </nav>
     </div>
   {/if}
@@ -109,65 +107,56 @@
     <slot/>
   </main>
 
-  <!-- 下端はピルナビが浮くぶん余白を足す -->
-  <footer class="relative pt-14 md:pt-16 pb-28 md:pb-32">
-    <div class="relative max-w-[1400px] mx-auto px-6 md:px-10">
-      <div class="grid md:grid-cols-12 gap-10 md:gap-12">
-        <div class="md:col-span-4">
-          <img src="{base}/black.svg" alt="bitboxx" class="h-5 w-auto" />
-          <p class="mt-6 font-mincho text-[13px] leading-7 text-ink/75">
-            〒103-0015<br/>
-            東京都中央区日本橋箱崎町16-11<br/>
-            ルミネ日本橋601
-          </p>
+  <!-- フッターは規約ページのみ — 一枚絵 (ホーム) には出さない -->
+  {#if !isHome}
+    <footer class="relative pt-14 md:pt-16 pb-28 md:pb-32">
+      <div class="relative max-w-[1400px] mx-auto px-6 md:px-10">
+        <div class="grid md:grid-cols-12 gap-10 md:gap-12">
+          <div class="md:col-span-5">
+            <img src="{base}/black.svg" alt="bitboxx" class="h-5 w-auto" />
+            <p class="mt-6 font-mincho text-[13px] leading-7 text-ink/75">
+              〒103-0015<br/>
+              東京都中央区日本橋箱崎町16-11<br/>
+              ルミネ日本橋601
+            </p>
+          </div>
+
+          <div class="md:col-span-4">
+            <p class="font-mincho text-[12px] tracking-[0.18em] text-ink/55">会社案内</p>
+            <ul class="mt-4 space-y-2 font-mincho text-[13px] text-ink/85">
+              {#each navItems as item (item.id)}
+                <li>
+                  <button type="button" class="hover:text-sakura transition-colors" on:click={() => openPanel(item.id)}>
+                    {item.label}
+                  </button>
+                </li>
+              {/each}
+              <li>
+                <button type="button" class="hover:text-sakura transition-colors" on:click={() => openPanel('contact')}>
+                  お問い合わせ
+                </button>
+              </li>
+            </ul>
+          </div>
+
+          <div class="md:col-span-3">
+            <p class="font-mincho text-[12px] tracking-[0.18em] text-ink/55">規約</p>
+            <ul class="mt-4 space-y-2 font-mincho text-[13px] text-ink/85">
+              <li><a href="{base}/terms_of_service" class="hover:text-sakura transition-colors">利用規約</a></li>
+              <li><a href="{base}/privacy_policy" class="hover:text-sakura transition-colors">プライバシーポリシー</a></li>
+            </ul>
+          </div>
         </div>
 
-        <div class="md:col-span-4">
-          <p class="font-mincho text-[12px] tracking-[0.18em] text-ink/55">会社案内</p>
-          <ul class="mt-4 space-y-2 font-mincho text-[13px] text-ink/85">
-            {#each navItems as [href, label]}
-              <li><a {href} class="hover:text-sakura transition-colors">{label}</a></li>
-            {/each}
-            <li><a href={sectionLinks.contact} class="hover:text-sakura transition-colors">お問い合わせ</a></li>
-          </ul>
-        </div>
-
-        <div class="md:col-span-4">
-          <p class="font-mincho text-[12px] tracking-[0.18em] text-ink/55">規約</p>
-          <ul class="mt-4 space-y-2 font-mincho text-[13px] text-ink/85">
-            <li><a href="{base}/terms_of_service" class="hover:text-sakura transition-colors">利用規約</a></li>
-            <li><a href="{base}/privacy_policy" class="hover:text-sakura transition-colors">プライバシーポリシー</a></li>
-          </ul>
+        <div class="mt-12 pt-6 border-t border-ink/10 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+          <p class="font-mincho text-[12px] text-ink/60">株式会社bitboxx</p>
+          <p class="font-mincho text-[12px] text-ink/50">© {new Date().getFullYear()} bitboxx Inc.</p>
         </div>
       </div>
-
-      <div class="mt-12 pt-6 border-t border-ink/10 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-        <p class="font-mincho text-[12px] text-ink/60">株式会社bitboxx</p>
-        <p class="font-mincho text-[12px] text-ink/50">© {new Date().getFullYear()} bitboxx Inc.</p>
-      </div>
-    </div>
-  </footer>
+    </footer>
+  {/if}
 </div>
 
 <style>
   :global(.text-cream-50\/8) { color: rgba(251, 247, 241, 0.08); }
-
-  /* Ensure the top-right CTA + hamburger stay solid ink regardless of load order */
-  .nav-cta {
-    background-color: #111014;
-    color: #ffffff;
-  }
-  .nav-cta:hover {
-    background-color: #FF2630;
-  }
-  .menu-btn {
-    background-color: #ffffff;
-    color: #111014;
-    border: 1px solid #111014;
-  }
-  .menu-btn:hover {
-    background-color: #FF2630;
-    color: #ffffff;
-    border-color: #FF2630;
-  }
 </style>
