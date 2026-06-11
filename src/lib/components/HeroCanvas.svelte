@@ -134,7 +134,8 @@
     // uScroll で前方へ流れ続け、主線の周期ぶん進んだら巻き戻して無限に走る。
     const GRID_CELL = 1.6;
     const gridScroll = { value: 0 };
-    const gridInk = new THREE.Color(dark ? '#2EE584' : '#111014');
+    // ダークでは沈んだ苔緑 — 背景に退いて、サクラだけが危険色として立つ
+    const gridInk = new THREE.Color(dark ? '#1FA862' : '#111014');
     const makeGridPlane = (y: number, opacity: number) => {
       const mat = new THREE.ShaderMaterial({
         transparent: true,
@@ -162,14 +163,20 @@
           uniform vec3 uColor;
           void main () {
             vec2 coord = vec2(vWorld.x, vWorld.z + uScroll) / ${GRID_CELL.toFixed(2)};
-            // 細線 (1 マス) と主線 (5 マス) の二層 — 方眼紙
-            vec2 g1 = abs(fract(coord - 0.5) - 0.5) / fwidth(coord);
+            // 細線 (1 マス) と主線 (5 マス) の二層 — 方眼紙。
+            // AA レンジを広めに取り (×1.4)、セルが画素サイズに潰れる前に
+            // 層ごとフェードアウトさせてモアレ / ちらつきを断つ。
+            vec2 fw1 = fwidth(coord);
+            vec2 g1 = abs(fract(coord - 0.5) - 0.5) / (fw1 * 1.4);
             float minor = 1.0 - min(min(g1.x, g1.y), 1.0);
+            float aMinor = smoothstep(0.55, 0.22, max(fw1.x, fw1.y));
             vec2 c5 = coord / 5.0;
-            vec2 g5 = abs(fract(c5 - 0.5) - 0.5) / fwidth(c5);
+            vec2 fw5 = fwidth(c5);
+            vec2 g5 = abs(fract(c5 - 0.5) - 0.5) / (fw5 * 1.4);
             float major = 1.0 - min(min(g5.x, g5.y), 1.0);
-            float line = max(minor * 0.38, major);
-            if (line <= 0.0) discard;
+            float aMajor = smoothstep(0.55, 0.22, max(fw5.x, fw5.y));
+            float line = max(minor * 0.36 * aMinor, major * aMajor);
+            if (line <= 0.001) discard;
             float fade = exp(-pow(vDist * 0.03, 2.0));
             gl_FragColor = vec4(uColor, line * uOpacity * fade);
           }`
@@ -181,8 +188,8 @@
       scene.add(mesh);
       return mesh;
     };
-    const gridFloor = makeGridPlane(-3.4, 0.85);
-    const gridCeil = makeGridPlane(4.1, 0.32);
+    const gridFloor = makeGridPlane(-3.4, 0.6);
+    const gridCeil = makeGridPlane(4.1, 0.22);
 
     // Rounded box geometry (fallback: use BoxGeometry with high segs + bevel trick)
     const makeBox = (size: number) => {
@@ -204,12 +211,13 @@
     // ダークでは明暗を反転 (明るいキューブがインク地に浮かぶ)。
     const palette = dark
       ? [
-          new THREE.Color('#F6F6F4'), // cream
+          // クリーム系 + 影のシルエットのみ — 中間グレーは濁って見えるので使わない
+          new THREE.Color('#F6F6F4'),
           new THREE.Color('#E6E6E2'),
           new THREE.Color('#CFCFC9'),
-          new THREE.Color('#9B989F'),
-          new THREE.Color('#3A3741'), // near ink
-          new THREE.Color('#4B4752'),
+          new THREE.Color('#23212A'),
+          new THREE.Color('#2C2933'),
+          new THREE.Color('#1B1920'),
           new THREE.Color('#FF2630') // single sakura accent (birthdays 12/26 + 04/30)
         ]
       : [
@@ -365,16 +373,16 @@
     mascot.position.set(1.2, -0.3, 1.4);
     group.add(mascot);
 
-    // Boss barrier — translucent sakura sphere over the mascot, only
-    // visible while the shield is up. Slowly rotates + pulses opacity.
-    const barrierGeo = new THREE.SphereGeometry(1.45, 24, 18);
+    // Boss barrier — ワイヤーフレームのサクラ球。塗り球だと画面が赤の塊になる
+    // ので、格子のシールドとして「張られている」感だけを出す。
+    const barrierGeo = new THREE.SphereGeometry(1.45, 28, 20);
     const barrierMat = new THREE.MeshBasicMaterial({
       color: '#FF2630',
       transparent: true,
       opacity: 0.18,
       side: THREE.DoubleSide,
       fog: false,
-      wireframe: false
+      wireframe: true
     });
     const barrier = new THREE.Mesh(barrierGeo, barrierMat);
     barrier.visible = false;
@@ -407,7 +415,7 @@
     const pMat = new THREE.LineBasicMaterial({
       color: FG,
       transparent: true,
-      opacity: 0.5,
+      opacity: dark ? 0.32 : 0.5, // ダークでは星屑がうるさくならないよう抑える
       fog: true
     });
     const points = new THREE.LineSegments(pGeo, pMat);
