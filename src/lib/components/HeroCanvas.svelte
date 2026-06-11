@@ -95,14 +95,27 @@
     if (finePointer && !prefersReduced && window.innerWidth >= 1024) {
       effects.push(
         new PP.DepthOfFieldEffect(camera, {
-          worldFocusDistance: 8.2,
-          worldFocusRange: 8.5,
-          bokehScale: 2.0,
+          worldFocusDistance: 8.6,
+          worldFocusRange: 15,
+          bokehScale: 1.6,
           height: 480
         })
       );
     }
-    effects.push(bloom);
+
+    // 質感 — 色収差 + フィルムグレイン + ビネット。
+    // 被弾・爆発の瞬間は色収差がスパイクして「画面が歪む」手応えになる。
+    const caEffect = new PP.ChromaticAberrationEffect({
+      offset: new THREE.Vector2(0.0006, 0.0006),
+      radialModulation: true,
+      modulationOffset: 0.25
+    });
+    let caBoost = 0;
+    const noiseEffect = new PP.NoiseEffect({ premultiply: true });
+    noiseEffect.blendMode.opacity.value = 0.3;
+    const vignetteEffect = new PP.VignetteEffect({ offset: 0.26, darkness: dark ? 0.55 : 0.36 });
+
+    effects.push(bloom, caEffect, noiseEffect, vignetteEffect);
     composer.addPass(new PP.EffectPass(camera, ...effects));
 
     // Lights — pared back to warm/cool white for a more monochrome scene.
@@ -116,6 +129,56 @@
     const rim = new THREE.PointLight(0xffffff, 1.2, 20);
     rim.position.set(-3, 2, -4);
     scene.add(rim);
+
+    // 無限グリッド — 床と天井。シェーダーで線を引く (スクリーンスペース AA +
+    // 距離フェード) ので、トーンマッピングや DOF に潰されず視認性を制御できる。
+    // uScroll で前方へ流れ続け、セルぶん進んだら巻き戻して無限に走る。
+    const GRID_CELL = 2.5;
+    const gridScroll = { value: 0 };
+    const gridInk = new THREE.Color(dark ? '#F6F6F4' : '#111014');
+    const makeGridPlane = (y: number, opacity: number) => {
+      const mat = new THREE.ShaderMaterial({
+        transparent: true,
+        depthWrite: false,
+        uniforms: {
+          uScroll: gridScroll,
+          uOpacity: { value: opacity },
+          uColor: { value: gridInk }
+        },
+        vertexShader: `
+          varying vec3 vWorld;
+          varying float vDist;
+          void main () {
+            vec4 wp = modelMatrix * vec4(position, 1.0);
+            vWorld = wp.xyz;
+            vec4 mv = viewMatrix * wp;
+            vDist = -mv.z;
+            gl_Position = projectionMatrix * mv;
+          }`,
+        fragmentShader: `
+          varying vec3 vWorld;
+          varying float vDist;
+          uniform float uScroll;
+          uniform float uOpacity;
+          uniform vec3 uColor;
+          void main () {
+            vec2 coord = vec2(vWorld.x, vWorld.z + uScroll) / ${GRID_CELL.toFixed(2)};
+            vec2 g = abs(fract(coord - 0.5) - 0.5) / fwidth(coord);
+            float line = 1.0 - min(min(g.x, g.y), 1.0);
+            if (line <= 0.0) discard;
+            float fade = exp(-pow(vDist * 0.033, 2.0));
+            gl_FragColor = vec4(uColor, line * uOpacity * fade);
+          }`
+      });
+      const mesh = new THREE.Mesh(new THREE.PlaneGeometry(160, 120), mat);
+      mesh.rotation.x = -Math.PI / 2;
+      mesh.position.set(0, y, -28);
+      mesh.frustumCulled = false;
+      scene.add(mesh);
+      return mesh;
+    };
+    const gridFloor = makeGridPlane(-3.4, 0.85);
+    const gridCeil = makeGridPlane(4.1, 0.32);
 
     // Rounded box geometry (fallback: use BoxGeometry with high segs + bevel trick)
     const makeBox = (size: number) => {
@@ -1370,9 +1433,11 @@
     };
 
     // ─── 画面シェイク — 着弾の手応え。減衰するランダムオフセット ───────
+    // 同時に色収差もスパイクさせて、画面ごと歪む感触にする。
     let shakeAmp = 0;
     const kickShake = (amount: number) => {
       shakeAmp = Math.min(0.16, shakeAmp + amount);
+      caBoost = Math.min(0.0055, caBoost + amount * 0.035);
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -1560,6 +1625,18 @@
       } else {
         shakeAmp = 0;
       }
+
+      // 色収差スパイクの減衰
+      if (caBoost > 0.00005) {
+        caEffect.offset.set(0.0006 + caBoost, 0.0006 + caBoost);
+        caBoost *= Math.max(0, 1 - dt * 5.5);
+      } else if (caBoost !== 0) {
+        caBoost = 0;
+        caEffect.offset.set(0.0006, 0.0006);
+      }
+
+      // グリッドの前進 — セルぶん進んだら巻き戻して無限に流す
+      gridScroll.value = (now * 0.0011) % GRID_CELL;
 
       group.position.y = -scrollY * 0.0015;
 
@@ -1841,6 +1918,11 @@
       scene.remove(sparkPoints);
       sparkGeo.dispose();
       sparkMat.dispose();
+      for (const g of [gridFloor, gridCeil]) {
+        scene.remove(g);
+        g.geometry.dispose();
+        g.material.dispose();
+      }
       for (const p of enemyProjs) {
         if (p.trail) {
           scene.remove(p.trail);

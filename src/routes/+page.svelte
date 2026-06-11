@@ -139,29 +139,29 @@
       num: '01',
       en: 'Product',
       title: 'プロダクト開発',
-      deliverable: '要件整理から設計・実装・リリースまで。Web／モバイル／サーバー／クラウド基盤。',
-      value: 'アイデアを、事業として動くプロダクトに変える。'
+      deliverable: '構想の整理、技術選定、設計、実装、リリース、その後の改善まで一気通貫。Web／モバイル／API／クラウド基盤。',
+      value: 'アイデアを、事業として動くプロダクトに。'
     },
     {
       num: '02',
       en: 'Operation',
       title: '運用・保守・改善',
-      deliverable: '日々の運用、障害対応、性能改善、機能追加。開発と同じチームが続けて担当。',
-      value: '作ったものを、毎日少しずつ良くしていく。'
+      deliverable: '監視、障害対応、性能改善、機能追加。開発したチームがそのまま運用も持ちます。',
+      value: '作ったものを、毎日少しずつ良くする。'
     },
     {
       num: '03',
       en: 'Design',
       title: 'UI／UX 設計',
-      deliverable: '情報設計、画面設計、デザインシステム、ブランドから落とすビジュアル。',
+      deliverable: '情報設計、画面設計、デザインシステム。ブランドから画面まで、一貫した体験に。',
       value: '使う人に届く形と、伝わる体験。'
     },
     {
       num: '04',
       en: 'Advisory',
       title: '技術顧問・アドバイザリー',
-      deliverable: '技術戦略、体制レビュー、採用・育成、中長期ロードマップ、投資判断。',
-      value: '経営判断の場に、技術の目を入れる。'
+      deliverable: '技術戦略、体制とコードのレビュー、採用支援、中長期ロードマップ、投資判断の相談。',
+      value: '経営判断の場に、技術の目を。'
     }
   ];
 
@@ -169,19 +169,19 @@
   const capabilities = [
     {
       tag: '新規サービスの立ち上げ',
-      body: 'アイデアを形にして世に出し、事業として育つところまで。小さく始めて、フェーズに合わせて機能を順に組み上げます。'
+      body: '小さく出して、反応を見て、機能を足す。事業の芽をプロダクトに育てる開発。'
     },
     {
       tag: 'AI を組み込んだ業務・プロダクト改善',
-      body: '生成 AI、データ分析、自動化を事業フローに組み込む。効果の見える場所から段階的に導入します。'
+      body: '生成 AI・データ分析・自動化を業務フローへ。効果の見える場所から段階導入。'
     },
     {
       tag: '決済・課金・業務システム',
-      body: 'オンライン決済の導入、会計連携、売上管理、返金対応。お金と業務が動く部分を、確実に。'
+      body: 'オンライン決済、会計連携、売上管理、返金対応。お金が動く部分を、確実に。'
     },
     {
       tag: '既存システムの刷新・運用',
-      body: '古くなった仕組みを、動かしたまま新しくする。クラウドへの移行、アクセス増にも耐える基盤、性能改善まで。'
+      body: '動かしたまま作り替える。クラウド移行、負荷対策、性能改善まで。'
     }
   ];
 
@@ -190,19 +190,19 @@
     {
       num: 'Reason 01',
       headline: '「何をつくるか」から、並走する。',
-      body: '「言われたものをつくる」ではなく、「何をつくるべきか」から並走します。技術と事業の両方の目を持って、経営判断の場に座ります。',
+      body: '「何をつくるべきか」を決める段階から並走し、技術と事業の両方の目で経営判断に加わります。',
       contrast: '多くの開発会社は仕様の通りにつくる。私たちは、仕様が固まる前から関わる。'
     },
     {
       num: 'Reason 02',
       headline: '作って終わり、ではない。',
-      body: '同じチームが、立ち上げから運用・改善まで続けて担当します。引き継ぎ事故もなく、書いた人がそのまま守るので、判断が速い。',
+      body: '立ち上げから運用・改善まで、同じチームが担当します。書いた人がそのまま守るから、判断が速い。',
       contrast: '別会社へ引き継ぐとき、よく落ちる文脈がある。私たちは、その引き継ぎ自体が起きない。'
     },
     {
       num: 'Reason 03',
       headline: 'つくらない、という選択も持つ。',
-      body: 'Excellent / Kawaii / Unique のいずれにも当てはまらないものは、つくりません。やらないことを決めるところから、設計が始まります。',
+      body: '三つのものさしに当てはまらないものは、つくりません。やらないことを決めるところから、設計は始まります。',
       contrast: '何でも引き受ける会社は多い。私たちは、価値が出るものだけを残す。'
     }
   ];
@@ -317,14 +317,26 @@
           class:opacity-0={heroQuiet}
           class:-translate-y-3={heroQuiet}
         >
-          <span class="block text-[14vw] md:text-[11vw] lg:text-[9.5rem] italic">
-            <span class="underline-handwritten">Excellent.</span>
+          <span class="hero-clip">
+            <span class="hero-rise" style="--d:60ms">
+              <span class="block text-[14vw] md:text-[11vw] lg:text-[9.5rem] italic">
+                <span class="underline-handwritten draw-in">Excellent.</span>
+              </span>
+            </span>
           </span>
-          <span class="block text-[14vw] md:text-[11vw] lg:text-[9.5rem] pl-[6vw] md:pl-[12vw]">
-            <span class="text-sakura italic">Kawaii.</span>
+          <span class="hero-clip">
+            <span class="hero-rise" style="--d:200ms">
+              <span class="block text-[14vw] md:text-[11vw] lg:text-[9.5rem] pl-[6vw] md:pl-[12vw]">
+                <span class="text-sakura italic">Kawaii.</span>
+              </span>
+            </span>
           </span>
-          <span class="block text-[14vw] md:text-[11vw] lg:text-[9.5rem] pl-[2vw] md:pl-[4vw]">
-            Unique<span class="text-sakura">.</span>
+          <span class="hero-clip">
+            <span class="hero-rise" style="--d:340ms">
+              <span class="block text-[14vw] md:text-[11vw] lg:text-[9.5rem] pl-[2vw] md:pl-[4vw]">
+                Unique<span class="text-sakura">.</span>
+              </span>
+            </span>
           </span>
         </h1>
 
@@ -335,14 +347,14 @@
             class:translate-y-2={heroQuiet}
             aria-hidden={heroQuiet}
           >
-            <p class="font-mincho font-light text-[26px] md:text-[44px] leading-[1.5] tracking-[0.04em] text-ink">
+            <p class="hero-fade font-mincho font-light text-[26px] md:text-[44px] leading-[1.5] tracking-[0.04em] text-ink" style="--d:880ms">
               まだ見ぬ<span class="relative inline-block">
                 <span class="relative z-10">最高</span>
                 <span class="absolute inset-x-0 bottom-[0.12em] h-[0.28em] bg-sakura/60 -z-0" aria-hidden="true"></span>
               </span>を、<br class="hidden sm:block"/>
               確かな品質で。
             </p>
-            <p class="mt-7 md:mt-10 font-mincho text-[15px] md:text-[17px] leading-[2.1] text-ink/60 max-w-lg tracking-[0.06em]">
+            <p class="hero-fade mt-7 md:mt-10 font-mincho text-[15px] md:text-[17px] leading-[2.1] text-ink/60 max-w-lg tracking-[0.06em]" style="--d:1020ms">
               唯一無二のアイデアを、卓越した技術でかたちにする。<br class="hidden md:block"/>
               手放したくなくなるプロダクトを、世界に。
             </p>
@@ -351,7 +363,8 @@
             <button
               type="button"
               on:click={() => activePanel.set('contact')}
-              class="btn-ink group inline-flex items-center gap-3 px-7 py-3.5 rounded-full text-base font-medium transition-colors duration-300 pointer-events-auto"
+              class="hero-fade btn-ink group inline-flex items-center gap-3 px-7 py-3.5 rounded-full text-base font-medium transition-colors duration-300 pointer-events-auto"
+              style="--d:1160ms"
             >
               <span class="font-display italic text-lg whitespace-nowrap">プロジェクトを相談する</span>
               <svg class="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
@@ -515,6 +528,22 @@
           </Reveal>
         {/each}
       </div>
+
+            <h3 class="mt-14 md:mt-16 font-mincho text-sm tracking-[0.2em] text-ink/55">ご依頼のかたち</h3>
+            <div class="mt-6 grid md:grid-cols-3">
+              {#each [
+                ['継続開発・運用保守', '月額で開発と運用をまとめて。いちばん多いかたち。'],
+                ['スポット開発', '範囲を決めて、見積りして、作って納める。'],
+                ['技術顧問', '月数回の定例で、技術判断の相談役に。']
+              ] as [t, d], i (t)}
+                <Reveal klass="h-full">
+                  <article class={`h-full py-7 md:py-8 border-t border-ink/15 ${i > 0 ? 'md:pl-10 md:border-l' : 'md:pr-10'} ${i === 1 ? 'md:pr-10' : ''}`}>
+                    <h4 class="font-mincho text-base text-ink">{t}</h4>
+                    <p class="mt-3 font-mincho text-[13px] md:text-[14px] leading-[2] text-ink/70">{d}</p>
+                  </article>
+                </Reveal>
+              {/each}
+            </div>
 
           {:else if $activePanel === 'company'}
             <Reveal>

@@ -81,7 +81,31 @@
     padding: 0 .12em;
   }
 
+  /* ヒーローの入場 — 行ごとのクリップ・ライズ、後から筆で引かれる下線、遅れて立つ本文 */
+  .hero-clip { display: block; overflow: hidden; }
+  .hero-rise {
+    display: block;
+    transform: translateY(112%);
+    animation: hero-rise .82s cubic-bezier(.2,.8,.2,1) forwards;
+    animation-delay: var(--d, 0ms);
+  }
+  .draw-in {
+    background-size: 0% 100%;
+    animation: draw-in .5s cubic-bezier(.2,.8,.2,1) forwards;
+    animation-delay: 1.05s;
+  }
+  .hero-fade {
+    opacity: 0;
+    transform: translateY(14px);
+    animation: hero-fade .7s cubic-bezier(.2,.8,.2,1) forwards;
+    animation-delay: var(--d, 1s);
+  }
+
 }
+
+@keyframes hero-rise { to { transform: translateY(0); } }
+@keyframes draw-in { to { background-size: 100% 100%; } }
+@keyframes hero-fade { to { opacity: 1; transform: none; } }
 
 /* Custom cursor (desktop only) */
 @media (hover: hover) and (pointer: fine) {
