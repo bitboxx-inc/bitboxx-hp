@@ -3,155 +3,233 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --cream: #FFFFFF;
-    --cream-soft: #F6F6F4;
-    --ink: #111014;
-    --sakura: #FF2630;
-  }
+	:root {
+		--cream: #ffffff;
+		--cream-soft: #f6f6f4;
+		--ink: #111014;
+		--sakura: #ff2630;
+	}
 
-  html {
-    scroll-behavior: smooth;
-  }
+	html {
+		scroll-behavior: smooth;
+	}
 
-  body {
-    background: #FFFFFF;
-    color: var(--ink);
-    font-family: "Space Grotesk", -apple-system, BlinkMacSystemFont,
-      "Helvetica Neue", "Noto Sans JP", "Hiragino Kaku Gothic ProN",
-      system-ui, sans-serif;
-    font-feature-settings: "palt";
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
-  }
+	body {
+		background: #ffffff;
+		color: var(--ink);
+		font-family:
+			'Space Grotesk',
+			-apple-system,
+			BlinkMacSystemFont,
+			'Helvetica Neue',
+			'Noto Sans JP',
+			'Hiragino Kaku Gothic ProN',
+			system-ui,
+			sans-serif;
+		font-feature-settings: 'palt';
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+		text-rendering: optimizeLegibility;
+	}
 
-  ::selection {
-    background: var(--ink);
-    color: var(--cream);
-  }
+	::selection {
+		background: var(--ink);
+		color: var(--cream);
+	}
 }
 
 @layer utilities {
-  .paper-grain::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    opacity: 0.09;
-    mix-blend-mode: multiply;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.22 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
-  }
+	.paper-grain::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		opacity: 0.09;
+		mix-blend-mode: multiply;
+		background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.22 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+	}
 
-  .mask-fade-y {
-    -webkit-mask-image: linear-gradient(to bottom, transparent, black 12%, black 88%, transparent);
-    mask-image: linear-gradient(to bottom, transparent, black 12%, black 88%, transparent);
-  }
+	.mask-fade-y {
+		-webkit-mask-image: linear-gradient(to bottom, transparent, black 12%, black 88%, transparent);
+		mask-image: linear-gradient(to bottom, transparent, black 12%, black 88%, transparent);
+	}
 
-  /* Dark CTA pill — asserted explicitly so Safari/iOS always renders it
+	/* Dark CTA pill — asserted explicitly so Safari/iOS always renders it
      even if Tailwind's custom colors race the paint. */
-  .btn-ink {
-    background-color: #111014;
-    color: #ffffff;
-  }
-  .btn-ink:hover {
-    background-color: #FF2630;
-  }
-  .btn-ink svg { color: #ffffff; }
-  .btn-ink:hover svg { color: #ffffff; }
+	.btn-ink {
+		background-color: #111014;
+		color: #ffffff;
+	}
+	.btn-ink:hover {
+		background-color: #ff2630;
+	}
+	.btn-ink svg {
+		color: #ffffff;
+	}
+	.btn-ink:hover svg {
+		color: #ffffff;
+	}
 
-  .reveal {
-    opacity: 0;
-    transform: translateY(28px);
-    transition: opacity .9s cubic-bezier(.2,.8,.2,1), transform .9s cubic-bezier(.2,.8,.2,1);
-  }
-  .reveal.is-visible {
-    opacity: 1;
-    transform: none;
-  }
-  .reveal-delay-1 { transition-delay: .08s; }
-  .reveal-delay-2 { transition-delay: .16s; }
-  .reveal-delay-3 { transition-delay: .24s; }
-  .reveal-delay-4 { transition-delay: .32s; }
+	.reveal {
+		opacity: 0;
+		transform: translateY(28px);
+		transition:
+			opacity 0.9s cubic-bezier(0.2, 0.8, 0.2, 1),
+			transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+	}
+	.reveal.is-visible {
+		opacity: 1;
+		transform: none;
+	}
+	.reveal-delay-1 {
+		transition-delay: 0.08s;
+	}
+	.reveal-delay-2 {
+		transition-delay: 0.16s;
+	}
+	.reveal-delay-3 {
+		transition-delay: 0.24s;
+	}
+	.reveal-delay-4 {
+		transition-delay: 0.32s;
+	}
 
-  .underline-handwritten {
-    background-image: linear-gradient(transparent 62%, var(--sakura) 62%, var(--sakura) 88%, transparent 88%);
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
-    padding: 0 .12em;
-  }
+	.underline-handwritten {
+		background-image: linear-gradient(
+			transparent 62%,
+			var(--sakura) 62%,
+			var(--sakura) 88%,
+			transparent 88%
+		);
+		background-repeat: no-repeat;
+		background-size: 100% 100%;
+		padding: 0 0.12em;
+	}
 
-  /* ヒーローの入場 — 行ごとのクリップ・ライズ、後から筆で引かれる下線、遅れて立つ本文 */
-  .hero-clip { display: block; overflow: hidden; }
-  .hero-rise {
-    display: block;
-    transform: translateY(112%);
-    animation: hero-rise .82s cubic-bezier(.2,.8,.2,1) forwards;
-    animation-delay: var(--d, 0ms);
-  }
-  .draw-in {
-    background-size: 0% 100%;
-    animation: draw-in .5s cubic-bezier(.2,.8,.2,1) forwards;
-    animation-delay: 1.05s;
-  }
-  .hero-fade {
-    opacity: 0;
-    transform: translateY(14px);
-    animation: hero-fade .7s cubic-bezier(.2,.8,.2,1) forwards;
-    animation-delay: var(--d, 1s);
-  }
+	/* 墨の上でも文字が立つ紙色のハロー — 蝋抜きのように墨を縁で払う */
+	.ink-guard {
+		text-shadow:
+			0 0 1px rgba(252, 251, 247, 0.85),
+			0 0 3px rgba(252, 251, 247, 0.75),
+			0 0 8px rgba(252, 251, 247, 0.6),
+			0 0 18px rgba(252, 251, 247, 0.45);
+	}
 
+	/* ヒーローの入場 — 行ごとのクリップ・ライズ、後から筆で引かれる下線、遅れて立つ本文 */
+	.hero-clip {
+		display: block;
+		overflow: hidden;
+	}
+	.hero-rise {
+		display: block;
+		transform: translateY(112%);
+		animation: hero-rise 0.82s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+		animation-delay: var(--d, 0ms);
+	}
+	.draw-in {
+		background-size: 0% 100%;
+		animation: draw-in 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+		animation-delay: 1.05s;
+	}
+	.hero-fade {
+		opacity: 0;
+		transform: translateY(14px);
+		animation: hero-fade 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+		animation-delay: var(--d, 1s);
+	}
 }
 
-@keyframes hero-rise { to { transform: translateY(0); } }
-@keyframes draw-in { to { background-size: 100% 100%; } }
-@keyframes hero-fade { to { opacity: 1; transform: none; } }
+@keyframes hero-rise {
+	to {
+		transform: translateY(0);
+	}
+}
+@keyframes draw-in {
+	to {
+		background-size: 100% 100%;
+	}
+}
+@keyframes hero-fade {
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
 
 /* Custom cursor (desktop only) */
 @media (hover: hover) and (pointer: fine) {
-  body { cursor: none; }
-  a, button, label, [data-cursor] { cursor: none; }
-  /* テキスト入力ではネイティブの I ビームを返す (カスタムカーソル側は is-hidden で消える) */
-  input, textarea, select { cursor: auto; }
-  .cursor-dot.is-hidden, .cursor-ring.is-hidden { opacity: 0; }
-  .cursor-dot, .cursor-ring {
-    position: fixed;
-    top: 0; left: 0;
-    pointer-events: none;
-    z-index: 9999;
-    transform: translate3d(-100px, -100px, 0);
-    will-change: transform;
-  }
-  /* difference 合成は明色ソースが正 — 白地では黒く、インク地では白く出る */
-  .cursor-dot {
-    width: 6px; height: 6px;
-    background: #F6F6F4;
-    border-radius: 9999px;
-    mix-blend-mode: difference;
-    transition: opacity .18s ease;
-  }
-  .cursor-ring {
-    width: 40px; height: 40px;
-    border: 1px solid rgba(246,246,244,0.75);
-    border-radius: 9999px;
-    mix-blend-mode: difference;
-    transition: width .22s cubic-bezier(.2,.8,.2,1), height .22s cubic-bezier(.2,.8,.2,1), margin .22s cubic-bezier(.2,.8,.2,1), border-width .22s, opacity .18s ease;
-    margin: -20px 0 0 -20px;
-  }
-  /* Link hover — ring tightens around the dot (no color shift). */
-  .cursor-ring.is-hover {
-    width: 14px; height: 14px;
-    margin: -7px 0 0 -7px;
-    border-width: 1.5px;
-  }
+	body {
+		cursor: none;
+	}
+	a,
+	button,
+	label,
+	[data-cursor] {
+		cursor: none;
+	}
+	/* テキスト入力ではネイティブの I ビームを返す (カスタムカーソル側は is-hidden で消える) */
+	input,
+	textarea,
+	select {
+		cursor: auto;
+	}
+	.cursor-dot.is-hidden,
+	.cursor-ring.is-hidden {
+		opacity: 0;
+	}
+	.cursor-dot,
+	.cursor-ring {
+		position: fixed;
+		top: 0;
+		left: 0;
+		pointer-events: none;
+		z-index: 9999;
+		transform: translate3d(-100px, -100px, 0);
+		will-change: transform;
+	}
+	/* difference 合成は明色ソースが正 — 白地では黒く、インク地では白く出る */
+	.cursor-dot {
+		width: 6px;
+		height: 6px;
+		background: #f6f6f4;
+		border-radius: 9999px;
+		mix-blend-mode: difference;
+		transition: opacity 0.18s ease;
+	}
+	.cursor-ring {
+		width: 40px;
+		height: 40px;
+		border: 1px solid rgba(246, 246, 244, 0.75);
+		border-radius: 9999px;
+		mix-blend-mode: difference;
+		transition:
+			width 0.22s cubic-bezier(0.2, 0.8, 0.2, 1),
+			height 0.22s cubic-bezier(0.2, 0.8, 0.2, 1),
+			margin 0.22s cubic-bezier(0.2, 0.8, 0.2, 1),
+			border-width 0.22s,
+			opacity 0.18s ease;
+		margin: -20px 0 0 -20px;
+	}
+	/* Link hover — ring tightens around the dot (no color shift). */
+	.cursor-ring.is-hover {
+		width: 14px;
+		height: 14px;
+		margin: -7px 0 0 -7px;
+		border-width: 1.5px;
+	}
 }
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: .001ms !important;
-    transition-duration: .001ms !important;
-    animation-iteration-count: 1 !important;
-  }
-  .reveal { opacity: 1 !important; transform: none !important; }
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.001ms !important;
+		transition-duration: 0.001ms !important;
+		animation-iteration-count: 1 !important;
+	}
+	.reveal {
+		opacity: 1 !important;
+		transform: none !important;
+	}
 }

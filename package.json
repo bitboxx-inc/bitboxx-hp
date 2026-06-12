@@ -36,8 +36,6 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@sveltejs/adapter-static": "^3.0.1",
-		"postprocessing": "^6.39.1",
-		"three": "^0.165.0"
+		"@sveltejs/adapter-static": "^3.0.1"
 	}
 }
