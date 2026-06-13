@@ -18,7 +18,6 @@
 	 * ラベルが実 DOM ボタンになりクリック / Enter で「着陸」= カメラがその惑星へ寄り、
 	 * 'select' を上位へ送る。
 	 *
-	 * 一つの意味ある数値 = 創業日からの経過日数 `day` を、星の数と系の基準位相に使う。
 	 * 環境は RoomEnvironment を PMREM したものでクロムのリングに反射を与える。
 	 */
 	import { createEventDispatcher, onMount } from 'svelte';
@@ -27,7 +26,6 @@
 	import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
 	export let items: OrreryItem[] = [];
-	export let foundedISO = '2024-04-25';
 
 	const dispatch = createEventDispatcher<{ select: string; focus: string }>();
 
@@ -36,7 +34,6 @@
 	let labelEls: HTMLButtonElement[] = [];
 	let reticleEl: HTMLDivElement;
 
-	let day = 0;
 	let focusIndex = 0;
 
 	let api: { leave: () => void; focusTo: (id: string) => void } = {
@@ -52,11 +49,6 @@
 
 	onMount(() => {
 		const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-		// ── 意味ある数値 ──
-		const founded = new Date(foundedISO + 'T00:00:00+09:00').getTime();
-		day = Math.max(0, Math.floor((Date.now() - founded) / 86400000));
-		const STAR_COUNT = 320 + (day % 120);
 
 		// ── レンダラ ──
 		const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
@@ -126,12 +118,14 @@
 		cube.add(cubeEdge);
 
 		// ── 軌道リング + 惑星 ──
-		// 中心の立方体 (正六面体) に対し、各ノードはプラトン立体 (JSON の solid で指定)。
-		// 完全な正多面体はこの 5 つしか存在しない (幾何学の定理) — それが「知的な根拠」。色分けはしない。
+		// 5 つの惑星 = 5 つのプラトン立体 (完全な正多面体はこの 5 つしか存在しない、という定理が
+		// 「知的な根拠」)。中心の「!?」立方体はブランドマークで別格。色分けはしない。
 		const solidGeo = (s: string): THREE.BufferGeometry => {
 			switch (s) {
 				case 'tetra':
 					return new THREE.TetrahedronGeometry(0.4); // 4 面
+				case 'hexa':
+					return new THREE.BoxGeometry(0.42, 0.42, 0.42); // 6 面
 				case 'octa':
 					return new THREE.OctahedronGeometry(0.36); // 8 面
 				case 'dodeca':
@@ -165,97 +159,41 @@
 			hitMeshes.push(hit);
 		});
 
-		// ── 漂う装飾リング — 少数・大きめ・霧に沈める (線を増やしすぎない) ──
+		// ── 漂う装飾リング — 手前は大きめ (元の構図)。奥に中・小を 1 つずつ足すだけ。
 		const halos: THREE.Mesh[] = [];
+		const addHalo = (
+			radius: number,
+			tube: number,
+			pos: [number, number, number],
+			rot: [number, number, number],
+			opacity: number,
+			spin: number
+		) => {
+			const hm = chromeFaint.clone();
+			hm.opacity = opacity;
+			const ring = new THREE.Mesh(new THREE.TorusGeometry(radius, tube, 10, 180), hm);
+			ring.position.set(pos[0], pos[1], pos[2]);
+			ring.rotation.set(rot[0], rot[1], rot[2]);
+			ring.userData.spin = spin;
+			scene.add(ring);
+			halos.push(ring);
+		};
+		// 手前 (3 つ — これが良かった)
 		for (let i = 0; i < 3; i++) {
 			const a = i * 2.4;
 			const dist = 9 + i * 3;
-			const radius = 5 + i * 2.5;
-			const hm = chromeFaint.clone();
-			hm.opacity = 0.3;
-			const ring = new THREE.Mesh(new THREE.TorusGeometry(radius, 0.02, 12, 220), hm);
-			ring.position.set(Math.cos(a) * dist, (i % 2 ? 1 : -1) * (2.5 + i), Math.sin(a) * dist);
-			ring.rotation.set(0.6 + i * 0.5, i * 0.7, i * 0.4);
-			ring.userData.spin = 0.05 * (i % 2 ? 1 : -1);
-			scene.add(ring);
-			halos.push(ring);
+			addHalo(
+				5 + i * 2.5,
+				0.02,
+				[Math.cos(a) * dist, (i % 2 ? 1 : -1) * (2.5 + i), Math.sin(a) * dist],
+				[0.6 + i * 0.5, i * 0.7, i * 0.4],
+				0.3,
+				0.05 * (i % 2 ? 1 : -1)
+			);
 		}
-
-		// ── 星 — 近景/遠景の 2 層。遠くへ散らし、ちらつかせて (twinkle) 奥行きを出す ──
-		const STAR_VERT = `
-			attribute float aPhase;
-			attribute float aSize;
-			uniform float uTime;
-			uniform float uSpeed;
-			varying float vTw;
-			void main () {
-				vec4 mv = modelViewMatrix * vec4(position, 1.0);
-				gl_Position = projectionMatrix * mv;
-				gl_PointSize = aSize * (200.0 / -mv.z);
-				float s = sin(uTime * uSpeed + aPhase);
-				vTw = smoothstep(-0.5, 0.95, s); // たまに 0 まで沈む = ちらっと/消える
-			}`;
-		const STAR_FRAG = `
-			precision mediump float;
-			uniform vec3 uColor;
-			uniform float uOpacity;
-			varying float vTw;
-			void main () {
-				float r = length(gl_PointCoord - 0.5) * 2.0; // 0 中心 .. 1 縁
-				if (r > 1.0) discard;
-				float glow = exp(-r * r * 4.0);     // 中心が明るく柔らかく減衰 = 光の粒
-				gl_FragColor = vec4(uColor, uOpacity * vTw * glow);
-			}`;
-		const starMats: THREE.ShaderMaterial[] = [];
-		const makeStars = (
-			count: number,
-			rMin: number,
-			rMax: number,
-			color: number,
-			sizeBase: number,
-			opacity: number,
-			speed: number
-		) => {
-			const geo = new THREE.BufferGeometry();
-			const arr = new Float32Array(count * 3);
-			const ph = new Float32Array(count);
-			const sz = new Float32Array(count);
-			for (let i = 0; i < count; i++) {
-				const a = i * 2.399963229; // 黄金角で球殻に散らす
-				const yy = 1 - (i / (count - 1)) * 2;
-				const rr = Math.sqrt(Math.max(0, 1 - yy * yy));
-				const rad = rMin + (((i * 17) % 100) / 100) * (rMax - rMin);
-				arr[i * 3] = Math.cos(a) * rr * rad;
-				arr[i * 3 + 1] = yy * rad * 0.75;
-				arr[i * 3 + 2] = Math.sin(a) * rr * rad;
-				ph[i] = (i * 12.9898) % 6.283;
-				sz[i] = sizeBase * (0.5 + ((i * 7) % 10) / 6.5);
-			}
-			geo.setAttribute('position', new THREE.BufferAttribute(arr, 3));
-			geo.setAttribute('aPhase', new THREE.BufferAttribute(ph, 1));
-			geo.setAttribute('aSize', new THREE.BufferAttribute(sz, 1));
-			const mat = new THREE.ShaderMaterial({
-				uniforms: {
-					uTime: { value: 0 },
-					uSpeed: { value: speed },
-					uColor: { value: new THREE.Color(color) },
-					uOpacity: { value: opacity }
-				},
-				vertexShader: STAR_VERT,
-				fragmentShader: STAR_FRAG,
-				transparent: true,
-				depthWrite: false,
-				blending: THREE.AdditiveBlending // 光を足す → 銀の空間に光って見える
-			});
-			starMats.push(mat);
-			return new THREE.Points(geo, mat);
-		};
-		// 遠景: ずっと遠くに小さな白い光。奥行きの背景。
-		const farStars = makeStars(640 + (day % 120), 70, 170, 0xffffff, 3.2, 0.85, 0.8);
-		scene.add(farStars);
-		// 近景: 系の周りに、少し大きく暖色で速くまたたく。
-		const nearStars = makeStars(STAR_COUNT, 22, 48, 0xfff1e0, 2.2, 0.8, 1.5);
-		scene.add(nearStars);
+		// 奥 — 中サイズ / かなり奥 — 小サイズ (霧に沈む)
+		addHalo(3.6, 0.014, [6.5, -2.5, 16], [0.8, 0.6, 0.3], 0.2, -0.06);
+		addHalo(2.0, 0.01, [-5.5, 3.5, 27], [0.5, 1.0, 0.6], 0.15, 0.07);
 
 		// ── カメラ基準 ──
 		const CAM_Y = 5.4;
@@ -369,10 +307,6 @@
 				h.rotation.x += dt * h.userData.spin * 0.6;
 				h.rotation.y += dt * h.userData.spin * 0.25;
 			}
-			// 星は 2 層が別速度で回り、パララックスで奥行きを出す + ちらつき
-			farStars.rotation.y = time * 0.006;
-			nearStars.rotation.y = time * 0.016;
-			for (const m of starMats) m.uniforms.uTime.value = time;
 
 			// カメラ — 縦長ほど低く構え (水平視点) かつ少し引いて、縦並びを上下に分ける
 			const pf = Math.min(1, Math.max(0, (1 - aspect) / 0.42));

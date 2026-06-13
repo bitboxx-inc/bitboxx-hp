@@ -57,32 +57,36 @@
 		{
 			num: '01',
 			title: 'プロダクト開発',
-			deliverable: '要件整理から設計・実装・リリースまで。Web／モバイル／サーバー／クラウド基盤。',
+			deliverable:
+				'要件の整理から設計・実装・リリースまで、一貫して引き受けます。Web・モバイルアプリ、サーバー、クラウド基盤に加え、決済・課金や生成AIの組み込みまで対応します。',
 			value: 'アイデアを、事業として動くプロダクトに変える。'
 		},
 		{
 			num: '02',
 			title: '運用・保守・改善',
-			deliverable: '日々の運用、障害対応、性能改善、機能追加。開発と同じチームが続けて担当。',
+			deliverable:
+				'日々の運用と監視、障害対応、性能改善、機能追加まで。開発と同じチームが続けて担うので、引き継ぎで文脈が抜け落ちることがありません。',
 			value: '作ったものを、毎日少しずつ良くしていく。'
 		},
 		{
 			num: '03',
 			title: 'UI／UX 設計',
-			deliverable: '情報設計、画面設計、デザインシステム、ブランドから落とすビジュアル。',
+			deliverable:
+				'情報設計から画面設計、デザインシステムの構築、ブランドを形にしたビジュアルまで。使う人が迷わないことを、いちばんの基準にします。',
 			value: '使う人に届く形と、伝わる体験。'
 		},
 		{
 			num: '04',
 			title: '技術顧問・アドバイザリー',
-			deliverable: '技術戦略、体制レビュー、採用・育成、中長期ロードマップ、投資判断。',
+			deliverable:
+				'技術戦略の立案、開発体制のレビュー、採用と育成の支援、中長期のロードマップや投資判断まで。経営と現場の両方の言葉で並走します。',
 			value: '経営判断の場に、技術の目を入れる。'
 		},
 		{
 			num: '05',
 			title: 'アウトドア × デジタル',
 			deliverable:
-				'自分たちで手がけるアウトドア事業と、その体験を支える技術。フィールドの運営から、道具・予約・記録をつなぐプロダクトまで。',
+				'自分たちで手がけるアウトドア事業と、その体験を支える技術。フィールドの運営から、道具や予約、記録をつなぐプロダクトまで。事業者だからこそ分かる課題を、ものづくりに還元します。',
 			value: '自然のなかで過ごす時間を、技術でもう一歩おもしろくする。'
 		}
 	];
@@ -102,6 +106,19 @@
 			num: '03',
 			headline: 'つくらない、という選択も持つ。',
 			contrast: '何でも引き受ける会社は多い。私たちは、価値が出るものだけを残す。'
+		}
+	];
+
+	const works = [
+		{
+			num: 'Case 01',
+			meta: '美容系事業会社 ／ アーキテクト伴走 ／ 継続支援',
+			body: 'ホームページ制作、事業用システム開発、事業方針の相談を一体で。システム選定から進め方の整理、コスト管理、投資判断まで、技術と経営の両面で並走しています。'
+		},
+		{
+			num: 'Case 02',
+			meta: '不動産会社 ／ 運用保守 ／ 継続＋スポット',
+			body: 'ホームページの更新、軽微な改善、社内アカウント管理を継続で。必要なときには、社内ツールの整備などにスポットで対応します。'
 		}
 	];
 
@@ -273,12 +290,7 @@
 			class:dimmed={view}
 			style="background:radial-gradient(120% 95% at 50% 40%, #f6f5f8 0%, #e9e8ed 52%, #d6d5dc 100%)"
 		>
-			<Orrery
-				bind:this={orrery}
-				items={planets}
-				foundedISO={companyInfo.established}
-				on:select={onSelect}
-			/>
+			<Orrery bind:this={orrery} items={planets} on:select={onSelect} />
 
 			<!-- HUD — 必要最低限。意味ある数値 (創業からの経過日数) はここに一度だけ。 -->
 			<div class="pointer-events-none absolute inset-0 z-20">
@@ -334,26 +346,28 @@
 					<p
 						class="mt-8 md:mt-12 max-w-3xl font-mincho text-[20px] md:text-[28px] leading-[1.9] text-ink tracking-[0.02em]"
 					>
-						お客様のお手伝いをするときは、<br class="hidden md:block" />
-						<span class="underline-handwritten">お客様が本来の事業に集中する時間</span
-						>を生み出すことを仕事としています。
+						お客様のお手伝いをするとき、私たちが第一に考えるのは、<br class="hidden md:block" />
+						<span class="underline-handwritten">お客様が本来の事業に集中できる時間</span
+						>を生み出すことです。
 					</p>
-					<p class="mt-5 md:mt-7 font-mincho text-[14px] md:text-[15px] leading-[2.1] text-ink/60">
-						システム開発そのものは、そのための手段です。
+					<p class="mt-5 md:mt-7 font-mincho text-[14px] md:text-[15px] leading-[2.1] text-ink/65">
+						システムやプロダクトをつくること自体は、そのための手段にすぎません。だからこそ、言われたものをそのままつくるのではなく、「本当に必要なものは何か」を一緒に見極めるところから始めます。
 					</p>
 					<p
 						class="mt-12 md:mt-16 max-w-3xl font-mincho text-[18px] md:text-[22px] leading-[1.95] text-ink tracking-[0.02em]"
 					>
-						そして私たちが引き受けるのは、<br class="hidden md:block" />
-						<span class="underline-handwritten">Excellent</span>.（卓越）か、<span
+						そのうえで私たちが引き受けるのは、<br class="hidden md:block" />
+						<span class="underline-handwritten">Excellent</span>.（卓越した品質）か、<span
 							class="text-sakura font-display italic">Kawaii</span
-						><span class="text-sakura">.</span>（愛着）か、<span class="font-display italic"
-							>Unique</span
-						><span class="text-sakura">.</span>（独自）か。<br class="hidden md:block" />
-						このどれかを生み出せる仕事だけです。
+						><span class="text-sakura">.</span>（愛着のもてる体験）か、<span
+							class="font-display italic">Unique</span
+						><span class="text-sakura">.</span>（他にはない独自性）か。<br
+							class="hidden md:block"
+						/>
+						関わる仕事に、このどれかの要素を確かに宿せること。
 					</p>
-					<p class="mt-5 font-mincho text-[14px] md:text-[15px] leading-[2.1] text-ink/60">
-						どれにもならないものは、つくらない。やらないことを決めるところから、私たちの設計は始まります。
+					<p class="mt-5 font-mincho text-[14px] md:text-[15px] leading-[2.1] text-ink/65">
+						私たちは、関わるすべての仕事で、この三つのどれかを確かな価値として生み出します。
 					</p>
 
 					<div class="mt-14 md:mt-20">
@@ -415,6 +429,35 @@
 								<div class="md:col-span-5 md:pl-6 md:border-l md:border-ink/15">
 									<p class="font-display italic text-[18px] md:text-[22px] leading-[1.55] text-ink">
 										{s.value}
+									</p>
+								</div>
+							</article>
+						{/each}
+					</div>
+				</div>
+			</section>
+		{/if}
+
+		{#if !mounted || view === 'works'}
+			<section id="works" class="doc-section" bind:this={panelScroller}>
+				{#if mounted}<div class="panel-head">
+						<button class="back-btn" on:click={() => back()}>← 戻る</button>
+						<p class="panel-en">{titles.works.en}</p>
+					</div>{/if}
+				<div class="panel-inner">
+					<h2 class="sec-label">実績</h2>
+					<div class="mt-8 md:mt-12">
+						{#each works as w}
+							<article
+								class="grid md:grid-cols-12 gap-3 md:gap-10 py-9 md:py-12 border-t border-ink/15"
+							>
+								<p class="md:col-span-3 font-mono text-[11px] tracking-[0.3em] text-ink/50 pt-1">
+									{w.num}
+								</p>
+								<div class="md:col-span-9 max-w-2xl">
+									<h3 class="font-mincho text-base md:text-lg text-ink">{w.meta}</h3>
+									<p class="mt-4 font-mincho text-[14px] md:text-[15px] leading-[2] text-ink/75">
+										{w.body}
 									</p>
 								</div>
 							</article>

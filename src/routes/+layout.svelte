@@ -34,41 +34,27 @@
 	</main>
 
 	{#if !isHome}
-		<footer class="relative pt-16 md:pt-20 pb-10">
-			<div class="relative max-w-[1400px] mx-auto px-6 md:px-10">
-				<div class="flex flex-col md:flex-row md:items-end md:justify-between gap-10">
-					<div>
-						<img src="{base}/black.svg" alt="bitboxx" class="h-5 w-auto" />
-						<p class="mt-5 font-mincho text-[12.5px] leading-[2] text-ink/65">
-							〒103-0015 東京都中央区日本橋箱崎町16-11 ルミネ日本橋601
-						</p>
-					</div>
-					<ul class="flex flex-wrap gap-x-8 gap-y-2 font-mincho text-[12.5px] text-ink/70">
-						<li>
-							<a href="{base}/terms_of_service" class="hover:text-sakura transition-colors"
-								>利用規約</a
-							>
-						</li>
-						<li>
-							<a href="{base}/privacy_policy" class="hover:text-sakura transition-colors"
-								>プライバシーポリシー</a
-							>
-						</li>
-						<li>
-							<a href="mailto:contact@bitboxx.co.jp" class="hover:text-sakura transition-colors"
-								>contact@bitboxx.co.jp</a
-							>
-						</li>
-					</ul>
-				</div>
-				<div
-					class="mt-10 pt-5 border-t border-ink/10 flex flex-col md:flex-row md:items-center md:justify-between gap-1.5"
-				>
-					<p class="font-mincho text-[12px] text-ink/55">株式会社bitboxx</p>
-					<p class="font-mono text-[11px] tracking-[0.12em] text-ink/45">
-						© {new Date().getFullYear()} bitboxx Inc.
-					</p>
-				</div>
+		<!-- 規約ページのフッターは最小限 — もう一方の規約への導線と著作権だけ。
+		     会社情報は本文 (事業者情報) に記載済みなので重複させない。 -->
+		<footer class="relative mt-16 border-t border-ink/10 py-8">
+			<div
+				class="max-w-4xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-3"
+			>
+				<ul class="flex gap-6 font-mincho text-[12px] text-ink/60">
+					<li>
+						<a href="{base}/terms_of_service" class="hover:text-sakura transition-colors"
+							>利用規約</a
+						>
+					</li>
+					<li>
+						<a href="{base}/privacy_policy" class="hover:text-sakura transition-colors"
+							>プライバシーポリシー</a
+						>
+					</li>
+				</ul>
+				<p class="font-mono text-[11px] tracking-[0.12em] text-ink/45">
+					© {new Date().getFullYear()} bitboxx Inc.
+				</p>
 			</div>
 		</footer>
 	{/if}

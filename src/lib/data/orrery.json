@@ -1,5 +1,5 @@
 {
-	"_schema": "各ノード: id / label(和文) / en(欧文) / solid(立体: tetra|octa|dodeca|icosa)。動作はいずれか一つ — content(コンテンツウィンドウを開く節ID) / href(アンカー・外部リンクへ遷移) / children(衛星。フォーカス後さらに選ぶ入れ子の軌道)。",
+	"_schema": "各ノード: id / label(和文) / en(欧文) / solid(立体: tetra|hexa|octa|dodeca|icosa)。動作はいずれか一つ — content(コンテンツウィンドウを開く節ID) / href(アンカー・外部リンクへ遷移) / children(衛星。フォーカス後さらに選ぶ入れ子の軌道)。中心の「!?」立方体はブランドマーク。惑星は5つのプラトン立体。",
 	"nodes": [
 		{
 			"id": "about",
@@ -14,6 +14,13 @@
 			"en": "BUSINESS",
 			"solid": "octa",
 			"content": "business"
+		},
+		{
+			"id": "works",
+			"label": "実績",
+			"en": "WORKS",
+			"solid": "hexa",
+			"content": "works"
 		},
 		{
 			"id": "company",
