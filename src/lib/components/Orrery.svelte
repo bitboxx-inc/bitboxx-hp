@@ -225,6 +225,12 @@
 			dragBase = 0,
 			dragOffset = 0,
 			moved = false;
+		// スワイプの勢い (フリック判定用)。離した瞬間の速度を慣性として少し先に投影し、
+		// 次の惑星まで送るか・その場へ戻すかを決める。
+		let dragVel = 0, // 正規化変位 / 秒 (平滑化済み)
+			lastDelta = 0,
+			lastMoveT = 0,
+			dragStartFocus = 0;
 		let wheelAcc = 0;
 		let wheelLock = 0; // スクロールのクールダウン (連続ステップ防止)
 		let approach = { active: false, t: 0, target: new THREE.Vector3() };
@@ -338,6 +344,17 @@
 			// ── DOM オーバーレイ (ラベル / レティクル) ──
 			// ラベルは「中心から外向き」に置く。奥 (上側) の惑星でも中央キューブに被らない。
 			const cubeC = projectPx(ORIGIN);
+			// 奥行き — 遠い惑星ほどラベルも縮小する。カメラからの距離を毎フレーム正規化。
+			let dMin = Infinity,
+				dMax = -Infinity;
+			const labelDist: number[] = [];
+			for (let i = 0; i < items.length; i++) {
+				const d = camera.position.distanceTo(planetMeshes[i].position);
+				labelDist[i] = d;
+				if (d < dMin) dMin = d;
+				if (d > dMax) dMax = d;
+			}
+			const dSpan = Math.max(0.001, dMax - dMin);
 			for (let i = 0; i < items.length; i++) {
 				const focused = i === focusIndex;
 				const pos = planetMeshes[i].position;
@@ -363,7 +380,10 @@
 				const ch = raycaster.intersectObject(cube, false);
 				const occluded = ch.length > 0 && ch[0].distance < distToPlanet - 0.2;
 				const lo = approach.active || sp.behind || occluded ? 0 : focused ? 1 : 0.82;
-				el.style.transform = `translate(-50%,-50%) translate(${sp.x + dx * off}px,${sp.y + dy * off}px)`;
+				// 距離に応じて文字を縮小 (近い=1.0 / 最遠=約0.66)。focus 惑星は常に最前列で 1.0。
+				const depthT = (labelDist[i] - dMin) / dSpan;
+				const fontScale = (1 - depthT * 0.34).toFixed(3);
+				el.style.transform = `translate(-50%,-50%) translate(${sp.x + dx * off}px,${sp.y + dy * off}px) scale(${fontScale})`;
 				el.style.opacity = String(lo);
 				el.style.pointerEvents = approach.active || occluded ? 'none' : 'auto';
 				el.classList.toggle('is-focused', focused);
@@ -415,6 +435,13 @@
 				const delta = portrait
 					? (e.clientY - dragStartY) / r.height
 					: (e.clientX - dragStartX) / r.width;
+				// 速度 = 変位の時間微分。指の勢いを平滑化して保持する。
+				const now = performance.now();
+				const dtv = Math.max(8, now - lastMoveT) / 1000;
+				const inst = (delta - lastDelta) / dtv;
+				dragVel = dragVel * 0.55 + inst * 0.45;
+				lastDelta = delta;
+				lastMoveT = now;
 				dragOffset = -delta * 2.4;
 			}
 		};
@@ -426,6 +453,11 @@
 			dragStartX = e.clientX;
 			dragStartY = e.clientY;
 			dragBase = master;
+			// フリック判定の初期化
+			dragVel = 0;
+			lastDelta = 0;
+			lastMoveT = performance.now();
+			dragStartFocus = focusIndex;
 		};
 		const onUp = (e: PointerEvent) => {
 			if (!dragging) return;
@@ -443,8 +475,12 @@
 				dragOffset = 0;
 				return;
 			}
-			// ドラッグ終了 → 最寄りへスナップ
-			const eff = dragBase + dragOffset;
+			// ドラッグ終了 → 慣性 (離した瞬間の速度) を少し先へ投影してスナップ先を決める。
+			// 遅い指 = ほぼ現在位置 → 最寄り (= 元の惑星に戻る)。
+			// 速い指 = 大きく投影 → 隣へ「くるっと」送られる。
+			const PROJECT = 0.18; // 投影する慣性の秒数
+			const projOffset = dragOffset + -2.4 * dragVel * PROJECT;
+			const eff = dragBase + projOffset;
 			let best = 0,
 				bestD = Infinity;
 			for (let i = 0; i < items.length; i++) {
@@ -454,8 +490,15 @@
 					best = i;
 				}
 			}
+			// 1 ジェスチャ = 最大 1 惑星 (ホイール/矢印と挙動を統一)。開始時の惑星から ±1 に丸める。
+			const n = items.length;
+			let step = ((best - dragStartFocus) % n + n) % n;
+			if (step > n / 2) step -= n; // 最短の符号付きステップ
+			if (step > 1) step = 1;
+			else if (step < -1) step = -1;
 			dragOffset = 0;
-			setFocus(best);
+			dragVel = 0;
+			setFocus(dragStartFocus + step);
 		};
 		const onWheel = (e: WheelEvent) => {
 			if (approach.active) return;
