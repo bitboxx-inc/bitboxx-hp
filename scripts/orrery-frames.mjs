@@ -19,45 +19,33 @@ async function run(name, width, height, dsf) {
 	page.on('console', (m) => {
 		if (m.type() === 'error') console.error(`[${name}] console:`, m.text());
 	});
+	const cx = width / 2,
+		cy = height / 2;
 	await page.goto(BASE_URL, { waitUntil: 'load' });
 	await page.evaluate(() => document.fonts?.ready ?? Promise.resolve());
+	await page.mouse.move(cx, cy);
 	await page.waitForTimeout(900);
 	await page.screenshot({ path: join(OUT, `${name}-01-idle.png`) });
 
 	// スクロールで focus を進める
-	const cx = width / 2,
-		cy = height / 2;
-	await page.mouse.move(cx, cy);
 	await page.mouse.wheel(0, 240);
 	await page.waitForTimeout(700);
+	await page.mouse.move(cx, cy);
 	await page.screenshot({ path: join(OUT, `${name}-02-focus2.png`) });
 	await page.mouse.wheel(0, 240);
 	await page.waitForTimeout(700);
+	await page.mouse.move(cx, cy);
 	await page.screenshot({ path: join(OUT, `${name}-03-focus3.png`) });
 
 	// カーソルを左右に振ってプレビュー回転
-	await page.mouse.move(width * 0.2, cy);
+	await page.mouse.move(width * 0.32, cy);
 	await page.waitForTimeout(400);
 	await page.screenshot({ path: join(OUT, `${name}-04-parallax.png`) });
 	await page.mouse.move(cx, cy);
-	await page.waitForTimeout(400);
+	await page.waitForTimeout(500);
 
-	// 着陸 — 現在 focus の惑星ラベルをクリック
-	try {
-		const btn = page.locator('.planet-label.is-focused');
-		await btn.click({ timeout: 2000 });
-	} catch {
-		// フォールバック: 見えているラベルを順に試す
-		const labels = page.locator('.planet-label');
-		const n = await labels.count();
-		for (let i = 0; i < n; i++) {
-			const op = await labels.nth(i).evaluate((el) => parseFloat(getComputedStyle(el).opacity));
-			if (op > 0.8) {
-				await labels.nth(i).click({ force: true });
-				break;
-			}
-		}
-	}
+	// 着陸 — focus 中の惑星ラベルをクリック
+	await page.locator('.planet-label.is-focused').click({ force: true, timeout: 3000 });
 	await page.waitForTimeout(300);
 	await page.screenshot({ path: join(OUT, `${name}-05-landing.png`) });
 	await page.waitForTimeout(700);

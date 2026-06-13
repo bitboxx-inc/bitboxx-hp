@@ -10,25 +10,22 @@
 
 <script lang="ts">
 	/**
-	 * Orrery — 3 次元グリッド空間に項目を太陽系のように配置した、自作のワイヤーフレーム描画系。
+	 * Orrery — three.js による本格 3D の空間ナビゲーション。
 	 *
-	 * three.js は使わず、Canvas2D に手書きの透視投影 (vec3 → 回転 → 1/z 射影) を載せている。
-	 * これは「ありきたりな 3D ライブラリのツヤ」を避け、製図図面のような幾何で空間を出すため。
+	 * 中心に bitboxx「!?」ロゴの立方体 (実材質・環境反射) が回り、項目が惑星として
+	 * 黄道面の軌道を回る。スクロール / ドラッグ / ←→ で次の惑星が手前に来て (focus)、
+	 * ラベルが実 DOM ボタンになりクリック / Enter で「着陸」= カメラがその惑星へ寄り、
+	 * 'select' を上位へ送る。
 	 *
-	 * 一つの意味ある数値 = 創業日 (2024-04-25) からの経過日数 `day` を、
-	 *   - HUD のモノスペース数字
-	 *   - 系全体の基準回転位相 (day をラジアンへ)
-	 *   - 遠景の星の数
-	 * という別々の形で同時に表現する。数値に意味を持たせ、違う形で出す。
-	 *
-	 * 操作: スクロール / 横ドラッグ / ←→ で隣の惑星が手前に回り込む (focus)。
-	 *       手前の惑星はラベルが実 DOM ボタンになり、クリック / Enter で「着陸」。
-	 *       着陸はカメラがその惑星へ急接近し、'select' を上位へ送る。
+	 * 一つの意味ある数値 = 創業日からの経過日数 `day` を、星の数と系の基準位相に使う。
+	 * 環境は RoomEnvironment を PMREM したものでクロムのリングに反射を与える。
 	 */
 	import { createEventDispatcher, onMount } from 'svelte';
+	import * as THREE from 'three';
+	import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
+	import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
 	export let items: OrreryItem[] = [];
-	/** 創業日 — 意味の源泉 */
 	export let foundedISO = '2024-04-25';
 
 	const dispatch = createEventDispatcher<{ select: string; focus: string }>();
@@ -37,15 +34,15 @@
 	let canvas: HTMLCanvasElement;
 	let labelEls: HTMLButtonElement[] = [];
 	let sunEl: HTMLAnchorElement;
+	let reticleEl: HTMLDivElement;
 
-	let day = 0; // 創業からの経過日数 (HUD 表示にも使う)
+	let day = 0;
 	let focusIndex = 0;
 
-	// ── 公開メソッド (上位がバインドして使う) ───────────────────
-	let api: {
-		leave: () => void;
-		focusTo: (id: string) => void;
-	} = { leave: () => {}, focusTo: () => {} };
+	let api: { leave: () => void; focusTo: (id: string) => void } = {
+		leave: () => {},
+		focusTo: () => {}
+	};
 	export function leave() {
 		api.leave();
 	}
@@ -53,41 +50,173 @@
 		api.focusTo(id);
 	}
 
-	type V3 = { x: number; y: number; z: number };
+	const SAKURA = 0xff2630;
+	const INK = 0x1b1a1f;
 
 	onMount(() => {
-		const ctx = canvas.getContext('2d')!;
 		const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 		// ── 意味ある数値 ──
 		const founded = new Date(foundedISO + 'T00:00:00+09:00').getTime();
 		day = Math.max(0, Math.floor((Date.now() - founded) / 86400000));
-		const STAR_COUNT = 90 + (day % 60); // 星の数 = day の別の形
-		const dayPhase = (day % 360) * (Math.PI / 180); // 基準位相 = day の別の形
+		const STAR_COUNT = 320 + (day % 120);
 
-		// ── カメラ ── 系を斜め上から見下ろす 3/4 ビュー
-		const CAM0: V3 = { x: 0, y: 4.0, z: -10.6 };
-		const PITCH0 = 0.42;
-		const cam = { ...CAM0, pitch: PITCH0, yaw: 0, focal: 900, near: 0.25 };
-		let focalBase = 900;
+		// ── レンダラ ──
+		const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+		renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+		renderer.toneMapping = THREE.ACESFilmicToneMapping;
+		renderer.toneMappingExposure = 1.08;
+		renderer.outputColorSpace = THREE.SRGBColorSpace;
 
-		// ── 入力状態 ──
+		const scene = new THREE.Scene();
+		const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 200);
+
+		// 環境マップ (クロムの反射用)
+		const pmrem = new THREE.PMREMGenerator(renderer);
+		const envRT = pmrem.fromScene(new RoomEnvironment(), 0.04);
+		scene.environment = envRT.texture;
+
+		// ── ライト ──
+		const hemi = new THREE.HemisphereLight(0xffffff, 0xd6d5da, 0.85);
+		scene.add(hemi);
+		const key = new THREE.DirectionalLight(0xffffff, 1.5);
+		key.position.set(4, 8, -3);
+		scene.add(key);
+		const rim = new THREE.DirectionalLight(0xffffff, 0.7);
+		rim.position.set(-5, 3, 6);
+		scene.add(rim);
+
+		// ── マテリアル ──
+		const chromeFaint = new THREE.MeshStandardMaterial({
+			color: 0xd9d8de,
+			metalness: 1.0,
+			roughness: 0.22,
+			envMapIntensity: 1.0,
+			transparent: true,
+			opacity: 0.55
+		});
+		const inkMat = new THREE.MeshStandardMaterial({
+			color: INK,
+			metalness: 0.35,
+			roughness: 0.45,
+			flatShading: true
+		});
+		const redMat = new THREE.MeshStandardMaterial({
+			color: SAKURA,
+			emissive: SAKURA,
+			emissiveIntensity: 0.4,
+			metalness: 0.2,
+			roughness: 0.35,
+			flatShading: true
+		});
+
+		// ── 中心: 「!?」ロゴ立方体 ──
+		const logoTex = makeLogoTexture();
+		logoTex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+		const cubeMat = new THREE.MeshPhysicalMaterial({
+			map: logoTex,
+			color: 0xffffff,
+			metalness: 0.0,
+			roughness: 0.26,
+			clearcoat: 1.0,
+			clearcoatRoughness: 0.18,
+			envMapIntensity: 0.9
+		});
+		const CUBE = 1.32;
+		const cube = new THREE.Mesh(new RoundedBoxGeometry(CUBE, CUBE, CUBE, 6, 0.07), cubeMat);
+		scene.add(cube);
+		// 立方体を縁取る細いクロムのフレーム
+		const cubeEdge = new THREE.LineSegments(
+			new THREE.EdgesGeometry(new THREE.BoxGeometry(CUBE, CUBE, CUBE)),
+			new THREE.LineBasicMaterial({ color: 0x9a99a0, transparent: true, opacity: 0.5 })
+		);
+		cube.add(cubeEdge);
+
+		// ── 軌道リング + 惑星 ──
+		const orbitMeshes: THREE.Mesh[] = [];
+		const planetMeshes: THREE.Mesh[] = [];
+		items.forEach((it) => {
+			const orbit = new THREE.Mesh(
+				new THREE.TorusGeometry(it.r, 0.0075, 8, 160),
+				chromeFaint.clone()
+			);
+			orbit.rotation.x = Math.PI / 2;
+			scene.add(orbit);
+			orbitMeshes.push(orbit);
+
+			const planet = new THREE.Mesh(new THREE.IcosahedronGeometry(0.17, 0), inkMat);
+			scene.add(planet);
+			planetMeshes.push(planet);
+		});
+
+		// ── 漂う装飾リング (クロム) ──
+		const halos: THREE.Mesh[] = [];
+		for (let i = 0; i < 6; i++) {
+			const a = i * 1.97;
+			const dist = 7 + (i % 3) * 3;
+			const radius = 3.4 + (i % 4) * 2.3;
+			const ring = new THREE.Mesh(
+				new THREE.TorusGeometry(radius, 0.018, 10, 180),
+				chromeFaint.clone()
+			);
+			ring.position.set(Math.cos(a) * dist, (i % 2 ? 1 : -1) * (2 + i * 0.7), Math.sin(a) * dist);
+			ring.rotation.set(0.5 + i * 0.4, i * 0.6, i * 0.3);
+			ring.userData.spin = 0.06 * (i % 2 ? 1 : -1) * (1 + i * 0.12);
+			scene.add(ring);
+			halos.push(ring);
+		}
+
+		// ── 黄道面の極座標グリッド ──
+		const grid = new THREE.PolarGridHelper(9.5, 16, 7, 90, 0x9a99a0, 0x9a99a0);
+		(grid.material as THREE.Material).transparent = true;
+		(grid.material as THREE.Material).opacity = 0.12;
+		scene.add(grid);
+
+		// ── 星 ──
+		const starGeo = new THREE.BufferGeometry();
+		const starPos = new Float32Array(STAR_COUNT * 3);
+		for (let i = 0; i < STAR_COUNT; i++) {
+			const a = i * 2.399963229;
+			const yy = 1 - (i / (STAR_COUNT - 1)) * 2;
+			const rr = Math.sqrt(Math.max(0, 1 - yy * yy));
+			const rad = 16 + ((i * 13) % 22);
+			starPos[i * 3] = Math.cos(a) * rr * rad;
+			starPos[i * 3 + 1] = yy * rad * 0.6;
+			starPos[i * 3 + 2] = Math.sin(a) * rr * rad;
+		}
+		starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+		const stars = new THREE.Points(
+			starGeo,
+			new THREE.PointsMaterial({
+				color: 0x44434a,
+				size: 0.05,
+				sizeAttenuation: true,
+				transparent: true,
+				opacity: 0.5
+			})
+		);
+		scene.add(stars);
+
+		// ── カメラ基準 ──
+		const CAM_Y = 5.4;
+		const CAM_Z = -11.6;
+		const ORIGIN = new THREE.Vector3(0, 0, 0);
+		const camBase = new THREE.Vector3();
+		const lookAt = new THREE.Vector3();
+		const tmp = new THREE.Vector3();
+		const tmp2 = new THREE.Vector3();
+
+		// ── 入力状態 (Canvas2D 版から踏襲) ──
 		let mx = 0,
-			my = 0; // 正規化カーソル [-1,1]
-		let masterTarget = 0,
-			master = 0; // 系の基準回転 (focus を手前へ運ぶ)
+			my = 0;
+		let master = 0,
+			masterTarget = 0;
 		let dragging = false,
 			dragStartX = 0,
 			dragBase = 0,
 			dragOffset = 0;
 		let wheelAcc = 0;
-
-		// approach (着陸) アニメーション
-		let approach: { active: boolean; t: number; target: V3 } = {
-			active: false,
-			t: 0,
-			target: { x: 0, y: 0, z: 0 }
-		};
+		let approach = { active: false, t: 0, target: new THREE.Vector3() };
 
 		const TAU = Math.PI * 2;
 		const norm = (a: number) => {
@@ -95,284 +224,135 @@
 			while (a < -Math.PI) a += TAU;
 			return a;
 		};
-		const snap = (i: number) => -Math.PI / 2 - (items[i].phase * Math.PI) / 180 + dayPhase;
-
+		const snap = (i: number) => -Math.PI / 2 - (items[i].phase * Math.PI) / 180;
 		const setFocus = (i: number, announce = true) => {
 			focusIndex = ((i % items.length) + items.length) % items.length;
 			if (announce) dispatch('focus', items[focusIndex].id);
 		};
-
-		// ── 投影 ──
-		const project = (p: V3, W: number, H: number) => {
-			let x = p.x - cam.x,
-				y = p.y - cam.y,
-				z = p.z - cam.z;
-			const cyaw = Math.cos(cam.yaw),
-				syaw = Math.sin(cam.yaw);
-			const x1 = cyaw * x - syaw * z;
-			const z1 = syaw * x + cyaw * z;
-			const cp = Math.cos(cam.pitch),
-				sp = Math.sin(cam.pitch);
-			// 正のピッチ = 見下ろし
-			const y1 = cp * y + sp * z1;
-			const z2 = -sp * y + cp * z1;
-			if (z2 <= cam.near) return null;
-			const s = cam.focal / z2;
-			return { x: W / 2 + x1 * s, y: H / 2 - y1 * s, s, z: z2 };
-		};
-
-		// ── 回転ヘルパ ──
-		const rotY = (v: V3, a: number): V3 => {
-			const c = Math.cos(a),
-				s = Math.sin(a);
-			return { x: c * v.x + s * v.z, y: v.y, z: -s * v.x + c * v.z };
-		};
-		const rotX = (v: V3, a: number): V3 => {
-			const c = Math.cos(a),
-				s = Math.sin(a);
-			return { x: v.x, y: c * v.y - s * v.z, z: s * v.y + c * v.z };
-		};
-
-		// 惑星本体 = ワイヤー八面体
-		const OCTA: V3[] = [
-			{ x: 1, y: 0, z: 0 },
-			{ x: -1, y: 0, z: 0 },
-			{ x: 0, y: 1, z: 0 },
-			{ x: 0, y: -1, z: 0 },
-			{ x: 0, y: 0, z: 1 },
-			{ x: 0, y: 0, z: -1 }
-		];
-		const OCTA_E = [
-			[0, 2],
-			[0, 3],
-			[0, 4],
-			[0, 5],
-			[1, 2],
-			[1, 3],
-			[1, 4],
-			[1, 5],
-			[2, 4],
-			[2, 5],
-			[3, 4],
-			[3, 5]
-		];
-
-		// 星 (遠景) — day の数だけ、球殻にばらまく
-		const stars: V3[] = [];
-		for (let i = 0; i < STAR_COUNT; i++) {
-			// 決定的分布 (Math.random は使わない: リロードで星が踊らない)
-			const a = i * 2.399963229; // 黄金角
-			const yy = 1 - (i / (STAR_COUNT - 1)) * 2;
-			const rr = Math.sqrt(Math.max(0, 1 - yy * yy));
-			const rad = 18 + ((i * 7) % 13);
-			stars.push({ x: Math.cos(a) * rr * rad, y: yy * rad * 0.55, z: Math.sin(a) * rr * rad });
-		}
-
-		// 惑星のワールド座標 (現在の master で)
-		const planetPos = (i: number): V3 => {
-			const ang = (items[i].phase * Math.PI) / 180 + master;
-			return { x: Math.cos(ang) * items[i].r, y: 0, z: Math.sin(ang) * items[i].r };
-		};
+		const planetAngle = (i: number) => (items[i].phase * Math.PI) / 180 + master;
 
 		// ── サイズ ──
 		let W = 0,
-			H = 0,
-			dpr = 1;
+			H = 0;
 		const resize = () => {
 			W = host.clientWidth;
 			H = host.clientHeight;
-			dpr = Math.min(window.devicePixelRatio || 1, 2);
-			canvas.width = Math.round(W * dpr);
-			canvas.height = Math.round(H * dpr);
-			canvas.style.width = W + 'px';
-			canvas.style.height = H + 'px';
-			// 最外周の軌道が画面幅に収まる焦点距離。狭い画面ほど寄る。
-			focalBase = W * (W < 720 ? 0.92 : 0.6);
-			cam.focal = focalBase;
+			renderer.setSize(W, H);
+			camera.aspect = W / Math.max(1, H);
+			camera.fov = W < 720 ? 46 : 34;
+			camera.updateProjectionMatrix();
 		};
 		resize();
 
-		const INK = '17,16,20';
-		const SAKURA = '255,38,48';
-
-		const line = (
-			a: { x: number; y: number } | null,
-			b: { x: number; y: number } | null,
-			col: string,
-			w = 1
-		) => {
-			if (!a || !b) return;
-			ctx.strokeStyle = col;
-			ctx.lineWidth = w;
-			ctx.beginPath();
-			ctx.moveTo(a.x, a.y);
-			ctx.lineTo(b.x, b.y);
-			ctx.stroke();
+		const projectPx = (v: THREE.Vector3) => {
+			tmp.copy(v).project(camera);
+			return { x: (tmp.x * 0.5 + 0.5) * W, y: (-tmp.y * 0.5 + 0.5) * H, behind: tmp.z > 1 };
 		};
 
-		// ── 描画 ──
-		const draw = (time: number) => {
-			ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-			ctx.clearRect(0, 0, W, H);
+		const easeInOut = (e: number) => (e < 0.5 ? 4 * e * e * e : 1 - Math.pow(-2 * e + 2, 3) / 2);
 
-			// 着陸の進行度 (カメラ急接近)
+		// ── フレーム ──
+		const frame = (time: number, dt: number) => {
+			// master を focus + 入力へ寄せる
+			if (!approach.active) {
+				let t = snap(focusIndex) + mx * 0.3 + dragOffset;
+				t = master + norm(t - master);
+				masterTarget = t;
+				master += (masterTarget - master) * Math.min(1, dt * 6);
+			}
+
+			// 惑星配置
+			for (let i = 0; i < items.length; i++) {
+				const ang = planetAngle(i);
+				const p = planetMeshes[i];
+				p.position.set(Math.cos(ang) * items[i].r, 0, Math.sin(ang) * items[i].r);
+				p.rotation.y += dt * 0.5;
+				p.rotation.x += dt * 0.3;
+				const focused = i === focusIndex;
+				p.material = focused ? redMat : inkMat;
+				const s = focused ? 1.7 : 1;
+				p.scale.setScalar(s);
+				const om = orbitMeshes[i].material as THREE.MeshStandardMaterial;
+				om.color.setHex(focused ? SAKURA : 0xd9d8de);
+				om.emissive.setHex(focused ? SAKURA : 0x000000);
+				om.emissiveIntensity = focused ? 0.4 : 0;
+				om.opacity = focused ? 0.85 : 0.5;
+				om.metalness = focused ? 0.3 : 1.0;
+			}
+
+			// 立方体の回転
+			cube.rotation.y = time * 0.18;
+			cube.rotation.x = time * 0.12;
+
+			// 装飾リングの首振り
+			for (const h of halos) {
+				h.rotation.z += dt * h.userData.spin;
+				h.rotation.x += dt * h.userData.spin * 0.5;
+			}
+			stars.rotation.y = time * 0.012;
+
+			// カメラ (控えめな parallax + 着陸 fly-in)
+			camBase.set(mx * 0.32, CAM_Y, CAM_Z);
 			let appE = 0;
 			if (approach.active) {
-				const e = Math.min(1, approach.t);
-				appE = e < 0.5 ? 4 * e * e * e : 1 - Math.pow(-2 * e + 2, 3) / 2; // easeInOutCubic
-				cam.x = CAM0.x + (approach.target.x - CAM0.x) * appE * 0.92;
-				cam.y = CAM0.y + (approach.target.y + 1.0 - CAM0.y) * appE * 0.92;
-				cam.z = CAM0.z + (approach.target.z - 1.2 - CAM0.z) * appE * 0.97;
-				cam.focal = focalBase * (1 + appE * 2.6);
+				appE = easeInOut(Math.min(1, approach.t));
+				tmp.subVectors(camBase, approach.target).normalize();
+				tmp2.copy(approach.target).addScaledVector(tmp, 1.7);
+				camera.position.lerpVectors(camBase, tmp2, appE);
+				lookAt.lerpVectors(ORIGIN, approach.target, appE);
 			} else {
-				cam.x = mx * 0.5;
-				cam.y = CAM0.y;
-				cam.z = CAM0.z;
-				cam.yaw = mx * 0.04;
-				cam.pitch = PITCH0 + my * 0.04;
-				cam.focal = focalBase;
+				camera.position.copy(camBase);
+				lookAt.set(mx * 0.18, my * 0.12, 0);
+			}
+			camera.lookAt(lookAt);
+
+			const dim = 1 - appE;
+			renderer.toneMappingExposure = 1.08 * (0.4 + 0.6 * dim);
+
+			const fp = planetMeshes[focusIndex];
+			renderer.render(scene, camera);
+
+			// ── DOM オーバーレイ (ラベル / レティクル / ワードマーク) ──
+			// ワードマークは立方体の下端より下へ
+			tmp.set(0, -0.92, 0);
+			const cubeBottom = projectPx(tmp);
+			if (sunEl) {
+				sunEl.style.transform = `translate(-50%,-50%) translate(${cubeBottom.x}px,${cubeBottom.y + 26}px)`;
+				sunEl.style.opacity = String(Math.max(0, 1 - appE * 2.2));
 			}
 
-			// 1) 星
-			const starRot = time * 0.000012;
-			for (const s of stars) {
-				const p = project(rotY(s, starRot), W, H);
-				if (!p) continue;
-				const o = Math.min(0.28, (p.s / cam.focal) * 7);
-				ctx.fillStyle = `rgba(${INK},${o.toFixed(3)})`;
-				const r = Math.max(0.6, p.s * 0.004);
-				ctx.fillRect(p.x - r, p.y - r, r * 2, r * 2);
-			}
-
-			// 2) 黄道面の格子 — 点群 (3 次元グリッド空間)。線にすると地平で縞になるので点で。
-			const G = 9;
-			for (let gx = -G; gx <= G; gx++) {
-				for (let gz = -G; gz <= G; gz++) {
-					const p = project({ x: gx, y: 0, z: gz }, W, H);
-					if (!p) continue;
-					const rad = Math.hypot(gx, gz);
-					const fade = 1 - Math.min(1, rad / (G + 1));
-					const o = (0.04 + fade * 0.1) * (1 - appE);
-					if (o < 0.012) continue;
-					ctx.fillStyle = `rgba(${INK},${o.toFixed(3)})`;
-					const r = Math.max(0.6, p.s * 0.0016);
-					ctx.fillRect(p.x - r, p.y - r, r * 2, r * 2);
-				}
-			}
-
-			// 3) 軌道リング
-			items.forEach((it, i) => {
-				const focused = i === focusIndex;
-				const o = (focused ? 0.32 : 0.13) * (1 - appE);
-				ctx.strokeStyle = focused
-					? `rgba(${SAKURA},${o.toFixed(3)})`
-					: `rgba(${INK},${o.toFixed(3)})`;
-				ctx.lineWidth = focused ? 1.3 : 1;
-				ctx.beginPath();
-				let started = false;
-				for (let a = 0; a <= 64; a++) {
-					const ang = (a / 64) * TAU;
-					const p = project({ x: Math.cos(ang) * it.r, y: 0, z: Math.sin(ang) * it.r }, W, H);
-					if (!p) {
-						started = false;
-						continue;
-					}
-					if (!started) {
-						ctx.moveTo(p.x, p.y);
-						started = true;
-					} else ctx.lineTo(p.x, p.y);
-				}
-				ctx.stroke();
-			});
-
-			// 4) 太陽 (ジャイロスコープ = 3 直交円) + 中心
-			const sunR = 0.62;
-			const sa = time * 0.00018;
-			const planes: Array<(v: V3) => V3> = [
-				(v) => rotY(v, sa),
-				(v) => rotX(rotY(v, sa), Math.PI / 2),
-				(v) => rotY(rotX(v, Math.PI / 2 + sa * 0.6), sa)
-			];
-			ctx.strokeStyle = `rgba(${INK},${(0.5 * (1 - appE)).toFixed(3)})`;
-			ctx.lineWidth = 1.1;
-			for (const tf of planes) {
-				ctx.beginPath();
-				let started = false;
-				for (let a = 0; a <= 48; a++) {
-					const ang = (a / 48) * TAU;
-					const v = tf({ x: Math.cos(ang) * sunR, y: Math.sin(ang) * sunR, z: 0 });
-					const p = project(v, W, H);
-					if (!p) {
-						started = false;
-						continue;
-					}
-					if (!started) {
-						ctx.moveTo(p.x, p.y);
-						started = true;
-					} else ctx.lineTo(p.x, p.y);
-				}
-				ctx.stroke();
-			}
-			const sunP = project({ x: 0, y: 0, z: 0 }, W, H);
-			if (sunP) {
-				ctx.fillStyle = `rgba(${SAKURA},${(0.9 * (1 - appE)).toFixed(3)})`;
-				ctx.beginPath();
-				ctx.arc(sunP.x, sunP.y, Math.max(2, sunP.s * 0.01), 0, TAU);
-				ctx.fill();
-				if (sunEl) {
-					sunEl.style.transform = `translate(-50%,-50%) translate(${sunP.x}px,${sunP.y + sunP.s * 0.085}px)`;
-					sunEl.style.opacity = String(Math.max(0, 1 - appE * 2.2));
-				}
-			}
-
-			// 5) 惑星 (奥から順に)
-			const order = items
-				.map((_, i) => i)
-				.sort((a, b) => project(planetPos(b), W, H)!.z - project(planetPos(a), W, H)!.z);
-			for (const i of order) {
-				const wp = planetPos(i);
-				const center = project(wp, W, H);
-				if (!center) {
-					if (labelEls[i]) labelEls[i].style.opacity = '0';
-					continue;
-				}
-				const focused = i === focusIndex;
-				const baseR = focused ? 0.3 : 0.17;
-				const spin = time * 0.0004 + i;
-				const col = focused ? SAKURA : INK;
-				const depthO = Math.min(1, (center.s / cam.focal) * 11);
-				const bodyO =
-					(focused ? 0.95 : 0.3 + 0.45 * depthO) *
-					(1 - (approach.active && i !== focusIndex ? appE : 0));
-
-				// 八面体
-				const pts = OCTA.map((v) => {
-					let r = rotY({ x: v.x * baseR, y: v.y * baseR, z: v.z * baseR }, spin);
-					r = rotX(r, spin * 0.6);
-					return project({ x: wp.x + r.x, y: wp.y + r.y, z: wp.z + r.z }, W, H);
-				});
-				for (const [a, b] of OCTA_E)
-					line(pts[a], pts[b], `rgba(${col},${bodyO.toFixed(3)})`, focused ? 1.4 : 1);
-
-				// focus のアクセント環
-				if (focused && !approach.active) {
-					ctx.strokeStyle = `rgba(${SAKURA},0.5)`;
-					ctx.lineWidth = 1.2;
-					ctx.beginPath();
-					ctx.arc(center.x, center.y, center.s * baseR * 1.7, 0, TAU);
-					ctx.stroke();
-				}
-
-				// ラベル DOM を惑星位置へ
+			for (let i = 0; i < items.length; i++) {
+				const sp = projectPx(planetMeshes[i].position);
 				const el = labelEls[i];
-				if (el) {
-					// 狭い画面では focus したラベルのみ (重なりを避ける)
-					const lo = focused ? 1 : W < 720 ? 0 : Math.max(0, depthO * 0.32 - 0.04);
-					el.style.transform = `translate(-50%,-50%) translate(${center.x}px,${center.y + center.s * baseR * 2.4}px)`;
-					el.style.opacity = String(approach.active ? (focused ? 0 : 0) : lo);
-					el.style.pointerEvents = focused && !approach.active ? 'auto' : 'none';
-					el.style.setProperty('--s', focused ? '1' : '0.82');
-					el.classList.toggle('is-focused', focused);
+				if (!el) continue;
+				const focused = i === focusIndex;
+				const dist = camera.position.distanceTo(planetMeshes[i].position);
+				const depthO = Math.min(1, 9 / dist - 0.2);
+				const lo = approach.active
+					? 0
+					: focused
+						? 1
+						: W < 720
+							? 0
+							: Math.max(0, depthO * 0.4 - 0.05);
+				el.style.transform = `translate(-50%,-50%) translate(${sp.x}px,${sp.y + 34}px)`;
+				el.style.opacity = String(sp.behind ? 0 : lo);
+				el.style.pointerEvents = focused && !approach.active ? 'auto' : 'none';
+				el.classList.toggle('is-focused', focused);
+			}
+
+			// レティクルの四隅ブラケット (DOM, crisp)
+			if (reticleEl) {
+				if (approach.active) {
+					reticleEl.style.opacity = '0';
+				} else {
+					const c = projectPx(fp.position);
+					tmp.copy(fp.position).add(new THREE.Vector3(0, 0.34, 0));
+					const top = projectPx(tmp);
+					const rad = Math.max(26, Math.hypot(c.x - top.x, c.y - top.y) * 1.8);
+					reticleEl.style.opacity = '1';
+					reticleEl.style.transform = `translate(-50%,-50%) translate(${c.x}px,${c.y}px)`;
+					reticleEl.style.setProperty('--r', `${rad}px`);
 				}
 			}
 		};
@@ -384,22 +364,12 @@
 			raf = requestAnimationFrame(loop);
 			const dt = Math.min(0.05, (now - last) / 1000);
 			last = now;
-
-			if (approach.active) {
-				approach.t += dt / 0.85;
-			} else {
-				// master を focus 目標 + 入力オフセットへ滑らかに寄せる
-				const preview = mx * 0.32;
-				let t = snap(focusIndex) + preview + dragOffset;
-				t = master + norm(t - master);
-				masterTarget = t;
-				master += (masterTarget - master) * Math.min(1, dt * 6);
-			}
-			draw(now);
+			if (approach.active) approach.t += dt / 0.85;
+			frame(now / 1000, dt);
 		};
 		if (prefersReduced) {
 			master = snap(0);
-			draw(performance.now());
+			frame(0, 0);
 		} else {
 			raf = requestAnimationFrame(loop);
 		}
@@ -409,14 +379,10 @@
 			const r = host.getBoundingClientRect();
 			mx = ((e.clientX - r.left) / r.width) * 2 - 1;
 			my = ((e.clientY - r.top) / r.height) * 2 - 1;
-			if (dragging) {
-				const dx = (e.clientX - dragStartX) / r.width;
-				dragOffset = -dx * 2.0;
-			}
+			if (dragging) dragOffset = -((e.clientX - dragStartX) / r.width) * 2.0;
 		};
 		const onDown = (e: PointerEvent) => {
 			if (approach.active) return;
-			// ラベル/太陽ボタン上の押下はドラッグにしない (クリックを奪わない)
 			if (e.target !== host && e.target !== canvas) return;
 			dragging = true;
 			dragStartX = e.clientX;
@@ -425,7 +391,6 @@
 		const onUp = () => {
 			if (!dragging) return;
 			dragging = false;
-			// ドラッグ量から最寄りの惑星へスナップ
 			const eff = dragBase + dragOffset;
 			let best = 0,
 				bestD = Infinity;
@@ -467,7 +432,6 @@
 		const onResize = () => resize();
 		window.addEventListener('resize', onResize);
 
-		// ── API ──
 		api = {
 			leave: () => {
 				approach.active = false;
@@ -483,7 +447,6 @@
 			}
 		};
 
-		// ラベル/太陽からの選択
 		selectHandler = (i: number) => {
 			if (approach.active) return;
 			if (i !== focusIndex) {
@@ -492,7 +455,8 @@
 			}
 			approach.active = true;
 			approach.t = 0;
-			approach.target = planetPos(i);
+			const ang = planetAngle(i);
+			approach.target.set(Math.cos(ang) * items[i].r, 0, Math.sin(ang) * items[i].r);
 			dispatch('select', items[i].id);
 		};
 		focusBtnHandler = (i: number) => {
@@ -507,10 +471,46 @@
 			host.removeEventListener('wheel', onWheel);
 			host.removeEventListener('keydown', onKey);
 			window.removeEventListener('resize', onResize);
+			scene.traverse((o) => {
+				const mesh = o as THREE.Mesh;
+				if (mesh.geometry) mesh.geometry.dispose();
+				const mat = mesh.material as THREE.Material | THREE.Material[];
+				if (Array.isArray(mat)) mat.forEach((m) => m.dispose());
+				else if (mat) mat.dispose();
+			});
+			logoTex.dispose();
+			envRT.texture.dispose();
+			pmrem.dispose();
+			renderer.dispose();
 		};
 	});
 
-	// テンプレートから呼ぶハンドラ (onMount 内で実体を差す)
+	// 「!?」ロゴをキャンバステクスチャに描く (box フレーム + ! + ?)
+	function makeLogoTexture(): THREE.CanvasTexture {
+		const S = 512;
+		const c = document.createElement('canvas');
+		c.width = c.height = S;
+		const x = c.getContext('2d')!;
+		x.fillStyle = '#f6f5f2';
+		x.fillRect(0, 0, S, S);
+		const BOX = 'm240,240H0V0h240v240Zm-226.46-13.54h212.92V13.54H13.54v212.92Z';
+		const EXCL =
+			'm85.61,92.07l-6.37,54.13h-11.72l-6.53-54.13v-29.43h24.63v29.43Zm-.63,63.42v22.74h-23.45v-22.74h23.45Z';
+		const QUES =
+			'm158.16,135.43c-.63,1.99-.97,5.08-1.02,9.28h-21.25c.31-8.86,1.16-14.99,2.52-18.37,1.36-3.39,4.88-7.28,10.54-11.69l5.74-4.49c1.89-1.41,3.41-2.96,4.56-4.64,2.1-2.89,3.14-6.06,3.14-9.52,0-3.98-1.16-7.62-3.5-10.89s-6.6-4.92-12.79-4.92-10.4,2.02-12.94,6.06-3.82,8.23-3.82,12.59h-22.74c.63-14.95,5.85-25.54,15.66-31.79,6.19-3.99,13.79-5.98,22.82-5.98,11.86,0,21.7,2.83,29.55,8.5,7.84,5.67,11.76,14.06,11.76,25.18,0,6.82-1.71,12.56-5.11,17.23-1.99,2.83-5.82,6.45-11.49,10.86l-5.59,4.33c-3.04,2.36-5.06,5.12-6.06,8.27Zm.63,42.8h-23.45v-22.74h23.45v22.74Z';
+		const margin = 64;
+		const scale = (S - margin * 2) / 240;
+		x.translate(margin, margin);
+		x.scale(scale, scale);
+		x.fillStyle = '#231815';
+		x.fill(new Path2D(BOX), 'evenodd');
+		x.fill(new Path2D(EXCL));
+		x.fill(new Path2D(QUES));
+		const tex = new THREE.CanvasTexture(c);
+		tex.colorSpace = THREE.SRGBColorSpace;
+		return tex;
+	}
+
 	let selectHandler: (i: number) => void = () => {};
 	let focusBtnHandler: (i: number) => void = () => {};
 </script>
@@ -524,19 +524,30 @@
 >
 	<canvas bind:this={canvas} class="absolute inset-0" aria-hidden="true"></canvas>
 
-	<!-- 太陽 = ブランド核 -->
+	<!-- focus 惑星の照準ブラケット -->
+	<div bind:this={reticleEl} class="reticle absolute left-0 top-0 z-10" aria-hidden="true">
+		<span class="rb tl"></span>
+		<span class="rb tr"></span>
+		<span class="rb bl"></span>
+		<span class="rb br"></span>
+	</div>
+
+	<!-- 立方体 = ブランド核。下にワードマーク。 -->
 	<a
 		bind:this={sunEl}
 		href="#about"
 		class="absolute left-0 top-0 z-10 select-none text-center"
 		on:click|preventDefault={() => focusBtnHandler(items.findIndex((i) => i.id === 'about'))}
 	>
-		<span class="block font-display italic text-lg md:text-xl tracking-hyper text-ink">bitboxx</span
+		<span class="font-techno block text-[10px] md:text-[11px] tracking-[0.44em] text-ink/80"
+			>BITBOXX</span
 		>
-		<span class="block font-mono text-[8.5px] tracking-[0.34em] text-ink/45 mt-0.5">E · K · U</span>
+		<span class="font-techno block text-[7.5px] tracking-[0.5em] text-ink/40 mt-1.5"
+			>E&nbsp;·&nbsp;K&nbsp;·&nbsp;U</span
+		>
 	</a>
 
-	<!-- 惑星ラベル (実 DOM ボタン = クリック & キーボード操作の実体) -->
+	<!-- 惑星ラベル (実 DOM ボタン) -->
 	{#each items as it, i (it.id)}
 		<button
 			bind:this={labelEls[i]}
@@ -545,9 +556,9 @@
 			on:focus={() => focusBtnHandler(i)}
 			aria-label={`${it.label} へ`}
 		>
-			<span class="block font-mono text-[9px] tracking-[0.28em] text-ink/45">{it.en}</span>
+			<span class="font-techno block text-[8.5px] tracking-[0.34em] text-ink/45">{it.en}</span>
 			<span
-				class="pl-ja block font-display text-[15px] md:text-[17px] tracking-hyper text-ink mt-0.5"
+				class="pl-ja font-techno block text-[14px] md:text-[15px] tracking-[0.18em] text-ink mt-1"
 				>{it.label}</span
 			>
 		</button>
@@ -557,7 +568,6 @@
 <style>
 	.planet-label {
 		transition: opacity 0.25s ease;
-		font-size: calc(1em * var(--s, 1));
 	}
 	:global(.planet-label.is-focused .pl-ja) {
 		color: #ff2630;
@@ -566,5 +576,43 @@
 		outline: 1px solid rgba(255, 38, 48, 0.6);
 		outline-offset: 6px;
 		border-radius: 2px;
+	}
+
+	/* 照準ブラケット */
+	.reticle {
+		width: 0;
+		height: 0;
+		pointer-events: none;
+		transition: opacity 0.2s ease;
+	}
+	.reticle .rb {
+		position: absolute;
+		width: 10px;
+		height: 10px;
+		border: 0 solid rgba(255, 38, 48, 0.85);
+	}
+	.reticle .tl {
+		left: calc(-1 * var(--r, 30px));
+		top: calc(-1 * var(--r, 30px));
+		border-left-width: 1.4px;
+		border-top-width: 1.4px;
+	}
+	.reticle .tr {
+		left: calc(var(--r, 30px) - 10px);
+		top: calc(-1 * var(--r, 30px));
+		border-right-width: 1.4px;
+		border-top-width: 1.4px;
+	}
+	.reticle .bl {
+		left: calc(-1 * var(--r, 30px));
+		top: calc(var(--r, 30px) - 10px);
+		border-left-width: 1.4px;
+		border-bottom-width: 1.4px;
+	}
+	.reticle .br {
+		left: calc(var(--r, 30px) - 10px);
+		top: calc(var(--r, 30px) - 10px);
+		border-right-width: 1.4px;
+		border-bottom-width: 1.4px;
 	}
 </style>

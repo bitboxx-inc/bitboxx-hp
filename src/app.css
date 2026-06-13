@@ -39,6 +39,11 @@
 }
 
 @layer utilities {
+	/* 未来テック系の見出し/ラベル用。和文は Noto Sans JP にフォールバック。 */
+	.font-techno {
+		font-family: 'Michroma', 'Space Grotesk', 'Noto Sans JP', system-ui, sans-serif;
+	}
+
 	/* Hero 由来のサクラ下線 — 本文の一語を蛍光ペンで引いたように強める */
 	.underline-handwritten {
 		background-image: linear-gradient(

@@ -240,7 +240,7 @@
 
 	<!-- ── 宇宙 (オアリー) — ハイドレーション後のみ ── -->
 	{#if mounted}
-		<div class="orrery-stage fixed inset-0 z-0 bg-cream-50" class:dimmed={view}>
+		<div class="orrery-stage fixed inset-0 z-0" class:dimmed={view} style="background:#e7e6ea">
 			<Orrery
 				bind:this={orrery}
 				items={planets}
@@ -248,24 +248,30 @@
 				on:select={onSelect}
 			/>
 
-			<!-- HUD — 必要最低限。意味ある数値 (創業からの経過日数) はここに一度だけ。 -->
+			<!-- HUD — 未来テックの計器枠。意味ある数値 (創業からの経過日数) はここに一度だけ。 -->
 			<div class="pointer-events-none absolute inset-0 z-20">
+				<!-- ビューポートの四隅ブラケット -->
+				<span class="hud-corner tl"></span>
+				<span class="hud-corner tr"></span>
+				<span class="hud-corner bl"></span>
+				<span class="hud-corner br"></span>
+
 				<div
-					class="absolute left-5 md:left-8 top-5 md:top-7 font-mono text-[10px] leading-[1.7] tracking-[0.22em] text-ink/55"
+					class="font-techno absolute left-6 md:left-9 top-6 md:top-8 text-[9px] leading-[2] tracking-[0.3em] text-ink/55"
 				>
 					BITBOXX INC.<br />
-					NIHONBASHI, TOKYO
+					NIHONBASHI · TOKYO
 				</div>
 				<div
-					class="absolute right-5 md:right-8 top-5 md:top-7 text-right font-mono text-[10px] leading-[1.7] tracking-[0.22em] text-ink/55"
+					class="font-techno absolute right-6 md:right-9 top-6 md:top-8 text-right text-[9px] leading-[2] tracking-[0.3em] text-ink/55"
 				>
 					EST. 2024.04.25<br />
 					DAY {String(dayCount).padStart(4, '0')}
 				</div>
 				<div
-					class="space-hint absolute left-1/2 -translate-x-1/2 bottom-6 md:bottom-8 text-center font-mono text-[9.5px] tracking-[0.3em] text-ink/40"
+					class="space-hint font-techno absolute left-1/2 -translate-x-1/2 bottom-7 md:bottom-9 text-center text-[8.5px] tracking-[0.34em] text-ink/40"
 				>
-					SCROLL · DRAG で周回 ／ 選択で着陸
+					SCROLL · DRAG ORBIT ／ SELECT TO LAND
 				</div>
 			</div>
 		</div>
@@ -585,10 +591,51 @@
 		margin: 0 auto;
 	}
 	.sec-label {
-		font-family: '"JetBrains Mono"', monospace;
-		font-size: 11px;
-		letter-spacing: 0.3em;
-		color: rgba(17, 16, 20, 0.5);
+		display: inline-flex;
+		align-items: center;
+		gap: 0.85rem;
+		font-family: 'Michroma', 'Space Grotesk', sans-serif;
+		font-size: 10px;
+		letter-spacing: 0.34em;
+		color: rgba(17, 16, 20, 0.6);
+	}
+	.sec-label::before {
+		content: '';
+		width: 34px;
+		height: 1px;
+		background: linear-gradient(90deg, rgba(255, 38, 48, 0.7), rgba(255, 38, 48, 0));
+	}
+
+	/* HUD の四隅ブラケット (未来テックの計器枠) */
+	.hud-corner {
+		position: absolute;
+		width: 22px;
+		height: 22px;
+		border: 0 solid rgba(17, 16, 20, 0.22);
+	}
+	.hud-corner.tl {
+		left: 18px;
+		top: 18px;
+		border-left-width: 1px;
+		border-top-width: 1px;
+	}
+	.hud-corner.tr {
+		right: 18px;
+		top: 18px;
+		border-right-width: 1px;
+		border-top-width: 1px;
+	}
+	.hud-corner.bl {
+		left: 18px;
+		bottom: 18px;
+		border-left-width: 1px;
+		border-bottom-width: 1px;
+	}
+	.hud-corner.br {
+		right: 18px;
+		bottom: 18px;
+		border-right-width: 1px;
+		border-bottom-width: 1px;
 	}
 
 	/* ── orrery モード: 選択された節をフルスクリーンパネルとして ── */
@@ -603,7 +650,8 @@
 		position: absolute;
 		inset: 0;
 		overflow-y: auto;
-		background: #ffffff;
+		/* 宇宙の発光を引き継ぐ淡いフィールド */
+		background: radial-gradient(120% 80% at 50% 0%, #ffffff 0%, #f5f4f6 45%, #ececef 100%);
 		pointer-events: auto;
 		padding-top: 5.5rem;
 	}
@@ -616,7 +664,7 @@
 		justify-content: space-between;
 		padding: 1.1rem 1.5rem;
 		margin: -5.5rem -1.5rem 2.5rem;
-		background: rgba(255, 255, 255, 0.85);
+		background: rgba(245, 244, 246, 0.82);
 		backdrop-filter: blur(8px);
 		border-bottom: 1px solid rgba(17, 16, 20, 0.08);
 	}
@@ -627,18 +675,19 @@
 		}
 	}
 	.back-btn {
-		font-family: '"Noto Serif JP"', serif;
-		font-size: 13px;
-		color: rgba(17, 16, 20, 0.75);
+		font-family: 'Michroma', 'Space Grotesk', 'Noto Sans JP', sans-serif;
+		font-size: 10px;
+		letter-spacing: 0.2em;
+		color: rgba(17, 16, 20, 0.7);
 		transition: color 0.2s ease;
 	}
 	.back-btn:hover {
 		color: #ff2630;
 	}
 	.panel-en {
-		font-family: '"JetBrains Mono"', monospace;
+		font-family: 'Michroma', 'Space Grotesk', sans-serif;
 		font-size: 10px;
-		letter-spacing: 0.3em;
+		letter-spacing: 0.34em;
 		color: rgba(17, 16, 20, 0.4);
 	}
 

@@ -6,7 +6,13 @@ const config: PlaywrightTestConfig = {
 		port: 4173
 	},
 	testDir: 'tests',
-	testMatch: /(.+\.)?(test|spec)\.[jt]s/
+	testMatch: /(.+\.)?(test|spec)\.[jt]s/,
+	// ヒーローは WebGL (three.js)。ヘッドレスでも描画させるため software GL を許可。
+	use: {
+		launchOptions: {
+			args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader']
+		}
+	}
 };
 
 export default config;
