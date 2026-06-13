@@ -3,6 +3,7 @@
 		id: string;
 		label: string; // 和文
 		en: string; // 欧文ラベル
+		solid: string; // プラトン立体: tetra | octa | dodeca | icosa
 		r: number; // 軌道半径
 		phase: number; // 軌道上の初期位相 (deg)
 	};
@@ -126,15 +127,20 @@
 		cube.add(cubeEdge);
 
 		// ── 軌道リング + 惑星 ──
-		// 中心の立方体 (正六面体) に対し、各セクションは残る 4 つのプラトン立体。
-		// 完全な正多面体はこの 5 つしか存在しない (幾何学の定理) — それが「知的な根拠」。
-		// 内→外で 面数 4→8→12→20 と複雑さが増す。色分けはしない。
-		const solidGeos = [
-			new THREE.TetrahedronGeometry(0.4), // 4 面: 私たちのこと
-			new THREE.OctahedronGeometry(0.36), // 8 面: 事業内容
-			new THREE.DodecahedronGeometry(0.32), // 12 面: 会社概要
-			new THREE.IcosahedronGeometry(0.32) // 20 面: お問い合わせ
-		];
+		// 中心の立方体 (正六面体) に対し、各ノードはプラトン立体 (JSON の solid で指定)。
+		// 完全な正多面体はこの 5 つしか存在しない (幾何学の定理) — それが「知的な根拠」。色分けはしない。
+		const solidGeo = (s: string): THREE.BufferGeometry => {
+			switch (s) {
+				case 'tetra':
+					return new THREE.TetrahedronGeometry(0.4); // 4 面
+				case 'octa':
+					return new THREE.OctahedronGeometry(0.36); // 8 面
+				case 'dodeca':
+					return new THREE.DodecahedronGeometry(0.32); // 12 面
+				default:
+					return new THREE.IcosahedronGeometry(0.32); // 20 面
+			}
+		};
 		// 全惑星は中心から等距離 — 軌道は一本のリングを共有する。
 		const orbitMat = chromeFaint.clone();
 		orbitMat.opacity = 0.16;
@@ -150,8 +156,8 @@
 			depthWrite: false
 		});
 		const hitGeo = new THREE.SphereGeometry(0.62, 8, 8);
-		items.forEach((_, i) => {
-			const planet = new THREE.Mesh(solidGeos[i % solidGeos.length], solidMat);
+		items.forEach((it) => {
+			const planet = new THREE.Mesh(solidGeo(it.solid), solidMat);
 			scene.add(planet);
 			planetMeshes.push(planet);
 			// クリックを取りやすくする不可視の当たり判定 (惑星に追従)

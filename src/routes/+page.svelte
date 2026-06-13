@@ -2,6 +2,7 @@
 	import { onMount, tick } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import companyInfo from '$lib/data/company_info.json';
+	import orreryData from '$lib/data/orrery.json';
 	import PrivacyPolicy from '$lib/domains/PrivacyPolicy.svelte';
 	import Orrery, { type OrreryItem } from '$lib/components/Orrery.svelte';
 
@@ -27,14 +28,29 @@
 	const jsonLdTag =
 		'<scr' + 'ipt type="application/ld+json">' + JSON.stringify(orgJsonLd) + '</scr' + 'ipt>';
 
-	// 項目 = 惑星。全て中心から等距離 (r 共通) で N/E/S/W に並ぶ。
-	const planets: OrreryItem[] = [
-		{ id: 'about', label: '私たちのこと', en: 'APPROACH', r: 3.9, phase: 0 },
-		{ id: 'business', label: '事業内容', en: 'BUSINESS', r: 3.9, phase: 90 },
-		{ id: 'company', label: '会社概要', en: 'COMPANY', r: 3.9, phase: 180 },
-		{ id: 'contact', label: 'お問い合わせ', en: 'CONTACT', r: 3.9, phase: 270 }
-	];
-	type ViewId = (typeof planets)[number]['id'];
+	// 軌道の構造は JSON で定義 (src/lib/data/orrery.json)。
+	// 動作はノードごとに content / href / children のいずれかで判定する。
+	type OrreryNode = {
+		id: string;
+		label: string;
+		en: string;
+		solid: string;
+		content?: string; // コンテンツウィンドウを開く節 ID
+		href?: string; // アンカー (#...) / 外部リンクへ遷移
+		children?: OrreryNode[]; // 衛星 (将来のネスト)
+	};
+	const nodes = orreryData.nodes as OrreryNode[];
+
+	// ノード → 惑星。全て中心から等距離 (r 共通)、位相は等間隔。
+	const planets: OrreryItem[] = nodes.map((n, i) => ({
+		id: n.id,
+		label: n.label,
+		en: n.en,
+		solid: n.solid,
+		r: 3.9,
+		phase: (i * 360) / nodes.length
+	}));
+	type ViewId = string;
 
 	const services = [
 		{
@@ -99,12 +115,9 @@
 		['事業内容', companyInfo.business]
 	];
 
-	const titles: Record<ViewId, { en: string; ja: string }> = {
-		about: { en: 'APPROACH', ja: '私たちのこと' },
-		business: { en: 'BUSINESS', ja: '事業内容' },
-		company: { en: 'COMPANY', ja: '会社概要' },
-		contact: { en: 'CONTACT', ja: 'お問い合わせ' }
-	};
+	const titles: Record<string, { en: string; ja: string }> = Object.fromEntries(
+		nodes.map((n) => [n.id, { en: n.en, ja: n.label }])
+	);
 
 	// 創業からの経過日数 — この一つの数値が、HUD の数字・系の回転位相・星の数という
 	// 三つの違う形で同時に現れる。
@@ -139,7 +152,21 @@
 	}
 
 	function onSelect(e: CustomEvent<string>) {
-		enter(e.detail as ViewId, true);
+		const node = nodes.find((n) => n.id === e.detail);
+		if (!node) return;
+		// 将来: children を持つノードは、ここで衛星のサブ軌道へドリルダウンする。
+		if (node.children && node.children.length) {
+			// TODO: 衛星ナビゲーション (ネスト)。今は最初の子へフォールバックしない。
+			orrery?.leave();
+			return;
+		}
+		if (node.href) {
+			if (node.href.startsWith('#')) location.hash = node.href;
+			else window.open(node.href, '_blank', 'noopener');
+			orrery?.leave();
+			return;
+		}
+		enter(node.content ?? node.id, true);
 	}
 
 	async function enter(id: ViewId, push: boolean) {

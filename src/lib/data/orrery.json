@@ -1,0 +1,33 @@
+{
+	"_schema": "各ノード: id / label(和文) / en(欧文) / solid(立体: tetra|octa|dodeca|icosa)。動作はいずれか一つ — content(コンテンツウィンドウを開く節ID) / href(アンカー・外部リンクへ遷移) / children(衛星。フォーカス後さらに選ぶ入れ子の軌道)。",
+	"nodes": [
+		{
+			"id": "about",
+			"label": "私たちのこと",
+			"en": "APPROACH",
+			"solid": "tetra",
+			"content": "about"
+		},
+		{
+			"id": "business",
+			"label": "事業内容",
+			"en": "BUSINESS",
+			"solid": "octa",
+			"content": "business"
+		},
+		{
+			"id": "company",
+			"label": "会社概要",
+			"en": "COMPANY",
+			"solid": "dodeca",
+			"content": "company"
+		},
+		{
+			"id": "contact",
+			"label": "お問い合わせ",
+			"en": "CONTACT",
+			"solid": "icosa",
+			"content": "contact"
+		}
+	]
+}
