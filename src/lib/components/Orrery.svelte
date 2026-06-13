@@ -135,9 +135,24 @@
 			}
 		};
 		// 全惑星は中心から等距離 — 軌道は一本のリングを共有する。
-		const orbitMat = chromeFaint.clone();
-		orbitMat.opacity = 0.16;
-		const orbitRing = new THREE.Mesh(new THREE.TorusGeometry(items[0].r, 0.006, 8, 220), orbitMat);
+		// 透明ガラスのチューブ — 背景を屈折させ、稜線に環境光のハイライトが乗って輪郭がクリアに見える。
+		const orbitMat = new THREE.MeshPhysicalMaterial({
+			color: 0xffffff,
+			metalness: 0,
+			roughness: 0.06,
+			transmission: 1.0, // ガラス (背景を透過・屈折)
+			thickness: 0.5,
+			ior: 1.45,
+			transparent: true,
+			opacity: 1,
+			clearcoat: 1.0,
+			clearcoatRoughness: 0.06,
+			envMapIntensity: 1.6
+		});
+		const orbitRing = new THREE.Mesh(
+			new THREE.TorusGeometry(items[0].r, 0.016, 20, 320),
+			orbitMat
+		);
 		orbitRing.rotation.x = Math.PI / 2;
 		scene.add(orbitRing);
 
