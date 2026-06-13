@@ -684,24 +684,6 @@
 			padding: 0 3rem 4rem;
 		}
 	}
-	/* 四隅のブラケット (「」のフレーム) */
-	:global(.is-app) .content-root.as-panel .doc-section::before {
-		content: '';
-		position: absolute;
-		inset: 9px;
-		pointer-events: none;
-		z-index: 8;
-		--c: rgba(255, 38, 48, 0.85);
-		background:
-			linear-gradient(var(--c), var(--c)) left top / 16px 1.4px no-repeat,
-			linear-gradient(var(--c), var(--c)) left top / 1.4px 16px no-repeat,
-			linear-gradient(var(--c), var(--c)) right top / 16px 1.4px no-repeat,
-			linear-gradient(var(--c), var(--c)) right top / 1.4px 16px no-repeat,
-			linear-gradient(var(--c), var(--c)) left bottom / 16px 1.4px no-repeat,
-			linear-gradient(var(--c), var(--c)) left bottom / 1.4px 16px no-repeat,
-			linear-gradient(var(--c), var(--c)) right bottom / 16px 1.4px no-repeat,
-			linear-gradient(var(--c), var(--c)) right bottom / 1.4px 16px no-repeat;
-	}
 	@keyframes swish-open {
 		0% {
 			clip-path: inset(47% 0 47% 0);
@@ -758,7 +740,7 @@
 	}
 	.panel-en::before {
 		content: '◢';
-		color: rgba(255, 38, 48, 0.8);
+		color: rgba(17, 16, 20, 0.35);
 		font-size: 8px;
 	}
 

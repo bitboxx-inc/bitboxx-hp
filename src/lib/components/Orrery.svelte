@@ -143,10 +143,21 @@
 		scene.add(orbitRing);
 
 		const planetMeshes: THREE.Mesh[] = [];
+		const hitMeshes: THREE.Mesh[] = [];
+		const hitMat = new THREE.MeshBasicMaterial({
+			transparent: true,
+			opacity: 0,
+			depthWrite: false
+		});
+		const hitGeo = new THREE.SphereGeometry(0.62, 8, 8);
 		items.forEach((_, i) => {
 			const planet = new THREE.Mesh(solidGeos[i % solidGeos.length], solidMat);
 			scene.add(planet);
 			planetMeshes.push(planet);
+			// クリックを取りやすくする不可視の当たり判定 (惑星に追従)
+			const hit = new THREE.Mesh(hitGeo, hitMat);
+			scene.add(hit);
+			hitMeshes.push(hit);
 		});
 
 		// ── 漂う装飾リング — 少数・大きめ・霧に沈める (線を増やしすぎない) ──
@@ -206,10 +217,17 @@
 			masterTarget = 0;
 		let dragging = false,
 			dragStartX = 0,
+			dragStartY = 0,
 			dragBase = 0,
-			dragOffset = 0;
+			dragOffset = 0,
+			moved = false;
 		let wheelAcc = 0;
+		let wheelLock = 0; // スクロールのクールダウン (連続ステップ防止)
 		let approach = { active: false, t: 0, target: new THREE.Vector3() };
+
+		// 惑星クリック用レイキャスト (奥のオブジェクトも当たるよう、見えない大きめの当たり判定)
+		const raycaster = new THREE.Raycaster();
+		const ndc = new THREE.Vector2();
 
 		const TAU = Math.PI * 2;
 		const norm = (a: number) => {
@@ -261,6 +279,7 @@
 				p.position.set(Math.cos(ang) * items[i].r, 0, Math.sin(ang) * items[i].r);
 				p.rotation.y += dt * 0.5;
 				p.rotation.x += dt * 0.3;
+				hitMeshes[i].position.copy(p.position);
 				// focus は色でなく、寄り (scale) と照準レティクルで示す
 				const focused = i === focusIndex;
 				p.scale.setScalar(focused ? 1.4 : 1);
@@ -307,23 +326,16 @@
 				sunEl.style.opacity = String(Math.max(0, 1 - appE * 2.2));
 			}
 
+			// 全ラベルを読みやすく・同じ色で。奥のラベルもクリックできる。
 			for (let i = 0; i < items.length; i++) {
 				const sp = projectPx(planetMeshes[i].position);
 				const el = labelEls[i];
 				if (!el) continue;
 				const focused = i === focusIndex;
-				const dist = camera.position.distanceTo(planetMeshes[i].position);
-				const depthO = Math.min(1, 9 / dist - 0.2);
-				const lo = approach.active
-					? 0
-					: focused
-						? 1
-						: W < 720
-							? 0
-							: Math.max(0, depthO * 0.4 - 0.05);
-				el.style.transform = `translate(-50%,-50%) translate(${sp.x}px,${sp.y + 34}px)`;
+				const lo = approach.active ? 0 : focused ? 1 : 0.78;
+				el.style.transform = `translate(-50%,-50%) translate(${sp.x}px,${sp.y + 36}px)`;
 				el.style.opacity = String(sp.behind ? 0 : lo);
-				el.style.pointerEvents = focused && !approach.active ? 'auto' : 'none';
+				el.style.pointerEvents = approach.active ? 'none' : 'auto';
 				el.classList.toggle('is-focused', focused);
 			}
 
@@ -365,18 +377,38 @@
 			const r = host.getBoundingClientRect();
 			mx = ((e.clientX - r.left) / r.width) * 2 - 1;
 			my = ((e.clientY - r.top) / r.height) * 2 - 1;
-			if (dragging) dragOffset = -((e.clientX - dragStartX) / r.width) * 2.0;
+			if (dragging) {
+				if (Math.abs(e.clientX - dragStartX) > 6 || Math.abs(e.clientY - dragStartY) > 6)
+					moved = true;
+				dragOffset = -((e.clientX - dragStartX) / r.width) * 2.0;
+			}
 		};
 		const onDown = (e: PointerEvent) => {
 			if (approach.active) return;
 			if (e.target !== host && e.target !== canvas) return;
 			dragging = true;
+			moved = false;
 			dragStartX = e.clientX;
+			dragStartY = e.clientY;
 			dragBase = master;
 		};
-		const onUp = () => {
+		const onUp = (e: PointerEvent) => {
 			if (!dragging) return;
 			dragging = false;
+			if (!moved) {
+				// クリック — レイキャストで惑星に当てる (奥のオブジェクトも遷移)
+				const r = host.getBoundingClientRect();
+				ndc.set(
+					((e.clientX - r.left) / r.width) * 2 - 1,
+					-(((e.clientY - r.top) / r.height) * 2 - 1)
+				);
+				raycaster.setFromCamera(ndc, camera);
+				const hits = raycaster.intersectObjects(hitMeshes, false);
+				if (hits.length) selectHandler(hitMeshes.indexOf(hits[0].object as THREE.Mesh));
+				dragOffset = 0;
+				return;
+			}
+			// ドラッグ終了 → 最寄りへスナップ
 			const eff = dragBase + dragOffset;
 			let best = 0,
 				bestD = Infinity;
@@ -393,10 +425,13 @@
 		const onWheel = (e: WheelEvent) => {
 			if (approach.active) return;
 			e.preventDefault();
+			const now = performance.now();
+			if (now < wheelLock) return; // クールダウン中は無視
 			wheelAcc += e.deltaY + e.deltaX;
-			if (Math.abs(wheelAcc) > 60) {
+			if (Math.abs(wheelAcc) > 220) {
 				setFocus(focusIndex + (wheelAcc > 0 ? 1 : -1));
 				wheelAcc = 0;
+				wheelLock = now + 380; // 1 ジェスチャ = 1 ステップ
 			}
 		};
 		const onKey = (e: KeyboardEvent) => {
@@ -433,12 +468,10 @@
 			}
 		};
 
+		// どの惑星でも (奥でも) クリックすればそこへ着陸する
 		selectHandler = (i: number) => {
 			if (approach.active) return;
-			if (i !== focusIndex) {
-				setFocus(i);
-				return;
-			}
+			setFocus(i, false);
 			approach.active = true;
 			approach.t = 0;
 			const ang = planetAngle(i);
@@ -525,15 +558,10 @@
 		class="absolute left-0 top-0 z-10 select-none text-center"
 		on:click|preventDefault={() => focusBtnHandler(items.findIndex((i) => i.id === 'about'))}
 	>
-		<span class="font-techno block text-[10px] md:text-[11px] tracking-[0.44em] text-ink/80"
-			>BITBOXX</span
-		>
-		<span class="font-techno block text-[7.5px] tracking-[0.5em] text-ink/40 mt-1.5"
-			>E&nbsp;·&nbsp;K&nbsp;·&nbsp;U</span
-		>
+		<span class="font-techno block text-[10px] md:text-[11px] tracking-[0.44em]">BITBOXX</span>
 	</a>
 
-	<!-- 惑星ラベル (実 DOM ボタン) -->
+	<!-- 惑星ラベル (実 DOM ボタン) — どれも読みやすく同色。クリックで着陸。 -->
 	{#each items as it, i (it.id)}
 		<button
 			bind:this={labelEls[i]}
@@ -542,9 +570,8 @@
 			on:focus={() => focusBtnHandler(i)}
 			aria-label={`${it.label} へ`}
 		>
-			<span class="font-techno block text-[8.5px] tracking-[0.34em] text-ink/45">{it.en}</span>
-			<span
-				class="pl-ja font-techno block text-[14px] md:text-[15px] tracking-[0.18em] text-ink mt-1"
+			<span class="font-techno block text-[8px] tracking-[0.34em]">{it.en}</span>
+			<span class="font-techno block text-[13px] md:text-[14px] tracking-[0.16em] mt-1"
 				>{it.label}</span
 			>
 		</button>
@@ -552,11 +579,16 @@
 </div>
 
 <style>
+	/* 浮遊文字は全部同じ濃い色。淡い光彩で背景に負けない。 */
+	.planet-label,
+	a {
+		color: #15141a;
+		text-shadow:
+			0 0 4px rgba(247, 246, 243, 0.85),
+			0 0 9px rgba(247, 246, 243, 0.7);
+	}
 	.planet-label {
 		transition: opacity 0.25s ease;
-	}
-	:global(.planet-label.is-focused .pl-ja) {
-		color: #ff2630;
 	}
 	.planet-label:focus-visible {
 		outline: 1px solid rgba(255, 38, 48, 0.6);
