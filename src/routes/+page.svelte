@@ -713,19 +713,28 @@
 
 	/* モーダル背景 — 暗幕をやめ、明るいフロストの幕でガラスを明るく保つ */
 	.glass-scrim {
-		background: rgba(228, 227, 233, 0.45);
-		backdrop-filter: blur(8px) saturate(1.2);
-		-webkit-backdrop-filter: blur(8px) saturate(1.2);
+		background: rgba(228, 227, 233, 0.38);
+		backdrop-filter: blur(14px) saturate(1.4);
+		-webkit-backdrop-filter: blur(14px) saturate(1.4);
 	}
 	/* リキッドグラスのカード (プライバシー等のモーダル) — 本体パネルと同じ質感 */
 	.glass-card {
-		background: rgba(245, 244, 248, 0.5);
-		backdrop-filter: blur(34px) saturate(1.8);
-		-webkit-backdrop-filter: blur(34px) saturate(1.8);
-		border: 1px solid rgba(255, 255, 255, 0.5);
+		background:
+			linear-gradient(
+				180deg,
+				rgba(255, 255, 255, 0.3),
+				rgba(255, 255, 255, 0.07) 20%,
+				rgba(255, 255, 255, 0) 52%
+			),
+			rgba(246, 245, 250, 0.3);
+		backdrop-filter: blur(42px) saturate(2.3) brightness(1.07);
+		-webkit-backdrop-filter: blur(42px) saturate(2.3) brightness(1.07);
+		border: 1px solid rgba(255, 255, 255, 0.62);
 		box-shadow:
-			0 40px 120px -40px rgba(17, 16, 20, 0.45),
-			inset 0 1px 0 rgba(255, 255, 255, 0.65);
+			0 50px 140px -45px rgba(17, 16, 20, 0.45),
+			inset 0 1px 0 rgba(255, 255, 255, 0.9),
+			inset 0 -1px 0 rgba(255, 255, 255, 0.2),
+			inset 0 0 70px rgba(255, 255, 255, 0.14);
 	}
 
 	/* ── アプリモード: 選んだ節を「テックなデジタルウィンドウ」として中央に開く ── */
@@ -745,14 +754,23 @@
 		overflow-y: auto;
 		overflow-x: hidden;
 		padding: 0 1.4rem 3rem;
-		/* リキッドグラス — 宇宙がより透ける。背面を強ブラー＆彩度上げで本文は読める。 */
-		background: rgba(245, 244, 248, 0.44);
-		backdrop-filter: blur(34px) saturate(1.8);
-		-webkit-backdrop-filter: blur(34px) saturate(1.8);
-		border: 1px solid rgba(255, 255, 255, 0.5);
+		/* リキッドグラス — 思い切って透過。強ブラー＆彩度ブースト＆上辺の光のシーンで液状ガラス感。 */
+		background:
+			linear-gradient(
+				180deg,
+				rgba(255, 255, 255, 0.3),
+				rgba(255, 255, 255, 0.07) 20%,
+				rgba(255, 255, 255, 0) 52%
+			),
+			rgba(246, 245, 250, 0.26);
+		backdrop-filter: blur(42px) saturate(2.3) brightness(1.07);
+		-webkit-backdrop-filter: blur(42px) saturate(2.3) brightness(1.07);
+		border: 1px solid rgba(255, 255, 255, 0.62);
 		box-shadow:
-			0 40px 120px -40px rgba(17, 16, 20, 0.42),
-			inset 0 1px 0 rgba(255, 255, 255, 0.65);
+			0 50px 140px -45px rgba(17, 16, 20, 0.45),
+			inset 0 1px 0 rgba(255, 255, 255, 0.9),
+			inset 0 -1px 0 rgba(255, 255, 255, 0.2),
+			inset 0 0 70px rgba(255, 255, 255, 0.14);
 		pointer-events: auto;
 		transform-origin: center;
 		animation: swish-open 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -787,10 +805,11 @@
 		justify-content: space-between;
 		padding: 0.95rem 1.4rem;
 		margin: 0 -1.4rem 2.4rem;
-		background: rgba(240, 239, 244, 0.5);
-		backdrop-filter: blur(18px) saturate(1.7);
-		-webkit-backdrop-filter: blur(18px) saturate(1.7);
-		border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+		background: rgba(242, 241, 246, 0.42);
+		backdrop-filter: blur(24px) saturate(2) brightness(1.05);
+		-webkit-backdrop-filter: blur(24px) saturate(2) brightness(1.05);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
 	}
 	@media (min-width: 768px) {
 		.panel-head {
