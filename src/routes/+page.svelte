@@ -106,7 +106,6 @@
 	// ── アプリ状態 ──
 	let mounted = false; // ハイドレーション後に orrery モードへ
 	let view: ViewId | null = null;
-	let covering = false; // 着陸フラッシュ
 	let orrery: Orrery;
 
 	onMount(() => {
@@ -127,9 +126,9 @@
 		return () => window.removeEventListener('popstate', onPop);
 	});
 
-	// スクロールロック: 宇宙 (view=null) では固定、パネル内のみスクロール
+	// アプリモードではページは固定。ウィンドウ内だけがスクロールする。
 	$: if (typeof document !== 'undefined' && mounted) {
-		document.body.style.overflow = view || showPrivacyModal ? '' : 'hidden';
+		document.body.style.overflow = 'hidden';
 	}
 
 	function onSelect(e: CustomEvent<string>) {
@@ -137,12 +136,9 @@
 	}
 
 	async function enter(id: ViewId, push: boolean) {
-		covering = true;
-		await new Promise((r) => setTimeout(r, 430));
 		view = id;
 		await tick();
 		panelScroller?.scrollTo(0, 0);
-		covering = false;
 		if (push) history.pushState({ view: id }, '', `#${id}`);
 	}
 
@@ -240,7 +236,11 @@
 
 	<!-- ── 宇宙 (オアリー) — ハイドレーション後のみ ── -->
 	{#if mounted}
-		<div class="orrery-stage fixed inset-0 z-0" class:dimmed={view} style="background:#e7e6ea">
+		<div
+			class="orrery-stage fixed inset-0 z-0"
+			class:dimmed={view}
+			style="background:radial-gradient(120% 95% at 50% 40%, #f6f5f8 0%, #e9e8ed 52%, #d6d5dc 100%)"
+		>
 			<Orrery
 				bind:this={orrery}
 				items={planets}
@@ -276,15 +276,20 @@
 			</div>
 		</div>
 
-		<!-- 着陸フラッシュ -->
-		{#if covering}
-			<div class="fixed inset-0 z-40 bg-cream-50" transition:fade={{ duration: 280 }}></div>
+		<!-- デジタルウィンドウの背面 (宇宙はうっすら透ける) -->
+		{#if view}
+			<button
+				class="tech-backdrop"
+				on:click={() => back()}
+				aria-label="閉じる"
+				transition:fade={{ duration: 260 }}
+			></button>
 		{/if}
 	{/if}
 
 	<!-- ── コンテンツ ──
        ハイドレーション前 (= プリレンダー HTML / JS 無効) は通常のスクロール文書として全節を表示。
-       ハイドレーション後は orrery から選ばれた節だけをフルスクリーンのパネルとして出す。 -->
+       ハイドレーション後は選ばれた節を、テックなデジタルウィンドウとして開く。 -->
 	<div class="content-root" class:as-panel={mounted}>
 		{#if !mounted || view === 'about'}
 			<section id="about" class="doc-section" bind:this={panelScroller}>
@@ -638,67 +643,133 @@
 		border-bottom-width: 1px;
 	}
 
-	/* ── orrery モード: 選択された節をフルスクリーンパネルとして ── */
+	/* 背面 — 宇宙はうっすら透ける */
+	.tech-backdrop {
+		position: fixed;
+		inset: 0;
+		z-index: 20;
+		width: 100%;
+		height: 100%;
+		background: rgba(228, 227, 233, 0.5);
+		backdrop-filter: blur(2px);
+		cursor: pointer;
+	}
+
+	/* ── アプリモード: 選んだ節を「テックなデジタルウィンドウ」として中央に開く ── */
 	:global(.is-app) .content-root.as-panel {
 		position: fixed;
 		inset: 0;
 		z-index: 30;
-		overflow: hidden;
+		display: grid;
+		place-items: center;
+		padding: 4vh 3vw;
 		pointer-events: none;
 	}
 	:global(.is-app) .content-root.as-panel .doc-section {
-		position: absolute;
-		inset: 0;
+		position: relative;
+		width: min(94vw, 1080px);
+		height: min(88vh, 880px);
 		overflow-y: auto;
-		/* 宇宙の発光を引き継ぐ淡いフィールド */
-		background: radial-gradient(120% 80% at 50% 0%, #ffffff 0%, #f5f4f6 45%, #ececef 100%);
+		overflow-x: hidden;
+		padding: 0 1.4rem 3rem;
+		background: rgba(246, 245, 248, 0.94);
+		border: 1px solid rgba(17, 16, 20, 0.14);
+		box-shadow: 0 40px 120px -40px rgba(17, 16, 20, 0.45);
 		pointer-events: auto;
-		padding-top: 5.5rem;
+		transform-origin: center;
+		animation: swish-open 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 	}
+	@media (min-width: 768px) {
+		:global(.is-app) .content-root.as-panel .doc-section {
+			padding: 0 3rem 4rem;
+		}
+	}
+	/* 四隅のブラケット (「」のフレーム) */
+	:global(.is-app) .content-root.as-panel .doc-section::before {
+		content: '';
+		position: absolute;
+		inset: 9px;
+		pointer-events: none;
+		z-index: 8;
+		--c: rgba(255, 38, 48, 0.85);
+		background:
+			linear-gradient(var(--c), var(--c)) left top / 16px 1.4px no-repeat,
+			linear-gradient(var(--c), var(--c)) left top / 1.4px 16px no-repeat,
+			linear-gradient(var(--c), var(--c)) right top / 16px 1.4px no-repeat,
+			linear-gradient(var(--c), var(--c)) right top / 1.4px 16px no-repeat,
+			linear-gradient(var(--c), var(--c)) left bottom / 16px 1.4px no-repeat,
+			linear-gradient(var(--c), var(--c)) left bottom / 1.4px 16px no-repeat,
+			linear-gradient(var(--c), var(--c)) right bottom / 16px 1.4px no-repeat,
+			linear-gradient(var(--c), var(--c)) right bottom / 1.4px 16px no-repeat;
+	}
+	@keyframes swish-open {
+		0% {
+			clip-path: inset(47% 0 47% 0);
+			opacity: 0;
+			transform: scaleX(0.9);
+		}
+		60% {
+			opacity: 1;
+		}
+		100% {
+			clip-path: inset(0 0 0 0);
+			opacity: 1;
+			transform: scaleX(1);
+		}
+	}
+	/* ウィンドウのタイトルバー */
 	.panel-head {
 		position: sticky;
 		top: 0;
-		z-index: 5;
+		z-index: 6;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding: 1.1rem 1.5rem;
-		margin: -5.5rem -1.5rem 2.5rem;
-		background: rgba(245, 244, 246, 0.82);
+		padding: 0.95rem 1.4rem;
+		margin: 0 -1.4rem 2.4rem;
+		background: rgba(238, 237, 241, 0.92);
 		backdrop-filter: blur(8px);
-		border-bottom: 1px solid rgba(17, 16, 20, 0.08);
+		border-bottom: 1px solid rgba(17, 16, 20, 0.12);
 	}
 	@media (min-width: 768px) {
 		.panel-head {
-			padding: 1.2rem 2.5rem;
-			margin: -5.5rem -2.5rem 3rem;
+			padding: 1rem 3rem;
+			margin: 0 -3rem 3rem;
 		}
 	}
 	.back-btn {
 		font-family: 'Michroma', 'Space Grotesk', 'Noto Sans JP', sans-serif;
 		font-size: 10px;
 		letter-spacing: 0.2em;
-		color: rgba(17, 16, 20, 0.7);
+		color: rgba(17, 16, 20, 0.72);
 		transition: color 0.2s ease;
 	}
 	.back-btn:hover {
 		color: #ff2630;
 	}
 	.panel-en {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.6rem;
 		font-family: 'Michroma', 'Space Grotesk', sans-serif;
 		font-size: 10px;
 		letter-spacing: 0.34em;
-		color: rgba(17, 16, 20, 0.4);
+		color: rgba(17, 16, 20, 0.45);
+	}
+	.panel-en::before {
+		content: '◢';
+		color: rgba(255, 38, 48, 0.8);
+		font-size: 8px;
 	}
 
 	.orrery-stage {
 		transition:
-			filter 0.4s ease,
-			opacity 0.4s ease;
+			filter 0.45s ease,
+			opacity 0.45s ease;
 	}
 	.orrery-stage.dimmed {
-		filter: blur(3px);
-		opacity: 0;
+		filter: blur(5px) saturate(0.9);
+		opacity: 0.28;
 		pointer-events: none;
 	}
 </style>

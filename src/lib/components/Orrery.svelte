@@ -50,9 +50,6 @@
 		api.focusTo(id);
 	}
 
-	const SAKURA = 0xff2630;
-	const INK = 0x1b1a1f;
-
 	onMount(() => {
 		const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -69,6 +66,8 @@
 		renderer.outputColorSpace = THREE.SRGBColorSpace;
 
 		const scene = new THREE.Scene();
+		// 霧で奥行き — 中央は鮮明、遠いリングや星は銀の空間へ溶ける
+		scene.fog = new THREE.Fog(0xe7e6ea, 14, 34);
 		const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 200);
 
 		// 環境マップ (クロムの反射用)
@@ -95,18 +94,12 @@
 			transparent: true,
 			opacity: 0.55
 		});
-		const inkMat = new THREE.MeshStandardMaterial({
-			color: INK,
-			metalness: 0.35,
-			roughness: 0.45,
-			flatShading: true
-		});
-		const redMat = new THREE.MeshStandardMaterial({
-			color: SAKURA,
-			emissive: SAKURA,
-			emissiveIntensity: 0.4,
-			metalness: 0.2,
-			roughness: 0.35,
+		// 惑星は色分けしない。形 (プラトン立体) が違いを語る。共通の研磨金属。
+		const solidMat = new THREE.MeshStandardMaterial({
+			color: 0x33333b,
+			metalness: 0.85,
+			roughness: 0.24,
+			envMapIntensity: 1.15,
 			flatShading: true
 		});
 
@@ -133,44 +126,45 @@
 		cube.add(cubeEdge);
 
 		// ── 軌道リング + 惑星 ──
+		// 中心の立方体 (正六面体) に対し、各セクションは残る 4 つのプラトン立体。
+		// 完全な正多面体はこの 5 つしか存在しない (幾何学の定理) — それが「知的な根拠」。
+		// 内→外で 面数 4→8→12→20 と複雑さが増す。色分けはしない。
+		const solidGeos = [
+			new THREE.TetrahedronGeometry(0.4), // 4 面: 私たちのこと
+			new THREE.OctahedronGeometry(0.36), // 8 面: 事業内容
+			new THREE.DodecahedronGeometry(0.32), // 12 面: 会社概要
+			new THREE.IcosahedronGeometry(0.32) // 20 面: お問い合わせ
+		];
 		const orbitMeshes: THREE.Mesh[] = [];
 		const planetMeshes: THREE.Mesh[] = [];
-		items.forEach((it) => {
-			const orbit = new THREE.Mesh(
-				new THREE.TorusGeometry(it.r, 0.0075, 8, 160),
-				chromeFaint.clone()
-			);
+		items.forEach((it, i) => {
+			const om = chromeFaint.clone();
+			om.opacity = 0.14;
+			const orbit = new THREE.Mesh(new THREE.TorusGeometry(it.r, 0.006, 8, 200), om);
 			orbit.rotation.x = Math.PI / 2;
 			scene.add(orbit);
 			orbitMeshes.push(orbit);
 
-			const planet = new THREE.Mesh(new THREE.IcosahedronGeometry(0.17, 0), inkMat);
+			const planet = new THREE.Mesh(solidGeos[i % solidGeos.length], solidMat);
 			scene.add(planet);
 			planetMeshes.push(planet);
 		});
 
-		// ── 漂う装飾リング (クロム) ──
+		// ── 漂う装飾リング — 少数・大きめ・霧に沈める (線を増やしすぎない) ──
 		const halos: THREE.Mesh[] = [];
-		for (let i = 0; i < 6; i++) {
-			const a = i * 1.97;
-			const dist = 7 + (i % 3) * 3;
-			const radius = 3.4 + (i % 4) * 2.3;
-			const ring = new THREE.Mesh(
-				new THREE.TorusGeometry(radius, 0.018, 10, 180),
-				chromeFaint.clone()
-			);
-			ring.position.set(Math.cos(a) * dist, (i % 2 ? 1 : -1) * (2 + i * 0.7), Math.sin(a) * dist);
-			ring.rotation.set(0.5 + i * 0.4, i * 0.6, i * 0.3);
-			ring.userData.spin = 0.06 * (i % 2 ? 1 : -1) * (1 + i * 0.12);
+		for (let i = 0; i < 3; i++) {
+			const a = i * 2.4;
+			const dist = 9 + i * 3;
+			const radius = 5 + i * 2.5;
+			const hm = chromeFaint.clone();
+			hm.opacity = 0.3;
+			const ring = new THREE.Mesh(new THREE.TorusGeometry(radius, 0.02, 12, 220), hm);
+			ring.position.set(Math.cos(a) * dist, (i % 2 ? 1 : -1) * (2.5 + i), Math.sin(a) * dist);
+			ring.rotation.set(0.6 + i * 0.5, i * 0.7, i * 0.4);
+			ring.userData.spin = 0.05 * (i % 2 ? 1 : -1);
 			scene.add(ring);
 			halos.push(ring);
 		}
-
-		// ── 黄道面の極座標グリッド ──
-		const grid = new THREE.PolarGridHelper(9.5, 16, 7, 90, 0x9a99a0, 0x9a99a0);
-		(grid.material as THREE.Material).transparent = true;
-		(grid.material as THREE.Material).opacity = 0.12;
-		scene.add(grid);
 
 		// ── 星 ──
 		const starGeo = new THREE.BufferGeometry();
@@ -268,16 +262,11 @@
 				p.position.set(Math.cos(ang) * items[i].r, 0, Math.sin(ang) * items[i].r);
 				p.rotation.y += dt * 0.5;
 				p.rotation.x += dt * 0.3;
+				// focus は色でなく、寄り (scale) と照準レティクルで示す
 				const focused = i === focusIndex;
-				p.material = focused ? redMat : inkMat;
-				const s = focused ? 1.7 : 1;
-				p.scale.setScalar(s);
+				p.scale.setScalar(focused ? 1.35 : 1);
 				const om = orbitMeshes[i].material as THREE.MeshStandardMaterial;
-				om.color.setHex(focused ? SAKURA : 0xd9d8de);
-				om.emissive.setHex(focused ? SAKURA : 0x000000);
-				om.emissiveIntensity = focused ? 0.4 : 0;
-				om.opacity = focused ? 0.85 : 0.5;
-				om.metalness = focused ? 0.3 : 1.0;
+				om.opacity = focused ? 0.46 : 0.13;
 			}
 
 			// 立方体の回転
