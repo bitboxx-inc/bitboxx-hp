@@ -150,7 +150,7 @@
 			envMapIntensity: 1.6
 		});
 		const orbitRing = new THREE.Mesh(
-			new THREE.TorusGeometry(items[0].r, 0.016, 20, 320),
+			new THREE.TorusGeometry(items[0].r, 0.011, 18, 320),
 			orbitMat
 		);
 		orbitRing.rotation.x = Math.PI / 2;
