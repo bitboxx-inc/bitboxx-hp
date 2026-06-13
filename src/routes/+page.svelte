@@ -639,7 +639,7 @@
 
 	{#if showPrivacyModal}
 		<div
-			class="fixed inset-0 bg-ink/80 backdrop-blur-sm flex items-center justify-center z-[1000] px-4"
+			class="glass-scrim fixed inset-0 flex items-center justify-center z-[1000] px-4"
 			on:click={(e) => {
 				if (e.target === e.currentTarget) closePrivacyModal();
 			}}
@@ -648,13 +648,13 @@
 		>
 			<div
 				bind:this={privacyDialogEl}
-				class="bg-cream-50 text-ink rounded-3xl shadow-2xl w-full max-w-3xl p-6 md:p-10 max-h-[90vh] flex flex-col"
+				class="glass-card text-ink rounded-3xl w-full max-w-3xl p-6 md:p-10 max-h-[90vh] flex flex-col"
 				role="dialog"
 				aria-modal="true"
 				aria-labelledby="privacy-modal-title"
 			>
 				<div class="flex justify-between items-center mb-4 pb-4 border-b border-ink/10">
-					<h2 id="privacy-modal-title" class="font-display italic text-2xl tracking-hyper">
+					<h2 id="privacy-modal-title" class="font-display italic text-xl md:text-2xl tracking-hyper">
 						プライバシーポリシー
 					</h2>
 					<button
@@ -710,9 +710,27 @@
 		z-index: 20;
 		width: 100%;
 		height: 100%;
-		background: rgba(228, 227, 233, 0.5);
-		backdrop-filter: blur(2px);
+		background: rgba(228, 227, 233, 0.4);
+		backdrop-filter: blur(4px) saturate(1.2);
+		-webkit-backdrop-filter: blur(4px) saturate(1.2);
 		cursor: pointer;
+	}
+
+	/* モーダル背景 — 暗幕をやめ、明るいフロストの幕でガラスを明るく保つ */
+	.glass-scrim {
+		background: rgba(228, 227, 233, 0.45);
+		backdrop-filter: blur(8px) saturate(1.2);
+		-webkit-backdrop-filter: blur(8px) saturate(1.2);
+	}
+	/* リキッドグラスのカード (プライバシー等のモーダル) — 本体パネルと同じ質感 */
+	.glass-card {
+		background: rgba(245, 244, 248, 0.5);
+		backdrop-filter: blur(34px) saturate(1.8);
+		-webkit-backdrop-filter: blur(34px) saturate(1.8);
+		border: 1px solid rgba(255, 255, 255, 0.5);
+		box-shadow:
+			0 40px 120px -40px rgba(17, 16, 20, 0.45),
+			inset 0 1px 0 rgba(255, 255, 255, 0.65);
 	}
 
 	/* ── アプリモード: 選んだ節を「テックなデジタルウィンドウ」として中央に開く ── */
@@ -732,11 +750,14 @@
 		overflow-y: auto;
 		overflow-x: hidden;
 		padding: 0 1.4rem 3rem;
-		/* 宇宙が透ける半透明パネル。背面ブラーで本文は読める。 */
-		background: rgba(244, 243, 247, 0.55);
-		backdrop-filter: blur(22px) saturate(1.05);
-		border: 1px solid rgba(17, 16, 20, 0.14);
-		box-shadow: 0 40px 120px -40px rgba(17, 16, 20, 0.4);
+		/* リキッドグラス — 宇宙がより透ける。背面を強ブラー＆彩度上げで本文は読める。 */
+		background: rgba(245, 244, 248, 0.44);
+		backdrop-filter: blur(34px) saturate(1.8);
+		-webkit-backdrop-filter: blur(34px) saturate(1.8);
+		border: 1px solid rgba(255, 255, 255, 0.5);
+		box-shadow:
+			0 40px 120px -40px rgba(17, 16, 20, 0.42),
+			inset 0 1px 0 rgba(255, 255, 255, 0.65);
 		pointer-events: auto;
 		transform-origin: center;
 		animation: swish-open 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -771,9 +792,10 @@
 		justify-content: space-between;
 		padding: 0.95rem 1.4rem;
 		margin: 0 -1.4rem 2.4rem;
-		background: rgba(238, 237, 241, 0.72);
-		backdrop-filter: blur(10px);
-		border-bottom: 1px solid rgba(17, 16, 20, 0.12);
+		background: rgba(240, 239, 244, 0.5);
+		backdrop-filter: blur(18px) saturate(1.7);
+		-webkit-backdrop-filter: blur(18px) saturate(1.7);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.4);
 	}
 	@media (min-width: 768px) {
 		.panel-head {
