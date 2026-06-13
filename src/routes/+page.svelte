@@ -27,12 +27,12 @@
 	const jsonLdTag =
 		'<scr' + 'ipt type="application/ld+json">' + JSON.stringify(orgJsonLd) + '</scr' + 'ipt>';
 
-	// 太陽系の項目 = 惑星
+	// 項目 = 惑星。全て中心から等距離 (r 共通) で N/E/S/W に並ぶ。
 	const planets: OrreryItem[] = [
-		{ id: 'about', label: '私たちのこと', en: 'APPROACH', r: 2.5, phase: 0 },
-		{ id: 'business', label: '事業内容', en: 'BUSINESS', r: 3.45, phase: 90 },
-		{ id: 'company', label: '会社概要', en: 'COMPANY', r: 4.35, phase: 180 },
-		{ id: 'contact', label: 'お問い合わせ', en: 'CONTACT', r: 5.15, phase: 270 }
+		{ id: 'about', label: '私たちのこと', en: 'APPROACH', r: 3.9, phase: 0 },
+		{ id: 'business', label: '事業内容', en: 'BUSINESS', r: 3.9, phase: 90 },
+		{ id: 'company', label: '会社概要', en: 'COMPANY', r: 3.9, phase: 180 },
+		{ id: 'contact', label: 'お問い合わせ', en: 'CONTACT', r: 3.9, phase: 270 }
 	];
 	type ViewId = (typeof planets)[number]['id'];
 

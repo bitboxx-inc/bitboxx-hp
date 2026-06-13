@@ -135,16 +135,15 @@
 			new THREE.DodecahedronGeometry(0.32), // 12 面: 会社概要
 			new THREE.IcosahedronGeometry(0.32) // 20 面: お問い合わせ
 		];
-		const orbitMeshes: THREE.Mesh[] = [];
-		const planetMeshes: THREE.Mesh[] = [];
-		items.forEach((it, i) => {
-			const om = chromeFaint.clone();
-			om.opacity = 0.14;
-			const orbit = new THREE.Mesh(new THREE.TorusGeometry(it.r, 0.006, 8, 200), om);
-			orbit.rotation.x = Math.PI / 2;
-			scene.add(orbit);
-			orbitMeshes.push(orbit);
+		// 全惑星は中心から等距離 — 軌道は一本のリングを共有する。
+		const orbitMat = chromeFaint.clone();
+		orbitMat.opacity = 0.16;
+		const orbitRing = new THREE.Mesh(new THREE.TorusGeometry(items[0].r, 0.006, 8, 220), orbitMat);
+		orbitRing.rotation.x = Math.PI / 2;
+		scene.add(orbitRing);
 
+		const planetMeshes: THREE.Mesh[] = [];
+		items.forEach((_, i) => {
 			const planet = new THREE.Mesh(solidGeos[i % solidGeos.length], solidMat);
 			scene.add(planet);
 			planetMeshes.push(planet);
@@ -264,9 +263,7 @@
 				p.rotation.x += dt * 0.3;
 				// focus は色でなく、寄り (scale) と照準レティクルで示す
 				const focused = i === focusIndex;
-				p.scale.setScalar(focused ? 1.35 : 1);
-				const om = orbitMeshes[i].material as THREE.MeshStandardMaterial;
-				om.opacity = focused ? 0.46 : 0.13;
+				p.scale.setScalar(focused ? 1.4 : 1);
 			}
 
 			// 立方体の回転
