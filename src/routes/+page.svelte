@@ -60,6 +60,13 @@
 			title: '技術顧問・アドバイザリー',
 			deliverable: '技術戦略、体制レビュー、採用・育成、中長期ロードマップ、投資判断。',
 			value: '経営判断の場に、技術の目を入れる。'
+		},
+		{
+			num: '05',
+			title: 'アウトドア × デジタル',
+			deliverable:
+				'自分たちで手がけるアウトドア事業と、その体験を支える技術。フィールドの運営から、道具・予約・記録をつなぐプロダクトまで。',
+			value: '自然のなかで過ごす時間を、技術でもう一歩おもしろくする。'
 		}
 	];
 
@@ -248,14 +255,8 @@
 				on:select={onSelect}
 			/>
 
-			<!-- HUD — 未来テックの計器枠。意味ある数値 (創業からの経過日数) はここに一度だけ。 -->
+			<!-- HUD — 必要最低限。意味ある数値 (創業からの経過日数) はここに一度だけ。 -->
 			<div class="pointer-events-none absolute inset-0 z-20">
-				<!-- ビューポートの四隅ブラケット -->
-				<span class="hud-corner tl"></span>
-				<span class="hud-corner tr"></span>
-				<span class="hud-corner bl"></span>
-				<span class="hud-corner br"></span>
-
 				<div
 					class="font-techno absolute left-6 md:left-9 top-6 md:top-8 text-[9px] leading-[2] tracking-[0.3em] text-ink/55"
 				>
@@ -309,6 +310,22 @@
 					<p class="mt-5 md:mt-7 font-mincho text-[14px] md:text-[15px] leading-[2.1] text-ink/60">
 						システム開発そのものは、そのための手段です。
 					</p>
+					<p
+						class="mt-12 md:mt-16 max-w-3xl font-mincho text-[18px] md:text-[22px] leading-[1.95] text-ink tracking-[0.02em]"
+					>
+						そして私たちが引き受けるのは、<br class="hidden md:block" />
+						<span class="underline-handwritten">Excellent</span><span class="text-sakura">.</span
+						>（卓越）か、<span class="text-sakura font-display italic">Kawaii</span><span
+							class="text-sakura">.</span
+						>（愛着）か、<span class="font-display italic">Unique</span><span class="text-sakura"
+							>.</span
+						>（独自）か。<br class="hidden md:block" />
+						このどれかを生み出せる仕事だけです。
+					</p>
+					<p class="mt-5 font-mincho text-[14px] md:text-[15px] leading-[2.1] text-ink/60">
+						どれにもならないものは、つくらない。やらないことを決めるところから、私たちの設計は始まります。
+					</p>
+
 					<div class="mt-14 md:mt-20">
 						{#each stances as s}
 							<article
@@ -611,38 +628,6 @@
 		background: linear-gradient(90deg, rgba(255, 38, 48, 0.7), rgba(255, 38, 48, 0));
 	}
 
-	/* HUD の四隅ブラケット (未来テックの計器枠) */
-	.hud-corner {
-		position: absolute;
-		width: 22px;
-		height: 22px;
-		border: 0 solid rgba(17, 16, 20, 0.22);
-	}
-	.hud-corner.tl {
-		left: 18px;
-		top: 18px;
-		border-left-width: 1px;
-		border-top-width: 1px;
-	}
-	.hud-corner.tr {
-		right: 18px;
-		top: 18px;
-		border-right-width: 1px;
-		border-top-width: 1px;
-	}
-	.hud-corner.bl {
-		left: 18px;
-		bottom: 18px;
-		border-left-width: 1px;
-		border-bottom-width: 1px;
-	}
-	.hud-corner.br {
-		right: 18px;
-		bottom: 18px;
-		border-right-width: 1px;
-		border-bottom-width: 1px;
-	}
-
 	/* 背面 — 宇宙はうっすら透ける */
 	.tech-backdrop {
 		position: fixed;
@@ -672,9 +657,11 @@
 		overflow-y: auto;
 		overflow-x: hidden;
 		padding: 0 1.4rem 3rem;
-		background: rgba(246, 245, 248, 0.94);
+		/* 宇宙が透ける半透明パネル。背面ブラーで本文は読める。 */
+		background: rgba(244, 243, 247, 0.72);
+		backdrop-filter: blur(18px) saturate(1.05);
 		border: 1px solid rgba(17, 16, 20, 0.14);
-		box-shadow: 0 40px 120px -40px rgba(17, 16, 20, 0.45);
+		box-shadow: 0 40px 120px -40px rgba(17, 16, 20, 0.4);
 		pointer-events: auto;
 		transform-origin: center;
 		animation: swish-open 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;

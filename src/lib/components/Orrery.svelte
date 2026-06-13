@@ -176,30 +176,46 @@
 			halos.push(ring);
 		}
 
-		// ── 星 ──
-		const starGeo = new THREE.BufferGeometry();
-		const starPos = new Float32Array(STAR_COUNT * 3);
-		for (let i = 0; i < STAR_COUNT; i++) {
-			const a = i * 2.399963229;
-			const yy = 1 - (i / (STAR_COUNT - 1)) * 2;
-			const rr = Math.sqrt(Math.max(0, 1 - yy * yy));
-			const rad = 16 + ((i * 13) % 22);
-			starPos[i * 3] = Math.cos(a) * rr * rad;
-			starPos[i * 3 + 1] = yy * rad * 0.6;
-			starPos[i * 3 + 2] = Math.sin(a) * rr * rad;
-		}
-		starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
-		const stars = new THREE.Points(
-			starGeo,
-			new THREE.PointsMaterial({
-				color: 0x44434a,
-				size: 0.05,
-				sizeAttenuation: true,
-				transparent: true,
-				opacity: 0.5
-			})
-		);
-		scene.add(stars);
+		// ── 星 — 近景/遠景の 2 層。速度差 (パララックス) で奥行きを出す ──
+		const makeStars = (
+			count: number,
+			rMin: number,
+			rMax: number,
+			opts: THREE.PointsMaterialParameters
+		) => {
+			const geo = new THREE.BufferGeometry();
+			const arr = new Float32Array(count * 3);
+			for (let i = 0; i < count; i++) {
+				const a = i * 2.399963229; // 黄金角で球殻に散らす
+				const yy = 1 - (i / (count - 1)) * 2;
+				const rr = Math.sqrt(Math.max(0, 1 - yy * yy));
+				const rad = rMin + (((i * 17) % 100) / 100) * (rMax - rMin);
+				arr[i * 3] = Math.cos(a) * rr * rad;
+				arr[i * 3 + 1] = yy * rad * 0.7;
+				arr[i * 3 + 2] = Math.sin(a) * rr * rad;
+			}
+			geo.setAttribute('position', new THREE.BufferAttribute(arr, 3));
+			return new THREE.Points(
+				geo,
+				new THREE.PointsMaterial({ sizeAttenuation: true, transparent: true, ...opts })
+			);
+		};
+		// 遠景: ずっと遠くに小さく散る。フォグの影響を受けず、奥行きの背景になる。
+		const farStars = makeStars(480 + (day % 80), 48, 96, {
+			color: 0x46454f,
+			size: 0.08,
+			opacity: 0.5,
+			fog: false
+		});
+		scene.add(farStars);
+		// 近景: 系の周りに。フォグで銀の空間へ溶け、遠景との間に距離が生まれる。
+		const nearStars = makeStars(STAR_COUNT, 18, 40, {
+			color: 0x3a3942,
+			size: 0.05,
+			opacity: 0.5,
+			fog: true
+		});
+		scene.add(nearStars);
 
 		// ── カメラ基準 ──
 		const CAM_Y = 5.4;
@@ -209,6 +225,13 @@
 		const lookAt = new THREE.Vector3();
 		const tmp = new THREE.Vector3();
 		const tmp2 = new THREE.Vector3();
+
+		// レスポンシブ: 縦長画面では軌道面を Z 軸まわりに倒し、惑星を縦並びにする。
+		// 閾値でパチッと切り替えず、毎フレーム目標角へ滑らかに寄せる (ぐわっと倒れる)。
+		let orbitTilt = 0;
+		const Z_AXIS = new THREE.Vector3(0, 0, 1);
+		const Q_FLAT = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 2);
+		const qOrbit = new THREE.Quaternion();
 
 		// ── 入力状態 (Canvas2D 版から踏襲) ──
 		let mx = 0,
@@ -272,11 +295,22 @@
 				master += (masterTarget - master) * Math.min(1, dt * 6);
 			}
 
-			// 惑星配置
+			// 軌道面の傾き — 縦長ほど倒して縦並びに。目標へ滑らかに寄せる。
+			const aspect = W / Math.max(1, H);
+			const tiltTarget = Math.min(1, Math.max(0, (1 - aspect) / 0.42)) * 1.4;
+			orbitTilt += (tiltTarget - orbitTilt) * Math.min(1, dt * 3.5);
+			const cb = Math.cos(orbitTilt),
+				sb = Math.sin(orbitTilt);
+			qOrbit.setFromAxisAngle(Z_AXIS, orbitTilt).multiply(Q_FLAT);
+			orbitRing.quaternion.copy(qOrbit);
+
+			// 惑星配置 (軌道面の傾きを反映)
 			for (let i = 0; i < items.length; i++) {
 				const ang = planetAngle(i);
+				const cx = Math.cos(ang) * items[i].r;
+				const cz = Math.sin(ang) * items[i].r;
 				const p = planetMeshes[i];
-				p.position.set(Math.cos(ang) * items[i].r, 0, Math.sin(ang) * items[i].r);
+				p.position.set(cx * cb, cx * sb, cz);
 				p.rotation.y += dt * 0.5;
 				p.rotation.x += dt * 0.3;
 				hitMeshes[i].position.copy(p.position);
@@ -289,15 +323,21 @@
 			cube.rotation.y = time * 0.18;
 			cube.rotation.x = time * 0.12;
 
-			// 装飾リングの首振り
+			// 装飾リングは常にゆっくり首を振り続ける (周囲の線が止まらない)
 			for (const h of halos) {
 				h.rotation.z += dt * h.userData.spin;
-				h.rotation.x += dt * h.userData.spin * 0.5;
+				h.rotation.x += dt * h.userData.spin * 0.6;
+				h.rotation.y += dt * h.userData.spin * 0.25;
 			}
-			stars.rotation.y = time * 0.012;
+			// 星は 2 層が別速度で回り、パララックスで奥行きを出す
+			farStars.rotation.y = time * 0.006;
+			nearStars.rotation.y = time * 0.016;
 
-			// カメラ (控えめな parallax + 着陸 fly-in)
-			camBase.set(mx * 0.32, CAM_Y, CAM_Z);
+			// カメラ — 縦長ほど低く構え (水平視点) かつ少し引いて、縦並びを上下に分ける
+			const pf = Math.min(1, Math.max(0, (1 - aspect) / 0.42));
+			const camY = CAM_Y - pf * 3.4;
+			const zoom = 1 + pf * 0.34;
+			camBase.set(mx * 0.32, camY, CAM_Z * zoom);
 			let appE = 0;
 			if (approach.active) {
 				appE = easeInOut(Math.min(1, approach.t));
@@ -326,21 +366,36 @@
 				sunEl.style.opacity = String(Math.max(0, 1 - appE * 2.2));
 			}
 
-			// 全ラベルを読みやすく・同じ色で。立体の下端より下へ出して重なりを避ける。
+			// ラベルは「中心から外向き」に置く。奥 (上側) の惑星でも中央キューブに被らない。
+			const cubeC = projectPx(ORIGIN);
 			for (let i = 0; i < items.length; i++) {
 				const focused = i === focusIndex;
 				const pos = planetMeshes[i].position;
 				const sp = projectPx(pos);
 				const el = labelEls[i];
 				if (!el) continue;
-				// 立体の投影上の高さ分だけ下げる (focus は 1.4 倍に拡大している)
-				tmp.set(pos.x, pos.y + 0.46 * (focused ? 1.4 : 1), pos.z);
-				const topp = projectPx(tmp);
-				const rpx = Math.abs(sp.y - topp.y);
-				const lo = approach.active ? 0 : focused ? 1 : 0.82;
-				el.style.transform = `translate(-50%,-50%) translate(${sp.x}px,${sp.y + rpx + 18}px)`;
-				el.style.opacity = String(sp.behind ? 0 : lo);
-				el.style.pointerEvents = approach.active ? 'none' : 'auto';
+				// 立体の投影上の半径 (focus は 1.4 倍に拡大している)
+				tmp2.set(pos.x, pos.y + 0.46 * (focused ? 1.4 : 1), pos.z);
+				const topp = projectPx(tmp2);
+				const rpx = Math.hypot(sp.x - topp.x, sp.y - topp.y);
+				// 中心 → 惑星の外向き方向へオフセット
+				let dx = sp.x - cubeC.x,
+					dy = sp.y - cubeC.y;
+				const dlen = Math.hypot(dx, dy) || 1;
+				dx /= dlen;
+				dy /= dlen;
+				const off = rpx + 28;
+				// 中央キューブの裏に回り込んでいるか (カメラ→惑星のレイがキューブに遮られる)
+				tmp.subVectors(pos, camera.position);
+				const distToPlanet = tmp.length();
+				tmp.normalize();
+				raycaster.set(camera.position, tmp);
+				const ch = raycaster.intersectObject(cube, false);
+				const occluded = ch.length > 0 && ch[0].distance < distToPlanet - 0.2;
+				const lo = approach.active || sp.behind || occluded ? 0 : focused ? 1 : 0.82;
+				el.style.transform = `translate(-50%,-50%) translate(${sp.x + dx * off}px,${sp.y + dy * off}px)`;
+				el.style.opacity = String(lo);
+				el.style.pointerEvents = approach.active || occluded ? 'none' : 'auto';
 				el.classList.toggle('is-focused', focused);
 			}
 
@@ -479,8 +534,7 @@
 			setFocus(i, false);
 			approach.active = true;
 			approach.t = 0;
-			const ang = planetAngle(i);
-			approach.target.set(Math.cos(ang) * items[i].r, 0, Math.sin(ang) * items[i].r);
+			approach.target.copy(planetMeshes[i].position);
 			dispatch('select', items[i].id);
 		};
 		focusBtnHandler = (i: number) => {
