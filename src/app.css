@@ -58,21 +58,19 @@
 	}
 }
 
-/* Custom cursor (desktop only) */
+/* Custom cursor (desktop only, ホーム = .app-cursor のときだけ) */
 @media (hover: hover) and (pointer: fine) {
-	body {
-		cursor: none;
-	}
-	a,
-	button,
-	label,
-	[data-cursor] {
+	.app-cursor,
+	.app-cursor a,
+	.app-cursor button,
+	.app-cursor label,
+	.app-cursor [data-cursor] {
 		cursor: none;
 	}
 	/* テキスト入力ではネイティブの I ビームを返す (カスタムカーソル側は is-hidden で消える) */
-	input,
-	textarea,
-	select {
+	.app-cursor input,
+	.app-cursor textarea,
+	.app-cursor select {
 		cursor: auto;
 	}
 	.cursor-dot.is-hidden,

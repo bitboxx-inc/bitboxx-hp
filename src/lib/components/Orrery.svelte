@@ -34,7 +34,6 @@
 	let host: HTMLDivElement;
 	let canvas: HTMLCanvasElement;
 	let labelEls: HTMLButtonElement[] = [];
-	let sunEl: HTMLAnchorElement;
 	let reticleEl: HTMLDivElement;
 
 	let day = 0;
@@ -202,11 +201,10 @@
 			uniform float uOpacity;
 			varying float vTw;
 			void main () {
-				vec2 d = gl_PointCoord - 0.5;
-				float r = dot(d, d);
-				if (r > 0.25) discard;
-				float edge = smoothstep(0.25, 0.0, r);
-				gl_FragColor = vec4(uColor, uOpacity * vTw * edge);
+				float r = length(gl_PointCoord - 0.5) * 2.0; // 0 中心 .. 1 縁
+				if (r > 1.0) discard;
+				float glow = exp(-r * r * 4.0);     // 中心が明るく柔らかく減衰 = 光の粒
+				gl_FragColor = vec4(uColor, uOpacity * vTw * glow);
 			}`;
 		const starMats: THREE.ShaderMaterial[] = [];
 		const makeStars = (
@@ -246,16 +244,17 @@
 				vertexShader: STAR_VERT,
 				fragmentShader: STAR_FRAG,
 				transparent: true,
-				depthWrite: false
+				depthWrite: false,
+				blending: THREE.AdditiveBlending // 光を足す → 銀の空間に光って見える
 			});
 			starMats.push(mat);
 			return new THREE.Points(geo, mat);
 		};
-		// 遠景: ずっと遠くに小さく。奥行きの背景。
-		const farStars = makeStars(640 + (day % 120), 70, 170, 0x3b3a44, 2.4, 0.6, 0.8);
+		// 遠景: ずっと遠くに小さな白い光。奥行きの背景。
+		const farStars = makeStars(640 + (day % 120), 70, 170, 0xffffff, 3.2, 0.85, 0.8);
 		scene.add(farStars);
-		// 近景: 系の周りに、少し大きく速くまたたく。
-		const nearStars = makeStars(STAR_COUNT, 22, 48, 0x33323b, 1.5, 0.5, 1.5);
+		// 近景: 系の周りに、少し大きく暖色で速くまたたく。
+		const nearStars = makeStars(STAR_COUNT, 22, 48, 0xfff1e0, 2.2, 0.8, 1.5);
 		scene.add(nearStars);
 
 		// ── カメラ基準 ──
@@ -399,15 +398,7 @@
 			const fp = planetMeshes[focusIndex];
 			renderer.render(scene, camera);
 
-			// ── DOM オーバーレイ (ラベル / レティクル / ワードマーク) ──
-			// ワードマークは立方体の下端より下へ
-			tmp.set(0, -0.92, 0);
-			const cubeBottom = projectPx(tmp);
-			if (sunEl) {
-				sunEl.style.transform = `translate(-50%,-50%) translate(${cubeBottom.x}px,${cubeBottom.y + 26}px)`;
-				sunEl.style.opacity = String(Math.max(0, 1 - appE * 2.2));
-			}
-
+			// ── DOM オーバーレイ (ラベル / レティクル) ──
 			// ラベルは「中心から外向き」に置く。奥 (上側) の惑星でも中央キューブに被らない。
 			const cubeC = projectPx(ORIGIN);
 			for (let i = 0; i < items.length; i++) {
@@ -652,16 +643,6 @@
 		<span class="rb br"></span>
 	</div>
 
-	<!-- 立方体 = ブランド核。下にワードマーク。 -->
-	<a
-		bind:this={sunEl}
-		href="#about"
-		class="sun-mark absolute left-0 top-0 z-10 select-none text-center"
-		on:click|preventDefault={() => focusBtnHandler(items.findIndex((i) => i.id === 'about'))}
-	>
-		<span class="font-techno block text-[10px] md:text-[11px] tracking-[0.44em]">BITBOXX</span>
-	</a>
-
 	<!-- 惑星ラベル (実 DOM ボタン) — どれも読みやすく同色。クリックで着陸。 -->
 	{#each items as it, i (it.id)}
 		<button
@@ -681,8 +662,7 @@
 
 <style>
 	/* 浮遊文字は全部同じ濃い色。白い縁取りで、暗い立体の上でも読める。 */
-	.planet-label,
-	.sun-mark {
+	.planet-label {
 		color: #14131a;
 		--o: #f5f4f7;
 		text-shadow:

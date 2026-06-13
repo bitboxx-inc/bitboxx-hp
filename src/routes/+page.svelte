@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
 	import { fade } from 'svelte/transition';
+	import { base } from '$app/paths';
 	import companyInfo from '$lib/data/company_info.json';
 	import orreryData from '$lib/data/orrery.json';
 	import PrivacyPolicy from '$lib/domains/PrivacyPolicy.svelte';
@@ -119,10 +120,6 @@
 		nodes.map((n) => [n.id, { en: n.en, ja: n.label }])
 	);
 
-	// 創業からの経過日数 — この一つの数値が、HUD の数字・系の回転位相・星の数という
-	// 三つの違う形で同時に現れる。
-	let dayCount = 0;
-
 	// ── アプリ状態 ──
 	let mounted = false; // ハイドレーション後に orrery モードへ
 	let view: ViewId | null = null;
@@ -130,8 +127,6 @@
 
 	onMount(() => {
 		mounted = true;
-		const founded = new Date(companyInfo.established + 'T00:00:00+09:00').getTime();
-		dayCount = Math.max(0, Math.floor((Date.now() - founded) / 86400000));
 		const fromHash = (location.hash || '').replace('#', '') as ViewId;
 		if (planets.some((p) => p.id === fromHash)) {
 			view = fromHash;
@@ -143,7 +138,10 @@
 			else back(false);
 		};
 		window.addEventListener('popstate', onPop);
-		return () => window.removeEventListener('popstate', onPop);
+		return () => {
+			window.removeEventListener('popstate', onPop);
+			document.body.style.overflow = ''; // 離脱時はスクロールロックを解除 (規約ページ等)
+		};
 	});
 
 	// アプリモードではページは固定。ウィンドウ内だけがスクロールする。
@@ -284,23 +282,29 @@
 
 			<!-- HUD — 必要最低限。意味ある数値 (創業からの経過日数) はここに一度だけ。 -->
 			<div class="pointer-events-none absolute inset-0 z-20">
-				<div
-					class="font-techno absolute left-6 md:left-9 top-6 md:top-8 text-[9px] leading-[2] tracking-[0.3em] text-ink/55"
-				>
-					BITBOXX INC.<br />
-					NIHONBASHI · TOKYO
+				<!-- 左上: bitboxx ロゴ (NIHONBASHI 文字と同じ薄さに) -->
+				<div class="absolute left-6 md:left-9 top-6 md:top-8">
+					<img src="{base}/black.svg" alt="bitboxx" class="h-5 md:h-6 w-auto opacity-[0.45]" />
+					<p class="font-techno mt-2.5 text-[8.5px] leading-[1.8] tracking-[0.3em] text-ink/45">
+						NIHONBASHI · TOKYO
+					</p>
 				</div>
 				<div
 					class="font-techno absolute right-6 md:right-9 top-6 md:top-8 text-right text-[9px] leading-[2] tracking-[0.3em] text-ink/55"
 				>
 					EST. 2024.04.25<br />
-					DAY {String(dayCount).padStart(4, '0')}
+					© {new Date().getFullYear()} BITBOXX
 				</div>
-				<div
-					class="space-hint font-techno absolute left-1/2 -translate-x-1/2 bottom-7 md:bottom-9 text-center text-[8.5px] tracking-[0.34em] text-ink/40"
+				<!-- 下部: Legal リンク (横並び) -->
+				<nav
+					class="font-mincho pointer-events-auto absolute left-1/2 -translate-x-1/2 bottom-5 md:bottom-7 flex items-center gap-5 md:gap-7 text-[11px] md:text-[12px] text-ink/55"
 				>
-					SCROLL · DRAG ORBIT ／ SELECT TO LAND
-				</div>
+					<a href="{base}/terms_of_service" class="hover:text-sakura transition-colors">利用規約</a>
+					<span class="text-ink/25">/</span>
+					<a href="{base}/privacy_policy" class="hover:text-sakura transition-colors"
+						>プライバシーポリシー</a
+					>
+				</nav>
 			</div>
 		</div>
 
@@ -322,7 +326,7 @@
 		{#if !mounted || view === 'about'}
 			<section id="about" class="doc-section" bind:this={panelScroller}>
 				{#if mounted}<div class="panel-head">
-						<button class="back-btn" on:click={() => back()}>← 空間へ戻る</button>
+						<button class="back-btn" on:click={() => back()}>← 戻る</button>
 						<p class="panel-en">{titles.about.en}</p>
 					</div>{/if}
 				<div class="panel-inner">
@@ -382,7 +386,7 @@
 		{#if !mounted || view === 'business'}
 			<section id="business" class="doc-section" bind:this={panelScroller}>
 				{#if mounted}<div class="panel-head">
-						<button class="back-btn" on:click={() => back()}>← 空間へ戻る</button>
+						<button class="back-btn" on:click={() => back()}>← 戻る</button>
 						<p class="panel-en">{titles.business.en}</p>
 					</div>{/if}
 				<div class="panel-inner">
@@ -423,7 +427,7 @@
 		{#if !mounted || view === 'company'}
 			<section id="company" class="doc-section" bind:this={panelScroller}>
 				{#if mounted}<div class="panel-head">
-						<button class="back-btn" on:click={() => back()}>← 空間へ戻る</button>
+						<button class="back-btn" on:click={() => back()}>← 戻る</button>
 						<p class="panel-en">{titles.company.en}</p>
 					</div>{/if}
 				<div class="panel-inner">
@@ -449,7 +453,7 @@
 		{#if !mounted || view === 'contact'}
 			<section id="contact" class="doc-section" bind:this={panelScroller}>
 				{#if mounted}<div class="panel-head">
-						<button class="back-btn" on:click={() => back()}>← 空間へ戻る</button>
+						<button class="back-btn" on:click={() => back()}>← 戻る</button>
 						<p class="panel-en">{titles.contact.en}</p>
 					</div>{/if}
 				<div class="panel-inner">

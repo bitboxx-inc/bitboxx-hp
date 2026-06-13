@@ -13,6 +13,6 @@ test('selecting a planet lands on its section', async ({ page }) => {
 	const focused = page.locator('.planet-label.is-focused');
 	await focused.waitFor({ state: 'visible', timeout: 5000 });
 	await focused.click();
-	// 着陸先のデジタルウィンドウに「空間へ戻る」操作が出る
-	await expect(page.getByRole('button', { name: '← 空間へ戻る' })).toBeVisible({ timeout: 5000 });
+	// 着陸先のデジタルウィンドウに「戻る」操作が出る
+	await expect(page.getByRole('button', { name: '← 戻る' })).toBeVisible({ timeout: 5000 });
 });

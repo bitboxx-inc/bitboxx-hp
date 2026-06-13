@@ -20,20 +20,13 @@
 	/>
 </svelte:head>
 
-<div class="relative min-h-screen bg-cream-50 text-ink font-sans flex flex-col overflow-x-clip">
-	<Cursor />
-
-	{#if !isHome}
-		<header
-			class="fixed top-0 left-0 w-full z-[80] bg-cream-50/85 backdrop-blur-md border-b border-ink/10"
-		>
-			<div class="max-w-[1500px] mx-auto h-16 px-5 md:px-10 flex items-center">
-				<a href="{base}/" class="flex items-center gap-3" aria-label="bitboxx — 空間へ戻る">
-					<img src="{base}/black.svg" alt="bitboxx" class="h-5 w-auto" />
-					<span class="font-mincho text-[12px] text-ink/55">← 空間へ戻る</span>
-				</a>
-			</div>
-		</header>
+<div
+	class="relative min-h-screen bg-cream-50 text-ink font-sans flex flex-col overflow-x-clip"
+	class:app-cursor={isHome}
+>
+	<!-- カスタムカーソルは宇宙 (ホーム) のみ。規約等の資料はネイティブカーソルで素直に。 -->
+	{#if isHome}
+		<Cursor />
 	{/if}
 
 	<main class="flex-1">
