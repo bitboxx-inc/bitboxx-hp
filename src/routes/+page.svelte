@@ -685,8 +685,8 @@
 		overflow-x: hidden;
 		padding: 0 1.4rem 3rem;
 		/* 宇宙が透ける半透明パネル。背面ブラーで本文は読める。 */
-		background: rgba(244, 243, 247, 0.72);
-		backdrop-filter: blur(18px) saturate(1.05);
+		background: rgba(244, 243, 247, 0.55);
+		backdrop-filter: blur(22px) saturate(1.05);
 		border: 1px solid rgba(17, 16, 20, 0.14);
 		box-shadow: 0 40px 120px -40px rgba(17, 16, 20, 0.4);
 		pointer-events: auto;
@@ -723,8 +723,8 @@
 		justify-content: space-between;
 		padding: 0.95rem 1.4rem;
 		margin: 0 -1.4rem 2.4rem;
-		background: rgba(238, 237, 241, 0.92);
-		backdrop-filter: blur(8px);
+		background: rgba(238, 237, 241, 0.72);
+		backdrop-filter: blur(10px);
 		border-bottom: 1px solid rgba(17, 16, 20, 0.12);
 	}
 	@media (min-width: 768px) {
