@@ -326,14 +326,19 @@
 				sunEl.style.opacity = String(Math.max(0, 1 - appE * 2.2));
 			}
 
-			// 全ラベルを読みやすく・同じ色で。奥のラベルもクリックできる。
+			// 全ラベルを読みやすく・同じ色で。立体の下端より下へ出して重なりを避ける。
 			for (let i = 0; i < items.length; i++) {
-				const sp = projectPx(planetMeshes[i].position);
+				const focused = i === focusIndex;
+				const pos = planetMeshes[i].position;
+				const sp = projectPx(pos);
 				const el = labelEls[i];
 				if (!el) continue;
-				const focused = i === focusIndex;
-				const lo = approach.active ? 0 : focused ? 1 : 0.78;
-				el.style.transform = `translate(-50%,-50%) translate(${sp.x}px,${sp.y + 36}px)`;
+				// 立体の投影上の高さ分だけ下げる (focus は 1.4 倍に拡大している)
+				tmp.set(pos.x, pos.y + 0.46 * (focused ? 1.4 : 1), pos.z);
+				const topp = projectPx(tmp);
+				const rpx = Math.abs(sp.y - topp.y);
+				const lo = approach.active ? 0 : focused ? 1 : 0.82;
+				el.style.transform = `translate(-50%,-50%) translate(${sp.x}px,${sp.y + rpx + 18}px)`;
 				el.style.opacity = String(sp.behind ? 0 : lo);
 				el.style.pointerEvents = approach.active ? 'none' : 'auto';
 				el.classList.toggle('is-focused', focused);
@@ -555,7 +560,7 @@
 	<a
 		bind:this={sunEl}
 		href="#about"
-		class="absolute left-0 top-0 z-10 select-none text-center"
+		class="sun-mark absolute left-0 top-0 z-10 select-none text-center"
 		on:click|preventDefault={() => focusBtnHandler(items.findIndex((i) => i.id === 'about'))}
 	>
 		<span class="font-techno block text-[10px] md:text-[11px] tracking-[0.44em]">BITBOXX</span>
@@ -579,13 +584,21 @@
 </div>
 
 <style>
-	/* 浮遊文字は全部同じ濃い色。淡い光彩で背景に負けない。 */
+	/* 浮遊文字は全部同じ濃い色。白い縁取りで、暗い立体の上でも読める。 */
 	.planet-label,
-	a {
-		color: #15141a;
+	.sun-mark {
+		color: #14131a;
+		--o: #f5f4f7;
 		text-shadow:
-			0 0 4px rgba(247, 246, 243, 0.85),
-			0 0 9px rgba(247, 246, 243, 0.7);
+			-1px -1px 0 var(--o),
+			1px -1px 0 var(--o),
+			-1px 1px 0 var(--o),
+			1px 1px 0 var(--o),
+			0 -1.4px 0 var(--o),
+			0 1.4px 0 var(--o),
+			-1.4px 0 0 var(--o),
+			1.4px 0 0 var(--o),
+			0 0 7px rgba(245, 244, 247, 0.95);
 	}
 	.planet-label {
 		transition: opacity 0.25s ease;
