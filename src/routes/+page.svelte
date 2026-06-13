@@ -341,12 +341,11 @@
 						class="mt-12 md:mt-16 max-w-3xl font-mincho text-[18px] md:text-[22px] leading-[1.95] text-ink tracking-[0.02em]"
 					>
 						そして私たちが引き受けるのは、<br class="hidden md:block" />
-						<span class="underline-handwritten">Excellent</span><span class="text-sakura">.</span
-						>（卓越）か、<span class="text-sakura font-display italic">Kawaii</span><span
-							class="text-sakura">.</span
-						>（愛着）か、<span class="font-display italic">Unique</span><span class="text-sakura"
-							>.</span
-						>（独自）か。<br class="hidden md:block" />
+						<span class="underline-handwritten">Excellent</span>.（卓越）か、<span
+							class="text-sakura font-display italic">Kawaii</span
+						><span class="text-sakura">.</span>（愛着）か、<span class="font-display italic"
+							>Unique</span
+						><span class="text-sakura">.</span>（独自）か。<br class="hidden md:block" />
 						このどれかを生み出せる仕事だけです。
 					</p>
 					<p class="mt-5 font-mincho text-[14px] md:text-[15px] leading-[2.1] text-ink/60">

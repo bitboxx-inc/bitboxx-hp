@@ -76,15 +76,15 @@
 		const envRT = pmrem.fromScene(new RoomEnvironment(), 0.04);
 		scene.environment = envRT.texture;
 
-		// ── ライト ──
-		const hemi = new THREE.HemisphereLight(0xffffff, 0xd6d5da, 0.85);
+		// ── ライト ── 主光源はユーザー側の左上から (太陽がそこにある想定)
+		const hemi = new THREE.HemisphereLight(0xffffff, 0xceccd4, 0.62);
 		scene.add(hemi);
-		const key = new THREE.DirectionalLight(0xffffff, 1.5);
-		key.position.set(4, 8, -3);
+		const key = new THREE.DirectionalLight(0xfff6ea, 2.1); // わずかに暖色の日光
+		key.position.set(-9, 9, -7); // 左 (-x) ・上 (+y) ・手前 (-z=ユーザー側)
 		scene.add(key);
-		const rim = new THREE.DirectionalLight(0xffffff, 0.7);
-		rim.position.set(-5, 3, 6);
-		scene.add(rim);
+		const fill = new THREE.DirectionalLight(0xffffff, 0.3); // 右下からの弱い起こし光
+		fill.position.set(7, -2, 6);
+		scene.add(fill);
 
 		// ── マテリアル ──
 		const chromeFaint = new THREE.MeshStandardMaterial({
@@ -182,45 +182,80 @@
 			halos.push(ring);
 		}
 
-		// ── 星 — 近景/遠景の 2 層。速度差 (パララックス) で奥行きを出す ──
+		// ── 星 — 近景/遠景の 2 層。遠くへ散らし、ちらつかせて (twinkle) 奥行きを出す ──
+		const STAR_VERT = `
+			attribute float aPhase;
+			attribute float aSize;
+			uniform float uTime;
+			uniform float uSpeed;
+			varying float vTw;
+			void main () {
+				vec4 mv = modelViewMatrix * vec4(position, 1.0);
+				gl_Position = projectionMatrix * mv;
+				gl_PointSize = aSize * (200.0 / -mv.z);
+				float s = sin(uTime * uSpeed + aPhase);
+				vTw = smoothstep(-0.5, 0.95, s); // たまに 0 まで沈む = ちらっと/消える
+			}`;
+		const STAR_FRAG = `
+			precision mediump float;
+			uniform vec3 uColor;
+			uniform float uOpacity;
+			varying float vTw;
+			void main () {
+				vec2 d = gl_PointCoord - 0.5;
+				float r = dot(d, d);
+				if (r > 0.25) discard;
+				float edge = smoothstep(0.25, 0.0, r);
+				gl_FragColor = vec4(uColor, uOpacity * vTw * edge);
+			}`;
+		const starMats: THREE.ShaderMaterial[] = [];
 		const makeStars = (
 			count: number,
 			rMin: number,
 			rMax: number,
-			opts: THREE.PointsMaterialParameters
+			color: number,
+			sizeBase: number,
+			opacity: number,
+			speed: number
 		) => {
 			const geo = new THREE.BufferGeometry();
 			const arr = new Float32Array(count * 3);
+			const ph = new Float32Array(count);
+			const sz = new Float32Array(count);
 			for (let i = 0; i < count; i++) {
 				const a = i * 2.399963229; // 黄金角で球殻に散らす
 				const yy = 1 - (i / (count - 1)) * 2;
 				const rr = Math.sqrt(Math.max(0, 1 - yy * yy));
 				const rad = rMin + (((i * 17) % 100) / 100) * (rMax - rMin);
 				arr[i * 3] = Math.cos(a) * rr * rad;
-				arr[i * 3 + 1] = yy * rad * 0.7;
+				arr[i * 3 + 1] = yy * rad * 0.75;
 				arr[i * 3 + 2] = Math.sin(a) * rr * rad;
+				ph[i] = (i * 12.9898) % 6.283;
+				sz[i] = sizeBase * (0.5 + ((i * 7) % 10) / 6.5);
 			}
 			geo.setAttribute('position', new THREE.BufferAttribute(arr, 3));
-			return new THREE.Points(
-				geo,
-				new THREE.PointsMaterial({ sizeAttenuation: true, transparent: true, ...opts })
-			);
+			geo.setAttribute('aPhase', new THREE.BufferAttribute(ph, 1));
+			geo.setAttribute('aSize', new THREE.BufferAttribute(sz, 1));
+			const mat = new THREE.ShaderMaterial({
+				uniforms: {
+					uTime: { value: 0 },
+					uSpeed: { value: speed },
+					uColor: { value: new THREE.Color(color) },
+					uOpacity: { value: opacity }
+				},
+				vertexShader: STAR_VERT,
+				fragmentShader: STAR_FRAG,
+				transparent: true,
+				depthWrite: false
+			});
+			starMats.push(mat);
+			return new THREE.Points(geo, mat);
 		};
-		// 遠景: ずっと遠くに小さく散る。フォグの影響を受けず、奥行きの背景になる。
-		const farStars = makeStars(480 + (day % 80), 48, 96, {
-			color: 0x46454f,
-			size: 0.08,
-			opacity: 0.5,
-			fog: false
-		});
+		// 遠景: ずっと遠くに小さく。奥行きの背景。
+		const farStars = makeStars(640 + (day % 120), 70, 170, 0x3b3a44, 2.4, 0.6, 0.8);
 		scene.add(farStars);
-		// 近景: 系の周りに。フォグで銀の空間へ溶け、遠景との間に距離が生まれる。
-		const nearStars = makeStars(STAR_COUNT, 18, 40, {
-			color: 0x3a3942,
-			size: 0.05,
-			opacity: 0.5,
-			fog: true
-		});
+		// 近景: 系の周りに、少し大きく速くまたたく。
+		const nearStars = makeStars(STAR_COUNT, 22, 48, 0x33323b, 1.5, 0.5, 1.5);
 		scene.add(nearStars);
 
 		// ── カメラ基準 ──
@@ -335,9 +370,10 @@
 				h.rotation.x += dt * h.userData.spin * 0.6;
 				h.rotation.y += dt * h.userData.spin * 0.25;
 			}
-			// 星は 2 層が別速度で回り、パララックスで奥行きを出す
+			// 星は 2 層が別速度で回り、パララックスで奥行きを出す + ちらつき
 			farStars.rotation.y = time * 0.006;
 			nearStars.rotation.y = time * 0.016;
+			for (const m of starMats) m.uniforms.uTime.value = time;
 
 			// カメラ — 縦長ほど低く構え (水平視点) かつ少し引いて、縦並びを上下に分ける
 			const pf = Math.min(1, Math.max(0, (1 - aspect) / 0.42));

@@ -44,17 +44,17 @@
 		font-family: 'Michroma', 'Space Grotesk', 'Noto Sans JP', system-ui, sans-serif;
 	}
 
-	/* Hero 由来のサクラ下線 — 本文の一語を蛍光ペンで引いたように強める */
+	/* サクラの赤ハイライト — 蛍光ペンで文字の下側に少し被せる (半透明マーカー) */
 	.underline-handwritten {
 		background-image: linear-gradient(
-			transparent 62%,
-			var(--sakura) 62%,
-			var(--sakura) 88%,
-			transparent 88%
+			transparent 58%,
+			rgba(255, 38, 48, 0.5) 58%,
+			rgba(255, 38, 48, 0.5) 86%,
+			transparent 86%
 		);
 		background-repeat: no-repeat;
 		background-size: 100% 100%;
-		padding: 0 0.12em;
+		padding: 0 0.06em;
 	}
 }
 
