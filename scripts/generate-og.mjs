@@ -37,11 +37,9 @@ const browser = await chromium.launch({ args: ['--enable-gpu'] });
 	const page = await ctx.newPage();
 	await page.goto(BASE_URL, { waitUntil: 'load' });
 	await page.evaluate(() => document.fonts.ready);
-	// OG にサイトの操作 UI は不要 — ヘッダーと連絡カードを隠す
-	await page.addStyleTag({
-		content: 'header, section a[href="#contact-form"] { display: none !important; }'
-	});
-	await page.waitForTimeout(1200);
+	// OG に操作ヒントは不要 — 隠す
+	await page.addStyleTag({ content: '.space-hint { display: none !important; }' });
+	await page.waitForTimeout(1400);
 	await page.screenshot({ path: resolve(root, 'static/og.png') });
 	await ctx.close();
 	console.log('wrote static/og.png');

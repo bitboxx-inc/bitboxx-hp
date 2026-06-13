@@ -39,61 +39,7 @@
 }
 
 @layer utilities {
-	.paper-grain::before {
-		content: '';
-		position: absolute;
-		inset: 0;
-		pointer-events: none;
-		opacity: 0.09;
-		mix-blend-mode: multiply;
-		background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.22 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
-	}
-
-	.mask-fade-y {
-		-webkit-mask-image: linear-gradient(to bottom, transparent, black 12%, black 88%, transparent);
-		mask-image: linear-gradient(to bottom, transparent, black 12%, black 88%, transparent);
-	}
-
-	/* Dark CTA pill — asserted explicitly so Safari/iOS always renders it
-     even if Tailwind's custom colors race the paint. */
-	.btn-ink {
-		background-color: #111014;
-		color: #ffffff;
-	}
-	.btn-ink:hover {
-		background-color: #ff2630;
-	}
-	.btn-ink svg {
-		color: #ffffff;
-	}
-	.btn-ink:hover svg {
-		color: #ffffff;
-	}
-
-	.reveal {
-		opacity: 0;
-		transform: translateY(28px);
-		transition:
-			opacity 0.9s cubic-bezier(0.2, 0.8, 0.2, 1),
-			transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
-	}
-	.reveal.is-visible {
-		opacity: 1;
-		transform: none;
-	}
-	.reveal-delay-1 {
-		transition-delay: 0.08s;
-	}
-	.reveal-delay-2 {
-		transition-delay: 0.16s;
-	}
-	.reveal-delay-3 {
-		transition-delay: 0.24s;
-	}
-	.reveal-delay-4 {
-		transition-delay: 0.32s;
-	}
-
+	/* Hero 由来のサクラ下線 — 本文の一語を蛍光ペンで引いたように強める */
 	.underline-handwritten {
 		background-image: linear-gradient(
 			transparent 62%,
@@ -104,55 +50,6 @@
 		background-repeat: no-repeat;
 		background-size: 100% 100%;
 		padding: 0 0.12em;
-	}
-
-	/* 墨の上でも文字が立つ紙色のハロー — 蝋抜きのように墨を縁で払う */
-	.ink-guard {
-		text-shadow:
-			0 0 1px rgba(252, 251, 247, 0.85),
-			0 0 3px rgba(252, 251, 247, 0.75),
-			0 0 8px rgba(252, 251, 247, 0.6),
-			0 0 18px rgba(252, 251, 247, 0.45);
-	}
-
-	/* ヒーローの入場 — 行ごとのクリップ・ライズ、後から筆で引かれる下線、遅れて立つ本文 */
-	.hero-clip {
-		display: block;
-		overflow: hidden;
-	}
-	.hero-rise {
-		display: block;
-		transform: translateY(112%);
-		animation: hero-rise 0.82s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-		animation-delay: var(--d, 0ms);
-	}
-	.draw-in {
-		background-size: 0% 100%;
-		animation: draw-in 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-		animation-delay: 1.05s;
-	}
-	.hero-fade {
-		opacity: 0;
-		transform: translateY(14px);
-		animation: hero-fade 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-		animation-delay: var(--d, 1s);
-	}
-}
-
-@keyframes hero-rise {
-	to {
-		transform: translateY(0);
-	}
-}
-@keyframes draw-in {
-	to {
-		background-size: 100% 100%;
-	}
-}
-@keyframes hero-fade {
-	to {
-		opacity: 1;
-		transform: none;
 	}
 }
 
@@ -227,9 +124,5 @@
 		animation-duration: 0.001ms !important;
 		transition-duration: 0.001ms !important;
 		animation-iteration-count: 1 !important;
-	}
-	.reveal {
-		opacity: 1 !important;
-		transform: none !important;
 	}
 }
