@@ -150,7 +150,10 @@
 		});
 		const hitGeo = new THREE.SphereGeometry(0.62, 8, 8);
 		items.forEach((it) => {
-			const planet = new THREE.Mesh(solidGeo(it.solid), solidMat);
+			// 距離に応じて透過させたいので、マテリアルは個別 (透過 ON)
+			const pm = solidMat.clone();
+			pm.transparent = true;
+			const planet = new THREE.Mesh(solidGeo(it.solid), pm);
 			scene.add(planet);
 			planetMeshes.push(planet);
 			// クリックを取りやすくする不可視の当たり判定 (惑星に追従)
@@ -273,9 +276,10 @@
 				master += (masterTarget - master) * Math.min(1, dt * 6);
 			}
 
-			// 軌道面の傾き — 縦長ほど倒して縦並びに。目標へ滑らかに寄せる。
+			// 軌道面の傾き — 縦長では斜め (襷: 左上→右下) に。目標へ滑らかに寄せる。
 			const aspect = W / Math.max(1, H);
-			const tiltTarget = Math.min(1, Math.max(0, (1 - aspect) / 0.42)) * 1.4;
+			const pf = Math.min(1, Math.max(0, (1 - aspect) / 0.42));
+			const tiltTarget = pf * 0.82; // 0 = 横並び(N/E/S/W), ~0.82rad(47°) = 斜めの襷
 			orbitTilt += (tiltTarget - orbitTilt) * Math.min(1, dt * 3.5);
 			const cb = Math.cos(orbitTilt),
 				sb = Math.sin(orbitTilt);
@@ -308,10 +312,9 @@
 				h.rotation.y += dt * h.userData.spin * 0.25;
 			}
 
-			// カメラ — 縦長ほど低く構え (水平視点) かつ少し引いて、縦並びを上下に分ける
-			const pf = Math.min(1, Math.max(0, (1 - aspect) / 0.42));
-			const camY = CAM_Y - pf * 3.4;
-			const zoom = 1 + pf * 0.34;
+			// カメラ — 縦長ではやや水平視点に寄せ、少し引いて画角に余白を作る
+			const camY = CAM_Y - pf * 2.2;
+			const zoom = 1 + pf * 0.42;
 			camBase.set(mx * 0.32, camY, CAM_Z * zoom);
 			let appE = 0;
 			if (approach.active) {
@@ -407,7 +410,12 @@
 			if (dragging) {
 				if (Math.abs(e.clientX - dragStartX) > 6 || Math.abs(e.clientY - dragStartY) > 6)
 					moved = true;
-				dragOffset = -((e.clientX - dragStartX) / r.width) * 2.0;
+				// 縦長 (スマホ) では縦スワイプで惑星を回す。横長では横ドラッグ。
+				const portrait = W < H;
+				const delta = portrait
+					? (e.clientY - dragStartY) / r.height
+					: (e.clientX - dragStartX) / r.width;
+				dragOffset = -delta * 2.4;
 			}
 		};
 		const onDown = (e: PointerEvent) => {

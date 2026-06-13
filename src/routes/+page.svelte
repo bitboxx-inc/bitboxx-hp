@@ -295,14 +295,16 @@
 			<!-- HUD — 必要最低限。意味ある数値 (創業からの経過日数) はここに一度だけ。 -->
 			<div class="pointer-events-none absolute inset-0 z-20">
 				<!-- 左上: bitboxx ロゴ (NIHONBASHI 文字と同じ薄さに) -->
-				<div class="absolute left-6 md:left-9 top-6 md:top-8">
+				<div class="absolute left-5 md:left-9 top-5 md:top-8">
 					<img src="{base}/black.svg" alt="bitboxx" class="h-5 md:h-6 w-auto opacity-[0.45]" />
-					<p class="font-techno mt-2.5 text-[8.5px] leading-[1.8] tracking-[0.3em] text-ink/45">
+					<p
+						class="font-techno mt-2 md:mt-2.5 text-[6px] md:text-[8.5px] leading-[1.8] tracking-[0.22em] md:tracking-[0.3em] text-ink/45"
+					>
 						NIHONBASHI · TOKYO
 					</p>
 				</div>
 				<div
-					class="font-techno absolute right-6 md:right-9 top-6 md:top-8 text-right text-[9px] leading-[2] tracking-[0.3em] text-ink/55"
+					class="font-techno absolute right-5 md:right-9 top-5 md:top-8 text-right text-[6px] md:text-[9px] leading-[2] tracking-[0.22em] md:tracking-[0.3em] text-ink/55"
 				>
 					EST. 2024.04.25<br />
 					© {new Date().getFullYear()} BITBOXX
