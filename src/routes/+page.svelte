@@ -139,14 +139,14 @@
 
 	// ── アプリ状態 ──
 	let mounted = false; // ハイドレーション後に orrery モードへ
-	let showIntro = true; // 初回ロードのイントロ (中央キューブ→軌道サークル生成)
+	let showIntro = true; // 初回描画のチラつきを覆う幕 (mounted で消える)
 	let view: ViewId | null = null;
 	let orrery: Orrery;
 
 	onMount(() => {
 		mounted = true;
-		// イントロのフェード完了後に DOM から除去 (CSS のタイムラインと同期)
-		const introTimer = setTimeout(() => (showIntro = false), 2200);
+		// 幕のフェード完了後に DOM から除去
+		const introTimer = setTimeout(() => (showIntro = false), 650);
 		const fromHash = (location.hash || '').replace('#', '') as ViewId;
 		if (planets.some((p) => p.id === fromHash)) {
 			view = fromHash;
@@ -670,18 +670,11 @@
 		</div>
 	{/if}
 
-	<!-- ── イントロ: 中央キューブが生まれ、軌道サークルが回りながら外へ広がってから本編へ ──
-	     プリレンダー HTML に含めて初期描画のチラつき (文書版) を覆う。
-	     JS 無効でも CSS だけで自動フェードし、下の文書が読める。 -->
+	<!-- ── 初期描画のチラつき (文書版) を覆う同色の幕 ──
+	     プリレンダー HTML に含め、orrery の準備が整う (= mounted) と同時にスッと消える。
+	     JS 無効でも CSS だけで自動フェードし、下の文書が読める。演出ではなくチラつき防止。 -->
 	{#if showIntro}
-		<div class="intro-veil" aria-hidden="true">
-			<div class="intro-stage">
-				<span class="intro-ring r3"></span>
-				<span class="intro-ring r2"></span>
-				<span class="intro-ring r1"></span>
-				<div class="intro-cube"><span>!?</span></div>
-			</div>
-		</div>
+		<div class="intro-veil" class:is-hiding={mounted} aria-hidden="true"></div>
 	{/if}
 </main>
 
@@ -875,20 +868,19 @@
 		pointer-events: none;
 	}
 
-	/* ── イントロ・ヴェール: 初回ロードの幕。中央キューブ→軌道リング生成→フェード ── */
+	/* ── チラつき防止の幕 (演出ではない) ── */
 	.intro-veil {
 		position: fixed;
 		inset: 0;
 		z-index: 1500;
-		display: grid;
-		place-items: center;
 		pointer-events: none;
 		background: radial-gradient(120% 95% at 50% 40%, #f6f5f8 0%, #e9e8ed 52%, #d6d5dc 100%);
-		animation: intro-veil 2.1s ease forwards;
+		/* JS 無効時のフォールバック: しばらく覆ってから自動でフェードし文書を見せる */
+		animation: intro-fade 1.6s ease forwards;
 	}
-	@keyframes intro-veil {
+	@keyframes intro-fade {
 		0%,
-		66% {
+		55% {
 			opacity: 1;
 		}
 		100% {
@@ -896,137 +888,22 @@
 			visibility: hidden;
 		}
 	}
-	.intro-stage {
-		position: relative;
-		width: 0;
-		height: 0;
-		display: grid;
-		place-items: center;
+	/* JS あり: 自動フェードは止め、orrery が整った瞬間 (mounted) にスッと消す */
+	:global(.is-app) .intro-veil {
+		animation: none;
+		transition:
+			opacity 0.45s ease,
+			visibility 0.45s;
 	}
-	/* 中央のブランドキューブ — 最初に生まれる */
-	.intro-cube {
-		position: relative;
-		display: grid;
-		place-items: center;
-		width: 56px;
-		height: 56px;
-		border-radius: 15px;
-		background: rgba(255, 255, 255, 0.62);
-		border: 1px solid rgba(255, 255, 255, 0.9);
-		box-shadow:
-			0 18px 40px -16px rgba(17, 16, 20, 0.4),
-			inset 0 1px 0 rgba(255, 255, 255, 1);
-		transform: scale(0) rotate(-24deg);
-		animation: intro-cube 0.62s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-	}
-	.intro-cube span {
-		font-family: 'Michroma', 'Space Grotesk', sans-serif;
-		font-size: 17px;
-		letter-spacing: 0.04em;
-		color: rgba(17, 16, 20, 0.78);
-	}
-	@keyframes intro-cube {
-		0% {
-			transform: scale(0) rotate(-24deg);
-			opacity: 0;
-		}
-		60% {
-			opacity: 1;
-		}
-		100% {
-			transform: scale(1) rotate(0deg);
-			opacity: 1;
-		}
-	}
-	/* 軌道リング — 中央から回りながら外へ生まれる */
-	.intro-ring {
-		position: absolute;
-		left: 50%;
-		top: 50%;
-		border-radius: 50%;
-		border: 1px solid rgba(17, 16, 20, 0.1);
-		transform: translate(-50%, -50%) scale(0);
+	.intro-veil.is-hiding {
 		opacity: 0;
-		animation: intro-ring 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
+		visibility: hidden;
 	}
-	/* 回転するアクセントの弧 (#FF2630) でグルグル感 */
-	.intro-ring::before {
-		content: '';
-		position: absolute;
-		inset: -1px;
-		border-radius: 50%;
-		border: 1px solid transparent;
-		border-top-color: #ff2630;
-		border-right-color: rgba(255, 38, 48, 0.35);
-		animation: intro-spin 1.15s linear infinite;
-	}
-	.intro-ring.r1 {
-		width: 150px;
-		height: 150px;
-		animation-delay: 0.22s;
-	}
-	.intro-ring.r2 {
-		width: 252px;
-		height: 252px;
-		animation-delay: 0.4s;
-	}
-	.intro-ring.r3 {
-		width: 360px;
-		height: 360px;
-		animation-delay: 0.58s;
-	}
-	.intro-ring.r2::before {
-		animation-duration: 1.5s;
-		animation-direction: reverse;
-	}
-	.intro-ring.r3::before {
-		animation-duration: 1.9s;
-	}
-	@keyframes intro-ring {
-		0% {
-			transform: translate(-50%, -50%) scale(0) rotate(-90deg);
-			opacity: 0;
-		}
-		100% {
-			transform: translate(-50%, -50%) scale(1) rotate(0deg);
-			opacity: 1;
-		}
-	}
-	@keyframes intro-spin {
-		to {
-			transform: rotate(360deg);
-		}
-	}
-	@media (max-width: 640px) {
-		.intro-ring.r1 {
-			width: 116px;
-			height: 116px;
-		}
-		.intro-ring.r2 {
-			width: 188px;
-			height: 188px;
-		}
-		.intro-ring.r3 {
-			width: 264px;
-			height: 264px;
-		}
-	}
-	/* モーション控えめ設定では素早いフェードのみ */
 	@media (prefers-reduced-motion: reduce) {
-		.intro-veil {
-			animation: intro-veil 0.6s ease 0.25s forwards;
-		}
-		.intro-ring {
-			animation: none;
-			opacity: 0;
-		}
-		.intro-ring::before {
-			animation: none;
-		}
-		.intro-cube {
-			animation: none;
-			transform: none;
-			opacity: 1;
+		:global(.is-app) .intro-veil {
+			transition:
+				opacity 0.2s ease,
+				visibility 0.2s;
 		}
 	}
 </style>
