@@ -365,10 +365,10 @@
 						><span class="text-sakura">.</span>（他にはない独自性）か。<br
 							class="hidden md:block"
 						/>
-						関わる仕事に、このどれかの要素を確かに宿せること。
+						関わる仕事に、このいずれかを宿すこと。
 					</p>
 					<p class="mt-5 font-mincho text-[14px] md:text-[15px] leading-[2.1] text-ink/65">
-						私たちは、関わるすべての仕事で、この三つのどれかを確かな価値として生み出します。
+						私たちが手がけたものには、いつもこの三つのいずれかが息づいています。
 					</p>
 
 					<div class="mt-14 md:mt-20">
