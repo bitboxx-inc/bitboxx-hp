@@ -711,32 +711,32 @@
 		cursor: pointer;
 	}
 
-	/* モーダル背景 — 暗幕をやめ、明るいフロストの幕でガラスを明るく保つ */
+	/* モーダル背景 — 暗幕をやめ、薄いフロストの幕。背景の宇宙がうっすら透ける */
 	.glass-scrim {
-		background: rgba(228, 227, 233, 0.32);
-		backdrop-filter: blur(18px) saturate(1.5);
-		-webkit-backdrop-filter: blur(18px) saturate(1.5);
+		background: rgba(228, 227, 233, 0.22);
+		backdrop-filter: blur(12px) saturate(1.3);
+		-webkit-backdrop-filter: blur(12px) saturate(1.3);
 	}
-	/* リキッドグラスのカード (プライバシー等のモーダル) — 本体パネルと同じ質感 */
+	/* iOS「クリア」相当のリキッドグラス — 乳白を抑え、背景の色と形が透けるティント */
 	.glass-card {
 		background:
 			linear-gradient(
 				180deg,
-				rgba(255, 255, 255, 0.42),
-				rgba(255, 255, 255, 0.09) 18%,
-				rgba(255, 255, 255, 0) 46%
+				rgba(255, 255, 255, 0.26),
+				rgba(255, 255, 255, 0.05) 22%,
+				rgba(255, 255, 255, 0) 56%
 			),
-			linear-gradient(125deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 34%),
-			rgba(247, 246, 251, 0.18);
-		backdrop-filter: blur(48px) saturate(2.8) brightness(1.1) contrast(1.04);
-		-webkit-backdrop-filter: blur(48px) saturate(2.8) brightness(1.1) contrast(1.04);
-		border: 1px solid rgba(255, 255, 255, 0.78);
+			linear-gradient(125deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0) 40%),
+			rgba(247, 246, 251, 0.1);
+		backdrop-filter: blur(24px) saturate(1.7) brightness(1.05);
+		-webkit-backdrop-filter: blur(24px) saturate(1.7) brightness(1.05);
+		border: 1px solid rgba(255, 255, 255, 0.7);
 		box-shadow:
 			0 56px 150px -45px rgba(17, 16, 20, 0.5),
-			0 0 0 1px rgba(255, 255, 255, 0.14),
-			inset 0 1.5px 0 rgba(255, 255, 255, 1),
-			inset 0 -1px 0 rgba(255, 255, 255, 0.3),
-			inset 0 0 90px rgba(255, 255, 255, 0.18);
+			0 0 0 1px rgba(255, 255, 255, 0.1),
+			inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
+			inset 0 -1px 0 rgba(255, 255, 255, 0.24),
+			inset 0 0 64px rgba(255, 255, 255, 0.1);
 	}
 
 	/* ── アプリモード: 選んだ節を「テックなデジタルウィンドウ」として中央に開く ── */
@@ -756,25 +756,25 @@
 		overflow-y: auto;
 		overflow-x: hidden;
 		padding: 0 1.4rem 3rem;
-		/* リキッドグラス — 思い切って透過。強ブラー＆彩度ブースト＆上辺の光のシーンで液状ガラス感。 */
+		/* iOS「クリア」相当 — 乳白を抑え、背景の色と形が透けるティント。軽めのフロスト。 */
 		background:
 			linear-gradient(
 				180deg,
-				rgba(255, 255, 255, 0.42),
-				rgba(255, 255, 255, 0.09) 18%,
-				rgba(255, 255, 255, 0) 46%
+				rgba(255, 255, 255, 0.26),
+				rgba(255, 255, 255, 0.05) 22%,
+				rgba(255, 255, 255, 0) 56%
 			),
-			linear-gradient(125deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 34%),
-			rgba(247, 246, 251, 0.15);
-		backdrop-filter: blur(48px) saturate(2.8) brightness(1.1) contrast(1.04);
-		-webkit-backdrop-filter: blur(48px) saturate(2.8) brightness(1.1) contrast(1.04);
-		border: 1px solid rgba(255, 255, 255, 0.78);
+			linear-gradient(125deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0) 40%),
+			rgba(247, 246, 251, 0.08);
+		backdrop-filter: blur(24px) saturate(1.7) brightness(1.05);
+		-webkit-backdrop-filter: blur(24px) saturate(1.7) brightness(1.05);
+		border: 1px solid rgba(255, 255, 255, 0.7);
 		box-shadow:
 			0 56px 150px -45px rgba(17, 16, 20, 0.5),
-			0 0 0 1px rgba(255, 255, 255, 0.14),
-			inset 0 1.5px 0 rgba(255, 255, 255, 1),
-			inset 0 -1px 0 rgba(255, 255, 255, 0.3),
-			inset 0 0 90px rgba(255, 255, 255, 0.18);
+			0 0 0 1px rgba(255, 255, 255, 0.1),
+			inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
+			inset 0 -1px 0 rgba(255, 255, 255, 0.24),
+			inset 0 0 64px rgba(255, 255, 255, 0.1);
 		pointer-events: auto;
 		transform-origin: center;
 		animation: swish-open 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -809,11 +809,11 @@
 		justify-content: space-between;
 		padding: 0.95rem 1.4rem;
 		margin: 0 -1.4rem 2.4rem;
-		background: rgba(243, 242, 247, 0.34);
-		backdrop-filter: blur(30px) saturate(2.4) brightness(1.08);
-		-webkit-backdrop-filter: blur(30px) saturate(2.4) brightness(1.08);
-		border-bottom: 1px solid rgba(255, 255, 255, 0.6);
-		box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.85);
+		background: rgba(243, 242, 247, 0.2);
+		backdrop-filter: blur(22px) saturate(1.7) brightness(1.04);
+		-webkit-backdrop-filter: blur(22px) saturate(1.7) brightness(1.04);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+		box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.8);
 	}
 	@media (min-width: 768px) {
 		.panel-head {
