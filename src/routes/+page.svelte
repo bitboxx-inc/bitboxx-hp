@@ -6,28 +6,13 @@
 	import orreryData from '$lib/data/orrery.json';
 	import PrivacyPolicy from '$lib/domains/PrivacyPolicy.svelte';
 	import Orrery, { type OrreryItem } from '$lib/components/Orrery.svelte';
+	import { SITE_URL, SITE_NAME, SITE_ALT_NAMES, CONTACT_EMAIL, abs } from '$lib/site';
 
-	const SITE_URL = 'https://bitboxx.co.jp/';
-
-	const orgJsonLd = {
-		'@context': 'https://schema.org',
-		'@type': 'Organization',
-		name: companyInfo.name,
-		url: SITE_URL,
-		logo: `${SITE_URL}black.svg`,
-		email: 'contact@bitboxx.co.jp',
-		foundingDate: companyInfo.established,
-		address: {
-			'@type': 'PostalAddress',
-			postalCode: companyInfo.postcode,
-			addressRegion: '東京都',
-			addressLocality: '中央区',
-			streetAddress: '日本橋箱崎町16-11 ルミネ日本橋601',
-			addressCountry: 'JP'
-		}
-	};
-	const jsonLdTag =
-		'<scr' + 'ipt type="application/ld+json">' + JSON.stringify(orgJsonLd) + '</scr' + 'ipt>';
+	// ── 検索/回答エンジン向けメタ ──
+	// タイトルは社名のみ。説明文と構造化データで事業内容・キーワードを補う。
+	const PAGE_TITLE = SITE_NAME;
+	const PAGE_DESCRIPTION =
+		'株式会社bitboxx（ビットボックス）は、東京・日本橋のプロダクト／システム開発会社です。Excellent / Kawaii / Unique の三つのものさしで、企画・設計から開発・運用・保守・技術顧問までを一貫して手がけます。';
 
 	// 軌道の構造は JSON で定義 (src/lib/data/orrery.json)。
 	// 動作はノードごとに content / href / children のいずれかで判定する。
@@ -136,6 +121,67 @@
 	const titles: Record<string, { en: string; ja: string }> = Object.fromEntries(
 		nodes.map((n) => [n.id, { en: n.en, ja: n.label }])
 	);
+
+	// ── 構造化データ (JSON-LD) ──
+	// 回答エンジン (AI 検索) が「何をする会社か」を抽出できるよう、Organization に
+	// 別名・スローガン・事業カタログ (services から生成) まで載せる。WebSite は
+	// Google が正しいサイト名を表示するための宣言。
+	const orgId = `${SITE_URL}#organization`;
+	const websiteId = `${SITE_URL}#website`;
+
+	const organizationLd = {
+		'@type': 'Organization',
+		'@id': orgId,
+		name: SITE_NAME,
+		alternateName: SITE_ALT_NAMES,
+		url: SITE_URL,
+		logo: { '@type': 'ImageObject', url: abs('black.svg') },
+		image: abs('og.png'),
+		description: PAGE_DESCRIPTION,
+		slogan: 'Excellent. Kawaii. Unique.',
+		email: CONTACT_EMAIL,
+		foundingDate: companyInfo.established,
+		founder: { '@type': 'Person', name: companyInfo.representative.replace(/^代表取締役\s*/, '') },
+		areaServed: 'JP',
+		knowsAbout: ['プロダクト開発', 'システム開発', 'UI/UX設計', '運用保守', '技術顧問'],
+		address: {
+			'@type': 'PostalAddress',
+			postalCode: companyInfo.postcode,
+			addressRegion: '東京都',
+			addressLocality: '中央区',
+			streetAddress: '日本橋箱崎町16-11 ルミネ日本橋601',
+			addressCountry: 'JP'
+		},
+		contactPoint: {
+			'@type': 'ContactPoint',
+			email: CONTACT_EMAIL,
+			contactType: 'sales',
+			areaServed: 'JP',
+			availableLanguage: ['ja']
+		},
+		hasOfferCatalog: {
+			'@type': 'OfferCatalog',
+			name: '事業内容',
+			itemListElement: services.map((s) => ({
+				'@type': 'Offer',
+				itemOffered: { '@type': 'Service', name: s.title, description: s.deliverable }
+			}))
+		}
+	};
+
+	const websiteLd = {
+		'@type': 'WebSite',
+		'@id': websiteId,
+		url: SITE_URL,
+		name: SITE_NAME,
+		alternateName: SITE_ALT_NAMES,
+		inLanguage: 'ja',
+		publisher: { '@id': orgId }
+	};
+
+	const jsonLd = { '@context': 'https://schema.org', '@graph': [organizationLd, websiteLd] };
+	const jsonLdTag =
+		'<scr' + 'ipt type="application/ld+json">' + JSON.stringify(jsonLd) + '</scr' + 'ipt>';
 
 	// ── アプリ状態 ──
 	let mounted = false; // ハイドレーション後に orrery モードへ
@@ -254,27 +300,25 @@
 </script>
 
 <svelte:head>
-	<title>bitboxx | Excellent. Kawaii. Unique.</title>
-	<meta
-		name="description"
-		content="bitboxx (ビットボックス) は、Excellent / Kawaii / Unique の三つのものさしで、事業の核となるプロダクトとシステムを設計・開発する東京のエンジニアリング会社です。"
-	/>
+	<title>{PAGE_TITLE}</title>
+	<meta name="description" content={PAGE_DESCRIPTION} />
+	<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1" />
+	<meta name="author" content={SITE_NAME} />
 	<link rel="canonical" href={SITE_URL} />
 	<meta property="og:type" content="website" />
-	<meta property="og:site_name" content="bitboxx" />
-	<meta property="og:title" content="bitboxx | Excellent. Kawaii. Unique." />
-	<meta
-		property="og:description"
-		content="Excellent / Kawaii / Unique の三つのものさしで、事業の核となるプロダクトとシステムを設計・開発する東京のエンジニアリング会社。"
-	/>
+	<meta property="og:site_name" content={SITE_NAME} />
+	<meta property="og:title" content={PAGE_TITLE} />
+	<meta property="og:description" content={PAGE_DESCRIPTION} />
 	<meta property="og:url" content={SITE_URL} />
-	<meta property="og:image" content={`${SITE_URL}og.png`} />
+	<meta property="og:image" content={abs('og.png')} />
 	<meta property="og:image:width" content="1200" />
 	<meta property="og:image:height" content="630" />
+	<meta property="og:image:alt" content="株式会社bitboxx — Excellent. Kawaii. Unique." />
 	<meta property="og:locale" content="ja_JP" />
 	<meta name="twitter:card" content="summary_large_image" />
-	<meta name="twitter:title" content="bitboxx | Excellent. Kawaii. Unique." />
-	<meta name="twitter:image" content={`${SITE_URL}og.png`} />
+	<meta name="twitter:title" content={PAGE_TITLE} />
+	<meta name="twitter:description" content={PAGE_DESCRIPTION} />
+	<meta name="twitter:image" content={abs('og.png')} />
 	<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 	{@html jsonLdTag}
 </svelte:head>

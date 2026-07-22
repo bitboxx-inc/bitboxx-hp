@@ -1,0 +1,6 @@
+# 全クローラを許可。AI 回答エンジン (GPTBot / ClaudeBot / PerplexityBot 等) も
+# 既定で読み取り可 — AEO のため明示的にブロックはしない。
+User-agent: *
+Allow: /
+
+Sitemap: https://bitboxx.co.jp/sitemap.xml
