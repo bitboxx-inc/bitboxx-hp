@@ -7,6 +7,7 @@
 	import PrivacyPolicy from '$lib/domains/PrivacyPolicy.svelte';
 	import Orrery, { type OrreryItem } from '$lib/components/Orrery.svelte';
 	import { SITE_URL, SITE_NAME, SITE_ALT_NAMES, CONTACT_EMAIL, abs } from '$lib/site';
+	import { newsIndex } from '$lib/news/loader';
 
 	// ── 検索/回答エンジン向けメタ ──
 	// タイトルは社名のみ。説明文と構造化データで事業内容・キーワードを補う。
@@ -189,18 +190,31 @@
 	let view: ViewId | null = null;
 	let orrery: Orrery;
 
+	// お知らせ (NEWS)。惑星ではないので view として別扱いする。
+	const latestNews = newsIndex[0] ?? null;
+	let beaconIsNew = false; // 直近30日以内の新着があれば HUD ビーコンの赤点を灯す
+	const isViewId = (h: string) => planets.some((p) => p.id === h) || h === 'news';
+	function daysSince(sortKey: string): number {
+		const [y, m, d] = sortKey.split('.').map(Number);
+		if (!y || !m || !d) return Infinity;
+		return (Date.now() - new Date(y, m - 1, d).getTime()) / 86400000;
+	}
+
 	onMount(() => {
 		mounted = true;
 		// 幕のフェード完了後に DOM から除去
 		const introTimer = setTimeout(() => (showIntro = false), 650);
+		beaconIsNew = !!latestNews && daysSince(latestNews.sortKey) <= 30;
 		const fromHash = (location.hash || '').replace('#', '') as ViewId;
 		if (planets.some((p) => p.id === fromHash)) {
 			view = fromHash;
 			orrery?.focusTo(fromHash);
+		} else if (fromHash === 'news') {
+			view = 'news';
 		}
 		const onPop = () => {
 			const h = (location.hash || '').replace('#', '') as ViewId;
-			if (planets.some((p) => p.id === h)) enter(h, false);
+			if (isViewId(h)) enter(h, false);
 			else back(false);
 		};
 		window.addEventListener('popstate', onPop);
@@ -346,6 +360,23 @@
 				<div class="absolute left-5 md:left-9 top-5 md:top-8">
 					<img src="{base}/black.svg" alt="bitboxx" class="h-5 md:h-6 w-auto opacity-[0.45]" />
 				</div>
+
+				<!-- ロゴ直下: お知らせ「交信ビーコン」— 最新1件を静かに表示。押すと NEWS ウィンドウが開く。
+				     中心の「!?」コアが発する交信、という見立て。惑星系(5立体)には手を入れない。 -->
+				{#if latestNews}
+					<button
+						class="news-beacon pointer-events-auto absolute left-5 md:left-9 top-[3.05rem] md:top-[4.05rem] text-left"
+						on:click={() => enter('news', true)}
+						aria-label={`お知らせ: ${latestNews.title}`}
+					>
+						<span class="beacon-rule" aria-hidden="true"></span>
+						<span class="beacon-meta font-techno">
+							{#if beaconIsNew}<span class="beacon-dot" aria-hidden="true"></span>{/if}
+							NEWS<span class="beacon-sep">·</span><span class="font-mono">{latestNews.date}</span>
+						</span>
+						<span class="beacon-title font-mincho">{latestNews.title}</span>
+					</button>
+				{/if}
 				<div
 					class="font-techno absolute right-5 md:right-9 top-5 md:top-8 text-right text-[6px] md:text-[9px] leading-[2] tracking-[0.22em] md:tracking-[0.3em] text-ink/55"
 				>
@@ -534,6 +565,43 @@
 							</div>
 						{/each}
 					</dl>
+				</div>
+			</section>
+		{/if}
+
+		{#if newsIndex.length && (!mounted || view === 'news')}
+			<section id="news" class="doc-section" bind:this={panelScroller}>
+				{#if mounted}<div class="panel-head">
+						<button class="back-btn" on:click={() => back()}>← 戻る</button>
+						<p class="panel-en">NEWS</p>
+					</div>{/if}
+				<div class="panel-inner">
+					<h2 class="sec-label">お知らせ</h2>
+					<ol class="mt-8 md:mt-12">
+						{#each newsIndex as n (n.slug)}
+							<li class="grid md:grid-cols-12 gap-2 md:gap-10 py-8 md:py-10 border-t border-ink/15">
+								<div class="md:col-span-3 flex items-center gap-3 md:pt-1">
+									<time class="font-mono text-[12px] tracking-[0.12em] text-ink/55" datetime={n.date}
+										>{n.date}</time
+									>
+									{#if n.category}<span class="news-cat">{n.category}</span>{/if}
+								</div>
+								<div class="md:col-span-9 max-w-2xl">
+									<h3 class="font-mincho text-[16px] md:text-[19px] leading-[1.7] text-ink">
+										{n.title}
+									</h3>
+									{#if n.html}
+										<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+										<div
+											class="news-body mt-3 font-mincho text-[13px] md:text-[14px] leading-[2] text-ink/70"
+										>
+											{@html n.html}
+										</div>
+									{/if}
+								</div>
+							</li>
+						{/each}
+					</ol>
 				</div>
 			</section>
 		{/if}
@@ -751,6 +819,105 @@
 		width: 34px;
 		height: 1px;
 		background: linear-gradient(90deg, rgba(255, 38, 48, 0.7), rgba(255, 38, 48, 0));
+	}
+
+	/* ── お知らせ「交信ビーコン」(HUD 左上・ロゴ直下) ── */
+	.news-beacon {
+		display: block;
+		max-width: 46vw;
+		padding-top: 0.55rem;
+	}
+	/* ロゴと切り離す細い罫。左端からスッと伸びる (HUD の EST 表記と同じ精度感) */
+	.news-beacon .beacon-rule {
+		display: block;
+		width: 26px;
+		height: 1px;
+		margin-bottom: 0.5rem;
+		background: linear-gradient(90deg, rgba(17, 16, 20, 0.35), rgba(17, 16, 20, 0));
+	}
+	.beacon-meta {
+		display: flex;
+		align-items: center;
+		font-size: 7px;
+		letter-spacing: 0.28em;
+		color: rgba(17, 16, 20, 0.55);
+		line-height: 1;
+	}
+	.beacon-sep {
+		margin: 0 0.5em;
+		color: rgba(17, 16, 20, 0.3);
+	}
+	/* 「新着あり」の合図。赤は焦点レティクル同様ごく控えめに、点のみ。 */
+	.beacon-dot {
+		width: 5px;
+		height: 5px;
+		margin-right: 0.7em;
+		border-radius: 9999px;
+		background: #ff2630;
+		box-shadow: 0 0 0 0 rgba(255, 38, 48, 0.55);
+		animation: beacon-pulse 2.4s ease-out infinite;
+	}
+	.beacon-title {
+		display: block;
+		margin-top: 0.5rem;
+		max-width: 100%;
+		font-size: 11px;
+		line-height: 1.5;
+		color: rgba(17, 16, 20, 0.72);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		transition: color 0.2s ease;
+	}
+	@media (min-width: 768px) {
+		.beacon-meta {
+			font-size: 8px;
+		}
+		.beacon-title {
+			font-size: 12.5px;
+			max-width: 20rem;
+		}
+	}
+	.news-beacon:hover .beacon-title {
+		color: #ff2630;
+	}
+	.news-beacon:focus-visible {
+		outline: 1px solid rgba(255, 38, 48, 0.6);
+		outline-offset: 5px;
+		border-radius: 2px;
+	}
+	@keyframes beacon-pulse {
+		0% {
+			box-shadow: 0 0 0 0 rgba(255, 38, 48, 0.5);
+		}
+		70% {
+			box-shadow: 0 0 0 7px rgba(255, 38, 48, 0);
+		}
+		100% {
+			box-shadow: 0 0 0 0 rgba(255, 38, 48, 0);
+		}
+	}
+
+	/* ── お知らせウィンドウ内: カテゴリタグ (赤い縦罫) と本文 ── */
+	.news-cat {
+		font-family: 'Michroma', 'Space Grotesk', sans-serif;
+		font-size: 9px;
+		letter-spacing: 0.2em;
+		line-height: 1;
+		color: rgba(17, 16, 20, 0.5);
+		padding-left: 0.55rem;
+		border-left: 2px solid rgba(255, 38, 48, 0.55);
+	}
+	.news-body :global(p) {
+		margin: 0;
+	}
+	.news-body :global(p + p) {
+		margin-top: 0.9em;
+	}
+	.news-body :global(a) {
+		color: #ff2630;
+		text-underline-offset: 3px;
+		text-decoration: underline;
 	}
 
 	/* 背面 — 宇宙はうっすら透ける */
